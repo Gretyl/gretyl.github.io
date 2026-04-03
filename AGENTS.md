@@ -15,9 +15,15 @@ Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, 
 
 ## Patterns in use
 
-- `tools/shadertoy.html` uses `@slider` annotations in GLSL comments to auto-generate UI controls — follow this pattern when adding shader presets
+- `docs/tools/shadertoy.html` uses `@slider` annotations in GLSL comments to auto-generate UI controls — follow this pattern when adding shader presets
 - Interactive pages (Artemis Trail, Shadertoy) are single-file HTML with embedded CSS and JS
-- Conventional commit messages: `type(scope): description`
+
+## Commits
+
+- **Atomic commits.** Each commit should contain exactly one logical change. Don't bundle unrelated edits.
+- **Conventional Commits.** Format: `type(scope): description`
+  - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+  - Scopes: match the area of the codebase — e.g., `shadertoy`, `artemis`, `jekyll`, `agents`
 
 ## Working with this repo
 
