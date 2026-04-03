@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebGL Shadertoy Harness</title>
+<style>
+:root {
+  --bg: #1a1a2e; --surface: #16213e; --text: #e4e4e4; --text-muted: #8899aa;
+  --accent: #22d3ee; --border: #2a2a4a; --error: #ff6b6b;
+  --editor-bg: #0d1117;
+  --sans: system-ui, -apple-system, sans-serif;
+  --mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: var(--sans); background: var(--bg); color: var(--text);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 380px 1fr;
+}
+
+/* Header */
+header {
+  grid-column: 1 / -1; display: flex; align-items: center;
+  justify-content: space-between; padding: 0.5rem 1rem;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+header h1 { font-size: 1.1rem; color: var(--accent); }
+.fps { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); }
+
+/* Editor panel */
+.editor-panel {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  padding: 0.5rem; overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+.editor-toolbar {
+  display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0;
+}
+.editor-toolbar select, .editor-toolbar button {
+  padding: 0.3rem 0.6rem; background: var(--surface); color: var(--accent);
+  border: 1px solid var(--border); border-radius: 4px;
+  font-family: var(--sans); font-size: 0.8rem; cursor: pointer;
+}
+.editor-toolbar select { flex: 1; color: var(--text); }
+.editor-toolbar button:hover { background: var(--border); }
+.editor-wrap {
+  flex: 1; position: relative; overflow: hidden; border-radius: 4px;
+  border: 1px solid var(--border);
+}
+#editor {
+  width: 100%; height: 100%; resize: none;
+  background: var(--editor-bg); color: var(--text);
+  font-family: var(--mono); font-size: 13px; line-height: 1.5;
+  tab-size: 2; padding: 0.5rem; border: none; outline: none;
+}
+#errors {
+  flex-shrink: 0; max-height: 6rem; overflow-y: auto;
+  font-family: var(--mono); font-size: 0.75rem; line-height: 1.4;
+  color: var(--error); white-space: pre-wrap; padding: 0 0.25rem;
+}
+#errors.ok { color: #66d9a0; }
+
+/* Parameters panel (auto-generated sliders) */
+.params-panel {
+  flex-shrink: 0; max-height: 10rem; overflow-y: auto;
+}
+.params-panel summary {
+  font-size: 0.8rem; color: var(--text-muted); cursor: pointer;
+  user-select: none;
+}
+.param-row {
+  display: flex; align-items: center; gap: 0.4rem; padding: 0.15rem 0;
+  font-size: 0.75rem; color: var(--text-muted);
+}
+.param-row label { min-width: 80px; text-align: right; font-family: var(--mono); }
+.param-row input[type=range] { flex: 1; }
+.param-row .param-val { width: 48px; font-family: var(--mono); text-align: left; }
+
+/* Canvas */
+.canvas-wrap {
+  position: relative; overflow: hidden; background: #000;
+}
+#glCanvas { display: block; width: 100%; height: 100%; }
+
+/* Controls bar */
+.controls {
+  grid-column: 1 / -1; display: flex; gap: 0.5rem;
+  align-items: center; padding: 0.4rem 1rem;
+  background: var(--surface); border-top: 1px solid var(--border);
+}
+.controls button {
+  padding: 0.3rem 0.8rem; background: var(--surface); color: var(--accent);
+  border: 1px solid var(--border); border-radius: 4px;
+  font-family: var(--sans); font-size: 0.8rem; cursor: pointer;
+}
+.controls button:hover { background: var(--border); }
+.controls .spacer { flex: 1; }
+.controls .hint {
+  font-size: 0.75rem; color: var(--text-muted); font-family: var(--mono);
+}
+
+/* Responsive: stack vertically on narrow screens */
+@media (max-width: 768px) {
+  body { grid-template-columns: 1fr; grid-template-rows: auto 40vh 1fr auto; }
+  .editor-panel { border-right: none; border-top: 1px solid var(--border); order: 1; }
+  .canvas-wrap { order: 0; }
+  .controls { order: 2; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>WebGL Shadertoy</h1>
+  <span class="fps" id="fps">FPS: --</span>
+</header>
+
+<div class="editor-panel">
+  <div class="editor-toolbar">
+    <select id="presetSelect"></select>
+    <button id="compileBtn" title="Ctrl+Enter">Compile</button>
+  </div>
+  <div class="params-panel" id="paramsPanel"></div>
+  <div class="editor-wrap">
+    <textarea id="editor" spellcheck="false" autocomplete="off" autocorrect="off"></textarea>
+  </div>
+  <div id="errors" class="ok">Ready</div>
+</div>
+
+<div class="canvas-wrap">
+  <canvas id="glCanvas"></canvas>
+</div>
+
+<div class="controls">
+  <button id="playBtn">Pause</button>
+  <button id="restartBtn">Restart</button>
+  <span class="spacer"></span>
+  <span class="hint">Ctrl+Enter = compile</span>
+  <button id="fullscreenBtn">Fullscreen</button>
+</div>
+
+<script type="module">
+import {
+  PRESETS, DEFAULT_PRESET,
+  wrapFragmentShader, parseCustomUniforms, preambleLineCount,
+} from './shaders.js';
+
+// ── WebGL bootstrap ────────────────────────────────────────────────────────
+const canvas = document.getElementById('glCanvas');
+const gl = canvas.getContext('webgl2');
+if (!gl) {
+  document.getElementById('errors').textContent = 'WebGL 2 is not supported in this browser.';
+  document.getElementById('errors').classList.remove('ok');
+  throw new Error('WebGL 2 not available');
+}
+
+// Empty VAO (required for gl_VertexID draws in WebGL 2)
+const vao = gl.createVertexArray();
+gl.bindVertexArray(vao);
+
+// Fixed vertex shader — fullscreen triangle via gl_VertexID
+const VERT_SRC = `#version 300 es
+void main() {
+  vec2 pos = vec2(
+    float((gl_VertexID & 1) << 2) - 1.0,
+    float((gl_VertexID & 2) << 1) - 1.0
+  );
+  gl_Position = vec4(pos, 0.0, 1.0);
+}
+`;
+
+function compileShader(type, src) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+    const log = gl.getShaderInfoLog(s);
+    gl.deleteShader(s);
+    return { ok: false, log };
+  }
+  return { ok: true, shader: s };
+}
+
+function linkProgram(vert, frag) {
+  const p = gl.createProgram();
+  gl.attachShader(p, vert);
+  gl.attachShader(p, frag);
+  gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+    const log = gl.getProgramInfoLog(p);
+    gl.deleteProgram(p);
+    return { ok: false, log };
+  }
+  return { ok: true, program: p };
+}
+
+// Compile the fixed vertex shader once
+const vertResult = compileShader(gl.VERTEX_SHADER, VERT_SRC);
+if (!vertResult.ok) throw new Error('Vertex shader failed: ' + vertResult.log);
+const vertShader = vertResult.shader;
+
+// ── State ──────────────────────────────────────────────────────────────────
+let currentProgram = null;
+let uniforms = {};        // cached uniform locations
+let customUniforms = [];  // [{name, min, max, value}]
+let customValues = {};    // name -> current slider value
+
+let running = true;
+let startTime = performance.now() / 1000;
+let pauseElapsed = 0;     // accumulated time when paused
+let frameCount = 0;
+
+let mouseX = 0, mouseY = 0, mouseClickX = 0, mouseClickY = 0;
+let mouseDown = false;
+
+// ── Shader compilation ─────────────────────────────────────────────────────
+const errorsEl = document.getElementById('errors');
+
+function adjustErrorLines(log, offset) {
+  return log.replace(/ERROR:\s*\d+:(\d+)/g, (match, line) => {
+    const adjusted = Math.max(1, parseInt(line, 10) - offset);
+    return `Line ${adjusted}`;
+  });
+}
+
+function tryCompile(userCode) {
+  const fullSrc = wrapFragmentShader(userCode);
+  const offset = preambleLineCount(userCode);
+
+  const fragResult = compileShader(gl.FRAGMENT_SHADER, fullSrc);
+  if (!fragResult.ok) {
+    errorsEl.textContent = adjustErrorLines(fragResult.log, offset);
+    errorsEl.classList.remove('ok');
+    return false;
+  }
+
+  const linkResult = linkProgram(vertShader, fragResult.shader);
+  gl.deleteShader(fragResult.shader);
+  if (!linkResult.ok) {
+    errorsEl.textContent = 'Link error: ' + linkResult.log;
+    errorsEl.classList.remove('ok');
+    return false;
+  }
+
+  // Success — swap programs
+  if (currentProgram) gl.deleteProgram(currentProgram);
+  currentProgram = linkResult.program;
+
+  // Cache built-in uniform locations
+  uniforms = {
+    iTime:       gl.getUniformLocation(currentProgram, 'iTime'),
+    iResolution: gl.getUniformLocation(currentProgram, 'iResolution'),
+    iMouse:      gl.getUniformLocation(currentProgram, 'iMouse'),
+    iFrame:      gl.getUniformLocation(currentProgram, 'iFrame'),
+  };
+
+  // Parse and rebuild custom uniform sliders
+  customUniforms = parseCustomUniforms(userCode);
+  for (const u of customUniforms) {
+    uniforms[u.name] = gl.getUniformLocation(currentProgram, u.name);
+    if (!(u.name in customValues)) customValues[u.name] = u.value;
+  }
+  buildParamSliders();
+
+  errorsEl.textContent = 'Compiled OK';
+  errorsEl.classList.add('ok');
+  return true;
+}
+
+// ── Custom parameter sliders ───────────────────────────────────────────────
+const paramsPanel = document.getElementById('paramsPanel');
+
+function buildParamSliders() {
+  if (customUniforms.length === 0) {
+    paramsPanel.innerHTML = '';
+    return;
+  }
+  let html = '<details open><summary>Parameters</summary>';
+  for (const u of customUniforms) {
+    const val = customValues[u.name] ?? u.value;
+    html += `<div class="param-row">
+      <label>${u.name}</label>
+      <input type="range" min="${u.min}" max="${u.max}" step="any"
+             value="${val}" data-param="${u.name}">
+      <span class="param-val" data-valfor="${u.name}">${val.toFixed(2)}</span>
+    </div>`;
+  }
+  html += '</details>';
+  paramsPanel.innerHTML = html;
+
+  // Wire up slider events
+  for (const input of paramsPanel.querySelectorAll('input[type=range]')) {
+    input.addEventListener('input', (e) => {
+      const name = e.target.dataset.param;
+      const v = parseFloat(e.target.value);
+      customValues[name] = v;
+      paramsPanel.querySelector(`[data-valfor="${name}"]`).textContent = v.toFixed(2);
+    });
+  }
+}
+
+// ── Preset dropdown ────────────────────────────────────────────────────────
+const presetSelect = document.getElementById('presetSelect');
+const editor = document.getElementById('editor');
+
+for (const name of Object.keys(PRESETS)) {
+  const opt = document.createElement('option');
+  opt.value = name;
+  opt.textContent = name;
+  presetSelect.appendChild(opt);
+}
+
+function loadPreset(name) {
+  editor.value = PRESETS[name];
+  customValues = {}; // reset slider values for new preset
+  tryCompile(editor.value);
+}
+
+presetSelect.addEventListener('change', () => loadPreset(presetSelect.value));
+
+// ── Editor events ──────────────────────────────────────────────────────────
+let debounceTimer = null;
+
+editor.addEventListener('input', () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => tryCompile(editor.value), 300);
+});
+
+// Tab inserts two spaces
+editor.addEventListener('keydown', (e) => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    editor.value = editor.value.substring(0, start) + '  ' + editor.value.substring(end);
+    editor.selectionStart = editor.selectionEnd = start + 2;
+  }
+  // Ctrl+Enter or Cmd+Enter = immediate compile
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    clearTimeout(debounceTimer);
+    tryCompile(editor.value);
+  }
+});
+
+// ── Mouse tracking (Shadertoy convention) ──────────────────────────────────
+canvas.addEventListener('mousedown', (e) => {
+  mouseDown = true;
+  const r = canvas.getBoundingClientRect();
+  const sx = canvas.width / r.width;
+  const sy = canvas.height / r.height;
+  mouseX = (e.clientX - r.left) * sx;
+  mouseY = canvas.height - (e.clientY - r.top) * sy;
+  mouseClickX = mouseX;
+  mouseClickY = mouseY;
+});
+
+canvas.addEventListener('mousemove', (e) => {
+  if (!mouseDown) return;
+  const r = canvas.getBoundingClientRect();
+  const sx = canvas.width / r.width;
+  const sy = canvas.height / r.height;
+  mouseX = (e.clientX - r.left) * sx;
+  mouseY = canvas.height - (e.clientY - r.top) * sy;
+});
+
+window.addEventListener('mouseup', () => {
+  if (mouseDown) {
+    mouseDown = false;
+    mouseClickX = -Math.abs(mouseClickX);
+    mouseClickY = -Math.abs(mouseClickY);
+  }
+});
+
+// Touch support
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  const t = e.touches[0];
+  canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: t.clientX, clientY: t.clientY }));
+}, { passive: false });
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  const t = e.touches[0];
+  canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: t.clientX, clientY: t.clientY }));
+}, { passive: false });
+canvas.addEventListener('touchend', () => {
+  window.dispatchEvent(new MouseEvent('mouseup'));
+});
+
+// ── Controls ───────────────────────────────────────────────────────────────
+const playBtn = document.getElementById('playBtn');
+const restartBtn = document.getElementById('restartBtn');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+playBtn.addEventListener('click', () => {
+  if (running) {
+    running = false;
+    pauseElapsed = getElapsed();
+    playBtn.textContent = 'Play';
+  } else {
+    running = true;
+    startTime = performance.now() / 1000 - pauseElapsed;
+    playBtn.textContent = 'Pause';
+  }
+});
+
+restartBtn.addEventListener('click', () => {
+  startTime = performance.now() / 1000;
+  pauseElapsed = 0;
+  frameCount = 0;
+  mouseX = mouseY = mouseClickX = mouseClickY = 0;
+  mouseDown = false;
+  if (!running) {
+    running = true;
+    playBtn.textContent = 'Pause';
+  }
+});
+
+fullscreenBtn.addEventListener('click', () => {
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  } else {
+    canvas.requestFullscreen().catch(() => {});
+  }
+});
+
+// ── FPS counter ────────────────────────────────────────────────────────────
+const fpsEl = document.getElementById('fps');
+let fpsFrames = 0;
+let fpsLastTime = performance.now();
+
+function updateFPS() {
+  fpsFrames++;
+  const now = performance.now();
+  if (now - fpsLastTime >= 1000) {
+    fpsEl.textContent = `FPS: ${fpsFrames}`;
+    fpsFrames = 0;
+    fpsLastTime = now;
+  }
+}
+
+// ── Render loop ────────────────────────────────────────────────────────────
+function getElapsed() {
+  return running
+    ? performance.now() / 1000 - startTime
+    : pauseElapsed;
+}
+
+function resizeCanvas() {
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  if (canvas.width !== w || canvas.height !== h) {
+    canvas.width = w;
+    canvas.height = h;
+    gl.viewport(0, 0, w, h);
+  }
+}
+
+function frame() {
+  requestAnimationFrame(frame);
+  resizeCanvas();
+  updateFPS();
+
+  if (!currentProgram) return;
+
+  const elapsed = getElapsed();
+
+  gl.useProgram(currentProgram);
+
+  // Built-in uniforms
+  if (uniforms.iTime !== null)
+    gl.uniform1f(uniforms.iTime, elapsed);
+  if (uniforms.iResolution !== null)
+    gl.uniform3f(uniforms.iResolution, canvas.width, canvas.height, window.devicePixelRatio);
+  if (uniforms.iMouse !== null)
+    gl.uniform4f(uniforms.iMouse, mouseX, mouseY,
+                 mouseDown ? mouseClickX : mouseClickX,
+                 mouseDown ? mouseClickY : mouseClickY);
+  if (uniforms.iFrame !== null)
+    gl.uniform1i(uniforms.iFrame, frameCount);
+
+  // Custom uniforms from sliders
+  for (const u of customUniforms) {
+    const loc = uniforms[u.name];
+    if (loc !== null) {
+      gl.uniform1f(loc, customValues[u.name] ?? u.value);
+    }
+  }
+
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  if (running) frameCount++;
+}
+
+// ── Context loss handling ──────────────────────────────────────────────────
+canvas.addEventListener('webglcontextlost', (e) => {
+  e.preventDefault();
+  errorsEl.textContent = 'WebGL context lost. Waiting for restore...';
+  errorsEl.classList.remove('ok');
+});
+
+canvas.addEventListener('webglcontextrestored', () => {
+  // Re-create GL resources
+  gl.bindVertexArray(gl.createVertexArray());
+  const vr = compileShader(gl.VERTEX_SHADER, VERT_SRC);
+  if (vr.ok) {
+    // Can't reassign const, but vertShader is module-scoped — rebuild program
+    tryCompile(editor.value);
+  }
+});
+
+// ── Init ───────────────────────────────────────────────────────────────────
+loadPreset(DEFAULT_PRESET);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
