@@ -6,16 +6,6 @@ Guidelines for AI agents contributing to this repository.
 
 Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, no package manager, no tests. Changes go live immediately when pushed to `main`.
 
-## Structure
-
-```
-index.html              Site root / landing page
-artemis-trail.html      Interactive lunar mission simulator
-tools/
-  shadertoy.html        WebGL shader IDE with live preview
-  shaders.js            Shader utilities, preset library, @slider parser
-```
-
 ## Key considerations
 
 - **No safety net.** Without tests or CI, review changes carefully before pushing. Validate HTML structure and JS correctness by reading the code.
