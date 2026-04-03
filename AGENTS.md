@@ -2,9 +2,9 @@
 
 Guidelines for AI agents contributing to this repository.
 
-## What we know
+## Repository
 
-This is a small, static GitHub Pages site. There are no tests, no linter, no CI pipeline, and no build step. Changes go live immediately when pushed to `main`.
+Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, no package manager, no tests. Changes go live immediately when pushed to `main`.
 
 ## Key considerations
 
@@ -18,6 +18,11 @@ This is a small, static GitHub Pages site. There are no tests, no linter, no CI 
 - `tools/shaders.js` uses `@slider` annotations in GLSL comments to auto-generate UI controls — follow this pattern when adding shader presets
 - Interactive pages (Artemis Trail, Shadertoy) are single-file HTML with embedded CSS and JS
 - Conventional commit messages: `type(scope): description`
+
+## Working with this repo
+
+- Edit HTML/JS files directly — there is nothing to compile or bundle
+- Open `.html` files in a browser to test locally
 
 ## Before pushing
 
