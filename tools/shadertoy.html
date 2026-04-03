@@ -175,6 +175,21 @@ function parseCustomUniforms(code) {
   return results;
 }
 
+function stripConflictingLines(code) {
+  return code
+    .split('\n')
+    .map(line => {
+      const t = line.trim();
+      if (/^#version\b/.test(t)) return '';
+      if (/^precision\s+(lowp|mediump|highp)\s+float\s*;/.test(t)) return '';
+      if (/^uniform\s+\w+\s+i(Time|Resolution|Mouse|Frame)\s*;/.test(t)) return '';
+      if (/^uniform\s+float\s+\w+\s*;\s*\/\/\s*@slider\b/.test(t)) return '';
+      if (/^out\s+vec4\s+fragColor_out\s*;/.test(t)) return '';
+      return line;
+    })
+    .join('\n');
+}
+
 function wrapFragmentShader(userCode, customs) {
   if (!customs) customs = parseCustomUniforms(userCode);
   const customDecls = customs
@@ -184,13 +199,19 @@ function wrapFragmentShader(userCode, customs) {
     PREAMBLE +
     (customDecls ? customDecls + '\n' : '') +
     'out vec4 fragColor_out;\n';
-  return preamble + '\n' + userCode + EPILOGUE;
+  return preamble + '\n' + stripConflictingLines(userCode) + EPILOGUE;
 }
 
 function preambleLineCount(userCode, customs) {
-  const wrapped = wrapFragmentShader(userCode, customs);
-  const beforeUser = wrapped.split(userCode)[0];
-  return beforeUser.split('\n').length - 1;
+  if (!customs) customs = parseCustomUniforms(userCode);
+  const customDecls = customs
+    .map((u) => `uniform float ${u.name};`)
+    .join('\n');
+  const preamble =
+    PREAMBLE +
+    (customDecls ? customDecls + '\n' : '') +
+    'out vec4 fragColor_out;\n';
+  return preamble.split('\n').length;
 }
 
 const PRESETS = {
