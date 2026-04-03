@@ -15,7 +15,7 @@ Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, 
 
 ## Patterns in use
 
-- `tools/shaders.js` uses `@slider` annotations in GLSL comments to auto-generate UI controls — follow this pattern when adding shader presets
+- `tools/shadertoy.html` uses `@slider` annotations in GLSL comments to auto-generate UI controls — follow this pattern when adding shader presets
 - Interactive pages (Artemis Trail, Shadertoy) are single-file HTML with embedded CSS and JS
 - Conventional commit messages: `type(scope): description`
 
@@ -23,6 +23,7 @@ Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, 
 
 - Edit HTML/JS files directly — there is nothing to compile or bundle
 - Open `.html` files in a browser to test locally
+- Use `uvx rodney` for headless Chrome browser validation (e.g., `uvx rodney start`, `uvx rodney open <url>`, `uvx rodney js '<expr>'`)
 
 ## Before pushing
 

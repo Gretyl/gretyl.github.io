@@ -183,6 +183,7 @@ function stripConflictingLines(code) {
       if (/^#version\b/.test(t)) return '';
       if (/^precision\s+(lowp|mediump|highp)\s+float\s*;/.test(t)) return '';
       if (/^uniform\s+\w+\s+i(Time|Resolution|Mouse|Frame)\s*;/.test(t)) return '';
+      if (/^uniform\s+float\s+\w+\s*;\s*\/\/\s*@slider\b/.test(t)) return '';
       if (/^out\s+vec4\s+fragColor_out\s*;/.test(t)) return '';
       return line;
     })
