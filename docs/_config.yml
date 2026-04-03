@@ -1,3 +1,18 @@
-theme: jekyll-theme-minimal
+remote_theme: vaibhavvikas/jekyll-theme-minimalistic
+plugins:
+  - jekyll-remote-theme
+
 title: Gretyl
 description: Projects and tools
+
+navigation:
+  - name: Projects
+    link: ./#projects
+    sublist:
+      - name: Artemis Trail
+        link: ./artemis-trail.html
+  - name: Tools
+    link: ./#tools
+    sublist:
+      - name: Shadertoy Harness
+        link: ./tools/shadertoy.html
