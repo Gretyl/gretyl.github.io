@@ -175,7 +175,7 @@ async function insertScore(name, depth) {
   await saveScores(s);
 }
 async function resetScores() {
-  await saveScores([...SEED_SCORES]);
+  await saveScores(Math.random() < 1/3 ? [] : [...SEED_SCORES]);
 }
 
 // Preload scores on start
