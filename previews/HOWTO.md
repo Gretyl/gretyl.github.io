@@ -1,10 +1,14 @@
-# MOCKING.md
+# HOWTO.md
 
 How to generate preview screenshots of Jekyll-themed pages without running Jekyll locally.
 
 ## The `previews/` directory
 
-This directory lives at the repo root, outside `docs/`, so its contents are not served by GitHub Pages. It holds mock-generated screenshot PNGs that are committed to feature branches for PR review. These files are development artifacts — they let reviewers see how a change will look with the Jekyll theme applied, without requiring deployment.
+This directory lives at the repo root, outside `docs/`, so its contents are not served by GitHub Pages. It holds:
+
+- **`sidebar-mock.html`** — a standalone HTML template that replicates the remote theme's sidebar layout with inlined CSS. Edit this file to reflect content changes, then screenshot it. If the upstream theme changes, re-fetch the source files (step 1 below) and update the mock.
+- **`*.png`** — screenshot artifacts committed to feature branches for PR review. These let reviewers see how a change will look with the Jekyll theme applied, without requiring deployment.
+- **`HOWTO.md`** — this file.
 
 ## Why mock?
 
@@ -12,7 +16,7 @@ This site uses `jekyll-remote-theme` with `vaibhavvikas/jekyll-theme-minimalisti
 
 ## Steps
 
-### 1. Fetch theme source files
+### 1. Fetch theme source files (only if the upstream theme changes)
 
 Download the layout and SCSS from the remote theme repo using `curl`:
 
@@ -24,34 +28,19 @@ curl -sL "https://raw.githubusercontent.com/vaibhavvikas/jekyll-theme-minimalist
 curl -sL "https://raw.githubusercontent.com/vaibhavvikas/jekyll-theme-minimalistic/master/_sass/jekyll-theme-minimalistic.scss" -o /tmp/theme-style.scss
 ```
 
-### 2. Build a mock HTML file
+Then update `sidebar-mock.html` to match.
 
-Create a standalone HTML file (e.g., `/tmp/sidebar-mock.html`) that:
+### 2. Update the mock HTML
 
-- Inlines the theme's CSS (from `jekyll-theme-minimalistic.scss`) as plain CSS in a `<style>` block — strip `@import` lines and replace SCSS color variables with hardcoded CSS custom properties
-- Replicates the theme's HTML structure: `.wrapper` > `.sidebar` + `section`
-- Populates the sidebar with the same elements the theme includes render (logo, title, description, navigation)
-- References local assets via absolute paths (e.g., `/home/user/gretyl.github.io/docs/assets/avatar.png`)
+Edit `previews/sidebar-mock.html` to reflect the change being previewed (e.g., new navigation items, updated content, new assets). The mock already has the theme's CSS inlined and the correct HTML structure — most changes only require editing the `<section>` content or sidebar navigation.
 
-Key CSS variables for the light color scheme:
-
-```css
-:root {
-  --clr-bg: #fff;
-  --clr-text: #606c71;
-  --clr-h1-and-bold: #333;
-  --clr-h2: #586069;
-  --clr-a-text: #1e6bb8;
-  --clr-a-text-hvr: #159957;
-  --clr-splitter-blockquote-and-section: #ddd;
-}
-```
+For asset references, use absolute paths to the repo's `docs/` directory (e.g., `docs/assets/avatar.png` resolved from the repo root).
 
 ### 3. Screenshot with rodney
 
 ```bash
 uvx rodney start
-uvx rodney open "file:///tmp/sidebar-mock.html"
+uvx rodney open "file://$(pwd)/previews/sidebar-mock.html"
 uvx rodney waitload
 uvx rodney sleep 1
 uvx rodney screenshot -w 960 -h 700 previews/hero-headshot-preview.png
