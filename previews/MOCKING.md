@@ -2,6 +2,10 @@
 
 How to generate preview screenshots of Jekyll-themed pages without running Jekyll locally.
 
+## The `previews/` directory
+
+This directory lives at the repo root, outside `docs/`, so its contents are not served by GitHub Pages. It holds mock-generated screenshot PNGs that are committed to feature branches for PR review. These files are development artifacts — they let reviewers see how a change will look with the Jekyll theme applied, without requiring deployment.
+
 ## Why mock?
 
 This site uses `jekyll-remote-theme` with `vaibhavvikas/jekyll-theme-minimalistic`. Opening raw `.html` files in a browser shows unstyled content with visible front matter and Liquid tags. Running Jekyll locally requires resolving gem version conflicts (`jekyll-sass-converter` vs `jekyll-remote-theme`). Mocking the theme layout in a standalone HTML file sidesteps both problems.
@@ -50,14 +54,14 @@ uvx rodney start
 uvx rodney open "file:///tmp/sidebar-mock.html"
 uvx rodney waitload
 uvx rodney sleep 1
-uvx rodney screenshot -w 960 -h 700 hero-headshot-preview.png
+uvx rodney screenshot -w 960 -h 700 previews/hero-headshot-preview.png
 ```
 
 The `-w` and `-h` flags set the viewport size. Use `960` width to see the desktop sidebar layout; use `720` or below to test the mobile-responsive collapsed view.
 
 ### 4. Commit the screenshot for PR review
 
-Push the PNG to the feature branch so reviewers can see it in the PR diff without deploying.
+Save screenshots to `previews/` and push to the feature branch so reviewers can see them in the PR diff without deploying.
 
 ## Image processing
 

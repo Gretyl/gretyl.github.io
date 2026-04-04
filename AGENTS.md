@@ -40,7 +40,7 @@ Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, 
 - Edit HTML/JS files directly — there is nothing to compile or bundle
 - Open `.html` files in a browser to test locally
 - Use `uvx rodney` for headless Chrome browser validation (e.g., `uvx rodney start`, `uvx rodney open <url>`, `uvx rodney js '<expr>'`)
-- For previewing Jekyll-themed pages without running Jekyll, see [MOCKING.md](MOCKING.md)
+- For previewing Jekyll-themed pages without running Jekyll, see [previews/MOCKING.md](previews/MOCKING.md)
 
 ## Before pushing
 
