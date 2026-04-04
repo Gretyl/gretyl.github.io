@@ -56,7 +56,7 @@ PNGs in `previews/` are gitignored by default to avoid shipping accidental scree
 git add -f previews/my-preview.png
 ```
 
-Remove preview PNGs before merging — they are ephemeral review artifacts, not permanent repo content.
+Preview PNGs are ephemeral review artifacts, not permanent repo content. Do not remove them until the user explicitly asks — their presence on the branch is how we collaborate via the PR. Removing them is the signal that the branch is ready to merge into `main`.
 
 ## Image processing
 
