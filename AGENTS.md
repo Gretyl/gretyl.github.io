@@ -23,6 +23,10 @@ Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, 
 - Navigation in `docs/_config.yml` must be updated when adding new entries (add to the `Entries` sublist)
 - **Analytics:** Jekyll-rendered pages (with front matter) use `{% include analytics.html %}`. Standalone HTML files (no front matter) must inline the raw GA4 snippet in `<head>` instead — Jekyll does not process Liquid tags in files without front matter, so `{% include %}` would appear as literal text
 
+## Branching workflow
+
+- **Feature branches + PRs.** Create a descriptively-named branch and open a PR for all changes — do not commit directly to `main`. The repo has branch protection requiring PRs, and pushes to `main` deploy immediately.
+
 ## Commits
 
 - **Atomic commits.** Each commit should contain exactly one logical change. Don't bundle unrelated edits.
