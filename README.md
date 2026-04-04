@@ -2,23 +2,14 @@
 
 Personal GitHub Pages site with interactive tools and experiments, served via Jekyll with the [Minimal](https://github.com/pages-themes/minimal) theme.
 
-## What's here
+## Arcade
 
 - [Artemis Trail](docs/artemis-trail.html) — interactive lunar mission simulator
-- [WebGL Shadertoy harness](docs/tools/shadertoy.html) — shader IDE with `@slider` annotations for live parameter tuning
+- [Implode](docs/implode.html) — promoting the ethical consumption of billionaires
 
-## Repo structure
+## Tools
 
-```
-docs/               ← GitHub Pages publishing source
-  _config.yml       ← Jekyll config (minimal theme)
-  index.html
-  artemis-trail.html
-  tools/
-    shadertoy.html
-AGENTS.md           ← guidelines for AI agents
-CLAUDE.md
-```
+- [Shadertoy Harness](docs/tools/shadertoy.html) — shader IDE with `@slider` annotations for live parameter tuning
 
 ## Development
 
