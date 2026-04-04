@@ -139,12 +139,25 @@ const SCORE_KEY = 'leaderboard-v2';
 let cachedScores = [];
 let scoresLoaded = false;
 
+const SEED_SCORES = [
+  {name:'GSA',depth:105},
+  {name:'STV',depth:457},
+  {name:'FSH',depth:1907},
+  {name:'JFF',depth:2614},
+  {name:'MSK',depth:3346},
+];
+
 async function loadScores() {
   try {
     const result = await window.storage.get(SCORE_KEY, true);
     cachedScores = result ? JSON.parse(result.value) : [];
   } catch {
     cachedScores = [];
+  }
+  // Seed on first launch (empty board)
+  if(!cachedScores.length){
+    cachedScores = [...SEED_SCORES];
+    await saveScores(cachedScores);
   }
   scoresLoaded = true;
   return cachedScores;
@@ -162,7 +175,7 @@ async function insertScore(name, depth) {
   await saveScores(s);
 }
 async function resetScores() {
-  await saveScores([]);
+  await saveScores([...SEED_SCORES]);
 }
 
 // Preload scores on start
