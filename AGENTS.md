@@ -17,6 +17,7 @@ Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, 
 
 - `docs/tools/shadertoy.html` uses `@slider` annotations in GLSL comments to auto-generate UI controls — follow this pattern when adding shader presets
 - Interactive pages (Artemis Trail, Shadertoy) are single-file HTML with embedded CSS and JS
+- **Arcade** section is for standalone games that are vibe coded — keep new games here
 
 ## Commits
 

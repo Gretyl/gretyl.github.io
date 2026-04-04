@@ -3,11 +3,11 @@ plugins:
   - jekyll-remote-theme
 
 title: Gretyl
-description: Projects and tools
+description: Arcade and tools
 
 navigation:
-  - name: Projects
-    link: ./#projects
+  - name: Arcade
+    link: ./#arcade
     sublist:
       - name: Artemis Trail
         link: ./artemis-trail.html
