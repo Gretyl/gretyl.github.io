@@ -34,7 +34,7 @@ Then update `sidebar-mock.html` to match.
 
 Edit `previews/sidebar-mock.html` to reflect the change being previewed (e.g., new navigation items, updated content, new assets). The mock already has the theme's CSS inlined and the correct HTML structure — most changes only require editing the `<section>` content or sidebar navigation.
 
-For asset references, use absolute paths to the repo's `docs/` directory (e.g., `docs/assets/avatar.png` resolved from the repo root).
+For asset references, use relative paths from `previews/` (e.g., `../docs/assets/avatar.png`). Avoid hardcoded absolute paths — they break when the repo is cloned to a different location.
 
 ### 3. Screenshot with rodney
 
