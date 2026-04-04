@@ -11,6 +11,8 @@ navigation:
     sublist:
       - name: Artemis Trail
         link: ./artemis-trail.html
+      - name: Implode
+        link: ./implode.html
   - name: Tools
     link: ./#tools
     sublist:
