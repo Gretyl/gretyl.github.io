@@ -2,6 +2,7 @@ remote_theme: vaibhavvikas/jekyll-theme-minimalistic
 plugins:
   - jekyll-remote-theme
 
+logo: assets/avatar.png
 title: Gretyl
 description: Arcade, tools, and entries
 
