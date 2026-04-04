@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>IMPLODE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:#0e7fa8;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+  canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges}
+
+  .screen{position:fixed;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;text-align:center;padding:20px}
+
+  #title-screen{background:linear-gradient(180deg,#1ab4d8 0%,#0e7fa8 40%,#064a6e 100%)}
+  #title-screen h1{font-family:'Press Start 2P',monospace;font-size:clamp(28px,8vw,52px);color:#ff4444;text-shadow:0 0 30px #ff444488,0 4px 0 #881111;margin-bottom:12px;letter-spacing:4px;animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{text-shadow:0 0 30px #ff444488,0 4px 0 #881111}50%{text-shadow:0 0 50px #ff4444cc,0 4px 0 #881111,0 0 80px #ff444444}}
+  #title-screen .tagline{font-family:'VT323',monospace;font-size:clamp(18px,4vw,26px);color:#ffee88;margin-bottom:30px;text-shadow:0 1px 4px #00000088}
+  #title-screen .log{font-family:'VT323',monospace;font-size:clamp(16px,3.5vw,20px);color:#e0ffff;margin-bottom:30px;line-height:1.6;max-width:460px;text-shadow:0 1px 3px #00000066}
+  .btn{font-family:'Press Start 2P',monospace;font-size:clamp(10px,2.5vw,14px);color:#fff;background:#ff4444;border:none;padding:14px 28px;cursor:pointer;text-shadow:0 1px 0 #88111188;box-shadow:0 4px 0 #aa2222,0 6px 16px #00000066;transition:transform .1s,box-shadow .1s;-webkit-tap-highlight-color:transparent}
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #aa2222,0 2px 6px #00000066}
+  .btn-alt{background:#1a8a5a;box-shadow:0 4px 0 #0e5a3a,0 6px 16px #00000066}
+  .btn-alt:active{box-shadow:0 1px 0 #0e5a3a,0 2px 6px #00000066}
+  .btn-small{font-size:clamp(8px,2vw,11px);padding:10px 20px}
+
+  #scores-screen{background:#0a0a12}
+  #scores-screen h2{font-family:'Press Start 2P',monospace;font-size:clamp(14px,3.5vw,20px);color:#ffcc00;margin-bottom:6px}
+  #scores-screen .sub{font-family:'VT323',monospace;font-size:18px;color:#ff888888;margin-bottom:18px}
+  .score-table{font-family:'VT323',monospace;font-size:clamp(18px,4vw,24px);color:#33ff99;line-height:2;margin-bottom:24px;text-shadow:0 0 8px #33ff9944}
+  .score-row{display:flex;justify-content:space-between;width:min(300px,80vw)}
+  .score-rank{color:#ffcc00;width:40px;text-align:left}
+  .score-name{flex:1;text-align:left}
+  .score-depth{text-align:right;color:#ff8888}
+
+  #gameover-screen{background:#0a0a12ee}
+  #gameover-screen h2{font-family:'Press Start 2P',monospace;font-size:clamp(16px,4vw,24px);color:#ff4444;margin-bottom:8px}
+  #gameover-screen .quip{font-family:'VT323',monospace;font-size:clamp(20px,4.5vw,28px);color:#ffcc00;margin-bottom:16px;max-width:80%}
+  #gameover-screen .stats{font-family:'VT323',monospace;font-size:clamp(18px,3.5vw,22px);color:#33ff99;line-height:1.9;margin-bottom:20px}
+
+  #survived-screen{background:rgba(255,255,255,0.97)}
+  #survived-screen h2{font-family:'Press Start 2P',monospace;font-size:clamp(12px,3vw,18px);color:#aa4444;margin-bottom:10px;line-height:1.6}
+  #survived-screen .shame{font-family:'VT323',monospace;font-size:clamp(20px,4vw,26px);color:#666;margin:16px 0;max-width:80%;line-height:1.5}
+
+  #initials-screen{background:#0a0a12ee}
+  #initials-screen h2{font-family:'Press Start 2P',monospace;font-size:clamp(12px,3vw,16px);color:#ffcc00;margin-bottom:6px}
+  #initials-screen .depth-val{font-family:'VT323',monospace;font-size:32px;color:#ff4444;margin-bottom:16px}
+  .initials-input{display:flex;gap:8px;margin-bottom:20px}
+  .initials-input .letter-box{width:44px;height:52px;background:#1a1a2e;border:2px solid #33ff99;display:flex;align-items:center;justify-content:center;font-family:'Press Start 2P',monospace;font-size:22px;color:#33ff99;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .initials-input .letter-box.active{border-color:#ffcc00;color:#ffcc00;animation:blink2 .8s step-end infinite}
+  @keyframes blink2{0%,100%{border-color:#ffcc00}50%{border-color:#ffcc0044}}
+  .letter-nav{display:flex;gap:12px;margin-bottom:16px}
+  .letter-nav button{font-family:'Press Start 2P',monospace;font-size:18px;width:44px;height:44px;background:#1a1a2e;border:2px solid #33ff99;color:#33ff99;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .letter-nav button:active{background:#33ff9933}
+
+  .hidden{display:none!important}
+  .mt{margin-top:12px}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="title-screen" class="screen">
+  <h1>IMPLODE</h1>
+  <div class="tagline">The only losing move is making it back alive!</div>
+  <div class="log">
+    Captain's Log, Day 1:<br>
+    "Skipped the inspection. Vibes are immaculate.<br>
+    The hull is certified by my gut feeling.<br>
+    Full speed down."
+  </div>
+  <button class="btn" id="btn-start">DESCEND</button>
+  <button class="btn btn-alt btn-small mt" id="btn-scores-title">HIGH SCORES</button>
+</div>
+
+<div id="scores-screen" class="screen hidden">
+  <h2>FORBES ABYSS LIST</h2>
+  <div class="sub">Ranked by shallowest demise</div>
+  <div id="score-list" class="score-table"></div>
+  <button class="btn btn-small" id="btn-scores-back">BACK</button>
+  <button class="btn btn-small" id="btn-unplug" style="display:none;position:fixed;bottom:16px;left:16px;background:#444;box-shadow:0 3px 0 #222,0 5px 12px #00000066;font-size:clamp(7px,1.8vw,9px);padding:8px 14px;pointer-events:auto">UNPLUG CABINET</button>
+</div>
+
+<div id="crt-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:100;background:#000"></div>
+
+<div id="gameover-screen" class="screen hidden">
+  <h2>IMPLODED!</h2>
+  <div class="quip" id="go-quip"></div>
+  <div class="stats" id="go-stats"></div>
+  <button class="btn" id="btn-again">HUBRIS AGAIN</button>
+  <button class="btn btn-alt btn-small mt" id="btn-scores-go">HIGH SCORES</button>
+</div>
+
+<div id="survived-screen" class="screen hidden">
+  <h2>YOU SURVIVED.</h2>
+  <div class="shame" id="shame-text"></div>
+  <button class="btn btn-small" style="background:#888;box-shadow:0 4px 0 #555,0 6px 16px #00000066" id="btn-shame">PLAY AGAIN (try harder to die)</button>
+</div>
+
+<div id="initials-screen" class="screen hidden">
+  <h2>NEW HIGH SCORE!</h2>
+  <div class="depth-val" id="init-depth"></div>
+  <div class="initials-input" id="init-boxes"></div>
+  <div class="letter-nav">
+    <button id="nav-up">&#9650;</button>
+    <button id="nav-down">&#9660;</button>
+    <button id="nav-next">&#9654;</button>
+  </div>
+  <button class="btn btn-small mt" id="btn-submit-score">SUBMIT</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// CANVAS
+// ═══════════════════════════════════════
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let W, H, GAME_W;
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  GAME_W = Math.min(W, 1000);
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ═══════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════
+const SEG_H = 4;
+const SUB_W = 28, SUB_H = 14;
+const DIVE_ACCEL = 0.50;
+const MAX_DIVE_VEL = 0.60;
+const MAX_RISE_VEL = 0.9;
+const INVULN_TIME = 1.8;
+const BOUNCE_VEL = 4;
+
+// ═══════════════════════════════════════
+// HIGH SCORES (shared persistent storage, sorted shallowest-first)
+// ═══════════════════════════════════════
+const SCORE_KEY = 'leaderboard-v2';
+let cachedScores = [];
+let scoresLoaded = false;
+
+async function loadScores() {
+  try {
+    const result = await window.storage.get(SCORE_KEY, true);
+    cachedScores = result ? JSON.parse(result.value) : [];
+  } catch {
+    cachedScores = [];
+  }
+  scoresLoaded = true;
+  return cachedScores;
+}
+async function saveScores(s) {
+  cachedScores = s;
+  try { await window.storage.set(SCORE_KEY, JSON.stringify(s), true); } catch {}
+}
+function isHighScore(d) { return cachedScores.length < 10 || d < cachedScores[cachedScores.length-1].depth; }
+async function insertScore(name, depth) {
+  const s = [...cachedScores];
+  s.push({name,depth});
+  s.sort((a,b)=>a.depth-b.depth);
+  if(s.length>10)s.length=10;
+  await saveScores(s);
+}
+async function resetScores() {
+  await saveScores([]);
+}
+
+// Preload scores on start
+loadScores();
+
+// ═══════════════════════════════════════
+// COLOR PROGRESSION
+// ═══════════════════════════════════════
+function getWaterColor(d) {
+  const zones = [
+    {d:0,    r:26, g:180,b:216}, // pristine island blue
+    {d:400,  r:14, g:127,b:168}, // mid blue
+    {d:1000, r:6,  g:50, b:90},  // deep blue
+    {d:1750, r:15, g:70, b:30},  // dark green
+    {d:2500, r:55, g:38, b:15},  // brown
+    {d:2900, r:85, g:75, b:12},  // murky yellow
+    {d:3200, r:100,g:25, b:130}, // bright purple
+    {d:3346, r:70, g:10, b:90},  // deep purple at max
+  ];
+  if(d<=0) return zones[0];
+  if(d>=zones[zones.length-1].d) return zones[zones.length-1];
+  for(let i=0;i<zones.length-1;i++){
+    if(d>=zones[i].d && d<zones[i+1].d){
+      const t=(d-zones[i].d)/(zones[i+1].d-zones[i].d);
+      return {
+        r:Math.floor(zones[i].r+(zones[i+1].r-zones[i].r)*t),
+        g:Math.floor(zones[i].g+(zones[i+1].g-zones[i].g)*t),
+        b:Math.floor(zones[i].b+(zones[i+1].b-zones[i].b)*t),
+      };
+    }
+  }
+  return zones[zones.length-1];
+}
+function getWallColor(d) { const c=getWaterColor(d); return{r:Math.max(0,c.r-18),g:Math.max(0,c.g-18),b:Math.max(0,c.b-14)}; }
+
+// ═══════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════
+let state='title';
+let subX,subY,subVX,subVY;
+let depth,maxDepth,scrollOffset;
+let hullHP,invulnTimer,blinkPhase;
+let diving;
+let walls,obstructions;
+let wallGenY,wallCenterX,wallWidth;
+let bubbles,confetti,particles,fish,sharks;
+let shakeAmt;
+let milestoneQueue,milestoneText,milestoneTimer;
+let nextWaiverDepth,waiverCount,waiverActive,currentWaiverText;
+let gameTime,implosionTimer,flashAlpha;
+let deathDepth;
+let surfaceFade;
+let crushTimer,crushPops;
+
+const milestones=[
+  {d:100,t:"100m — Your investors are still smiling"},
+  {d:300,t:"300m — WiFi lost. No one can stop you now"},
+  {d:550,t:"550m — Deeper than most military subs.\nYours cost less. Coincidence?"},
+  {d:800,t:"800m — Sunlight is for poor people"},
+  {d:1050,t:"1050m — The hull groans.\nThe sommelier says it's fine."},
+  {d:1300,t:"1300m — Insurance expired 300m ago"},
+  {d:1600,t:"1600m — A rivet pings off the wall.\nYou call it 'ambient music.'"},
+  {d:1900,t:"1900m — The viewport fogs.\nFrom the outside."},
+  {d:2100,t:"2100m — That sound? Applause.\nIt's the rivets leaving."},
+  {d:2400,t:"2400m — Bluetooth controller disconnects.\nWas always Bluetooth."},
+  {d:2650,t:"2650m — Water drips from the ceiling.\n'Feature, not a bug.'"},
+  {d:2900,t:"2900m — Hull cracks are now\na design feature"},
+  {d:3050,t:"3050m — The viewport cracks.\nYou call it 'character.'"},
+  {d:3200,t:"3200m — Hubris: CRITICAL"},
+  {d:3300,t:"3300m — 'All good here.'"},
+  {d:3346,t:"3346m — PHYSICS WOULD LIKE A WORD"},
+];
+
+const waivers=[
+  "WAIVER: I understand this sub was inspected by vibes alone.",
+  "WAIVER: 'Pressure-tested' means the CEO sat on it once.",
+  "WAIVER: Emergency exits are purely decorative.",
+  "WAIVER: Hull material was chosen for aesthetics.",
+  "WAIVER: 'Unsinkable' was marketing, not engineering.",
+  "WAIVER: I waive my right to blame anyone worth over $1B.",
+  "WAIVER: The oxygen is artisanal and limited edition.",
+];
+
+const deathQuips=["The ocean always wins.","Disrupted by physics.","Your legacy is bubbles.","Net worth at depth: $0.","Should've taken the yacht.","Move fast and break hulls.","Innovated too close to crush depth."];
+const shameTexts=["Congratulations. You have learned nothing.\nYour privilege is intact.","You survived. The ocean is disappointed.\nSo is everyone on Twitter.","Against all odds, you live.\nYour memoir will be insufferable."];
+
+// ═══════════════════════════════════════
+// WALL GENERATION
+// ═══════════════════════════════════════
+function gL(){return(W-GAME_W)/2}
+
+function initWalls(){
+  walls=[];obstructions=[];
+  wallGenY=0;
+  wallCenterX=GAME_W/2;
+  wallWidth=GAME_W-30;
+  lastSharkDepth=0;
+  lastObstDepth=0;
+  currentBandIdx=-1;
+  currentBandType=3;
+  bandSharkCount=0;
+}
+
+let lastSharkDepth=0;
+let lastObstDepth=0;
+let currentBandIdx=-1;
+let currentBandType=3; // 0=obs,1=sharks,2=both,3=open
+let bandSharkCount=0;
+
+function generateWallsTo(targetY){
+  // Minimum passable gap: sub width + 50% margin
+  const MIN_GAP = SUB_W * 1.5;
+  const OBS_VERT_SPACING = SUB_H * 2.5; // min vertical gap between obstructions
+
+  while(wallGenY<targetY){
+    const d=wallGenY;
+    const narrowFactor=Math.max(0.22,1-d/5500);
+    const targetW=(GAME_W-30)*narrowFactor;
+    wallWidth+=(targetW-wallWidth)*0.003;
+
+    // Wall volatility: doubles at 750, 1500, 2500
+    let volatility = 1;
+    if(d >= 2500) volatility = 8;
+    else if(d >= 1500) volatility = 4;
+    else if(d >= 750) volatility = 2;
+
+    const jitter = Math.min(4.5, d/1000) * volatility;
+    wallWidth += (Math.random()-0.5) * jitter;
+    wallWidth = Math.max(MIN_GAP + 20, Math.min(GAME_W-30, wallWidth));
+
+    const wander = Math.min(3.5, d/1400) * volatility;
+    wallCenterX += (Math.random()-0.5) * wander * 2;
+    wallCenterX += (GAME_W/2 - wallCenterX) * 0.008;
+    const hW = wallWidth / 2;
+    wallCenterX = Math.max(hW+10, Math.min(GAME_W-hW-10, wallCenterX));
+
+    const gl = gL();
+    walls.push({y:wallGenY, left:gl+wallCenterX-hW, right:gl+wallCenterX+hW});
+
+    // Obstruction spawning from 500m onward, with vertical spacing
+    // Frequency increases with depth
+    const obsChance = d > 500 ? 0.004 + Math.max(0, d-500) * 0.000003 : 0;
+    let bandAllowsObs = true;
+
+    // Band system after 2000m: controls whether sharks/obs/both/open
+    if(d > 2000){
+      const bandIdx = Math.floor((d - 2000) / 325);
+      if(bandIdx !== currentBandIdx){
+        currentBandIdx = bandIdx;
+        currentBandType = Math.floor(Math.random() * 4);
+        bandSharkCount = 0;
+      }
+      bandAllowsObs = currentBandType === 0 || currentBandType === 2;
+      const bandHasSharks = currentBandType === 1 || currentBandType === 2;
+
+      // Spawn sharks: 1-3 per band, spaced at least 80m apart
+      if(bandHasSharks && bandSharkCount < 3 && d - lastSharkDepth >= 80 && Math.random() < 0.015){
+        lastSharkDepth = d;
+        bandSharkCount++;
+        const sharkX = gl + wallCenterX + (Math.random()-.5) * wallWidth * 0.6;
+        const dir = Math.random() < .5 ? 1 : -1;
+        sharks.push({
+          x:sharkX, y:d,
+          leftBound:gl + wallCenterX - hW + 15,
+          rightBound:gl + wallCenterX + hW - 15,
+          vx:dir * (0.5 + Math.random() * 0.6),
+          size:8 + Math.random() * 6,
+        });
+      }
+    }
+
+    // Spawn obstructions (band-gated after 2000m, free before)
+    const canSpawnObs = d <= 2000 || bandAllowsObs;
+    if(canSpawnObs && obsChance > 0 && d - lastObstDepth >= OBS_VERT_SPACING && Math.random() < obsChance){
+      const maxObstW = Math.max(0, wallWidth - MIN_GAP - 20);
+      if(maxObstW > SUB_W * 0.5){
+        const ow = SUB_W * 0.5 + Math.random() * (maxObstW - SUB_W * 0.5);
+        const oh = 10 + Math.random() * 16;
+        const side = Math.random();
+        let ox;
+        if(side<.35) ox = wallCenterX - hW + ow/2 + 10;
+        else if(side<.7) ox = wallCenterX + hW - ow/2 - 10;
+        else ox = wallCenterX + (Math.random()-.5) * wallWidth * 0.35;
+
+        const obsLeft = ox - ow/2;
+        const obsRight = ox + ow/2;
+        const gapLeft = obsLeft - (wallCenterX - hW);
+        const gapRight = (wallCenterX + hW) - obsRight;
+        if(gapLeft >= MIN_GAP || gapRight >= MIN_GAP){
+          // Generate jagged edge vertices matching wall volatility at this depth
+          const edgePoints = [];
+          const steps = Math.max(4, Math.floor(oh / 3));
+          for(let ei=0; ei<=steps; ei++){
+            const t = ei / steps;
+            const edgeJitter = (Math.random()-.5) * volatility * 1.5;
+            edgePoints.push({t, jx: edgeJitter});
+          }
+          obstructions.push({x:gl+ox, y:wallGenY, w:ow, h:oh, edgePoints, spawnDepth:d});
+          lastObstDepth = d;
+        }
+      }
+    }
+
+    wallGenY+=SEG_H;
+  }
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+function initGame(){
+  const gl=gL();
+  subX=gl+GAME_W/2;
+  subY=H*0.3;
+  subVX=0;subVY=0;
+  depth=0;maxDepth=0;scrollOffset=0;
+  hullHP=3;invulnTimer=0;blinkPhase=0;diving=false;
+  bubbles=[];confetti=[];particles=[];fish=[];sharks=[];
+  shakeAmt=0;
+  milestoneQueue=milestones.map(m=>({...m}));
+  milestoneText='';milestoneTimer=0;
+  nextWaiverDepth=600+Math.random()*400;
+  waiverCount=0;waiverActive=false;currentWaiverText='';
+  gameTime=0;implosionTimer=0;flashAlpha=0;deathDepth=0;surfaceFade=0;
+  crushTimer=0;crushPops=0;
+  initWalls();
+  generateWallsTo(H+400);
+}
+
+// ═══════════════════════════════════════
+// INPUT
+// ═══════════════════════════════════════
+let inputDown=false,inputX=null,keys={};
+window.addEventListener('keydown',e=>{keys[e.key]=true});
+window.addEventListener('keyup',e=>{keys[e.key]=false});
+canvas.addEventListener('mousedown',e=>{inputDown=true;inputX=e.clientX});
+canvas.addEventListener('mousemove',e=>{if(inputDown)inputX=e.clientX});
+canvas.addEventListener('mouseup',()=>{inputDown=false;inputX=null});
+canvas.addEventListener('touchstart',e=>{inputDown=true;inputX=e.touches[0].clientX;e.preventDefault()},{passive:false});
+canvas.addEventListener('touchmove',e=>{inputX=e.touches[0].clientX;e.preventDefault()},{passive:false});
+canvas.addEventListener('touchend',e=>{inputDown=false;inputX=null;e.preventDefault()},{passive:false});
+
+// Waiver dismiss
+function setupWaiverDismiss(){
+  canvas.addEventListener('pointerdown',e=>{
+    if(waiverActive){
+      waiverActive=false;
+      e.preventDefault();
+      e.stopPropagation();
+      inputDown=false;
+    }
+  },{capture:true});
+}
+setupWaiverDismiss();
+
+// ═══════════════════════════════════════
+// SCREENS
+// ═══════════════════════════════════════
+const screenIds=['title-screen','scores-screen','gameover-screen','survived-screen','initials-screen'];
+function showScreen(id){screenIds.forEach(s=>document.getElementById(s).classList.toggle('hidden',s!==id))}
+function hideAllScreens(){screenIds.forEach(s=>document.getElementById(s).classList.add('hidden'))}
+
+async function renderScoreList(){
+  if(!scoresLoaded) await loadScores();
+  const s=cachedScores;
+  const el=document.getElementById('score-list');
+  if(!s.length){el.innerHTML='<div style="color:#ff888888;font-size:20px">No scores yet.<br>Go fail gloriously.</div>';return}
+  el.innerHTML=s.map((sc,i)=>`<div class="score-row"><span class="score-rank">${i+1}.</span><span class="score-name">${sc.name}</span><span class="score-depth">${sc.depth}m</span></div>`).join('');
+}
+
+// Unplug cabinet: show button every 3rd view, only when 10 scores exist
+let scoresViewCount = 0;
+
+async function showScoresScreen(){
+  await renderScoreList();
+  scoresViewCount++;
+  const btn = document.getElementById('btn-unplug');
+  btn.style.display = (cachedScores.length >= 10 && scoresViewCount % 3 === 0) ? 'block' : 'none';
+  showScreen('scores-screen');
+}
+
+function startGame(){hideAllScreens();state='playing';initGame();lastTime=performance.now();requestAnimationFrame(loop)}
+
+document.getElementById('btn-start').onclick=startGame;
+document.getElementById('btn-scores-title').onclick=()=>showScoresScreen();
+document.getElementById('btn-scores-back').onclick=()=>{document.getElementById('btn-unplug').style.display='none';showScreen('title-screen')};
+document.getElementById('btn-again').onclick=startGame;
+document.getElementById('btn-scores-go').onclick=()=>showScoresScreen();
+document.getElementById('btn-shame').onclick=startGame;
+
+// CRT shutoff + reboot
+document.getElementById('btn-unplug').onclick=async()=>{
+  // Hide everything, show CRT overlay
+  hideAllScreens();
+  document.getElementById('btn-unplug').style.display='none';
+  const crt = document.getElementById('crt-overlay');
+  crt.style.display='block';
+
+  // CRT shutoff animation on canvas behind overlay
+  const cvs = document.createElement('canvas');
+  cvs.width = W; cvs.height = H;
+  cvs.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;z-index:101';
+  document.body.appendChild(cvs);
+  const c = cvs.getContext('2d');
+
+  // Capture current screen as the "CRT image"
+  // Animate: squeeze vertically to a horizontal line, then shrink to a dot, then black
+  await new Promise(resolve=>{
+    let t=0;
+    const anim=()=>{
+      t+=0.025;
+      c.fillStyle='#000';
+      c.fillRect(0,0,W,H);
+      if(t<1){
+        // Phase 1: squeeze to horizontal line (0-1s)
+        const squeeze=Math.pow(t,0.5);
+        const lineH=Math.max(2,H*(1-squeeze));
+        const lineY=(H-lineH)/2;
+        // White phosphor line
+        c.fillStyle=`rgba(200,220,255,${0.8-t*0.3})`;
+        c.fillRect(0,lineY,W,lineH);
+        // Scanline glow
+        c.fillStyle=`rgba(150,180,255,${0.3*(1-t)})`;
+        c.fillRect(0,lineY-2,W,lineH+4);
+      } else if(t<1.6){
+        // Phase 2: horizontal line shrinks to center dot
+        const dt=(t-1)/0.6;
+        const dotW=Math.max(3,W*(1-Math.pow(dt,0.7)));
+        const dotH=Math.max(2,3*(1-dt));
+        const dotX=(W-dotW)/2;
+        const dotY=(H-dotH)/2;
+        c.fillStyle=`rgba(200,220,255,${0.5*(1-dt)})`;
+        c.fillRect(dotX,dotY,dotW,dotH);
+      } else if(t<2){
+        // Phase 3: center dot fades with afterglow
+        const dt=(t-1.6)/0.4;
+        const glow=3*(1-dt);
+        if(glow>0.5){
+          c.fillStyle=`rgba(150,180,255,${0.2*(1-dt)})`;
+          c.beginPath();c.arc(W/2,H/2,glow,0,Math.PI*2);c.fill();
+        }
+      } else {
+        // Done — black screen
+        resolve();
+        return;
+      }
+      requestAnimationFrame(anim);
+    };
+    anim();
+  });
+
+  // Wipe scores
+  await resetScores();
+
+  // Sit at black for 10 seconds
+  await new Promise(r=>setTimeout(r,10000));
+
+  // "Reboot" — remove CRT canvas, hide overlay, show title
+  document.body.removeChild(cvs);
+  crt.style.display='none';
+  showScreen('title-screen');
+};
+
+// Initials entry
+let iLetters=[0,0,0],iPos=0;
+const ALPHA='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+function showInitialsScreen(d){
+  iLetters=[0,0,0];iPos=0;
+  document.getElementById('init-depth').textContent=d+'m';
+  renderInitBoxes();showScreen('initials-screen');
+}
+function renderInitBoxes(){
+  const el=document.getElementById('init-boxes');el.innerHTML='';
+  for(let i=0;i<3;i++){
+    const b=document.createElement('div');
+    b.className='letter-box'+(i===iPos?' active':'');
+    b.textContent=ALPHA[iLetters[i]];
+    b.onclick=()=>{iPos=i;renderInitBoxes()};
+    el.appendChild(b);
+  }
+}
+document.getElementById('nav-up').onclick=()=>{iLetters[iPos]=(iLetters[iPos]+1)%26;renderInitBoxes()};
+document.getElementById('nav-down').onclick=()=>{iLetters[iPos]=(iLetters[iPos]+25)%26;renderInitBoxes()};
+document.getElementById('nav-next').onclick=()=>{iPos=Math.min(2,iPos+1);renderInitBoxes()};
+document.getElementById('btn-submit-score').onclick=async()=>{
+  await insertScore(iLetters.map(i=>ALPHA[i]).join(''),deathDepth);
+  await showScoresScreen();
+};
+
+// ═══════════════════════════════════════
+// UPDATE
+// ═══════════════════════════════════════
+function update(dt){
+  if(state!=='playing'&&state!=='imploding'&&state!=='crushing')return;
+  gameTime+=dt;
+
+  if(state==='playing'){
+    if(waiverActive)return; // freeze game during waiver
+
+    // Physics: realistic buoyancy — strongest near surface, weakens with depth
+    const surfaceBuoyancy = 0.12;
+    const depthBuoyancy = surfaceBuoyancy / (1 + depth * 0.0006);
+    subVY -= depthBuoyancy * dt * 60;
+    const wantDive = inputDown || keys[' '] || keys['ArrowDown'] || keys['s'];
+    if(wantDive){ subVY += DIVE_ACCEL * dt * 60; diving = true } else { diving = false }
+    // Max dive speed decreases with depth: comfortable at surface, deliberate crawl deep
+    // At 0m: 1.6, at 500m: ~1.25, at 1500m: ~0.9, at 3000m: ~0.65
+    const maxDiveAtDepth = MAX_DIVE_VEL * (0.35 + 0.65 / (1 + depth * 0.001));
+    subVY = Math.max(-MAX_RISE_VEL, Math.min(maxDiveAtDepth, subVY));
+
+    // Horizontal
+    const steer=2.2;
+    if(keys['ArrowLeft']||keys['a'])subVX-=steer*dt*60*0.3;
+    if(keys['ArrowRight']||keys['d'])subVX+=steer*dt*60*0.3;
+    if(inputDown&&inputX!==null){
+      const diff=inputX-subX;
+      subVX+=Math.sign(diff)*Math.min(Math.abs(diff)*0.012,steer*dt*60*0.3);
+    }
+    subVX*=0.92;
+    subX+=subVX;
+    const gl=gL();
+    subX=Math.max(gl+SUB_W,Math.min(gl+GAME_W-SUB_W,subX));
+
+    // Scroll
+    const CRUSH_DEPTH = 3346;
+    const crushLineScreenY = CRUSH_DEPTH - scrollOffset;
+    const lockThreshold = H * 0.67;
+    const normalSubY = H * 0.3;
+
+    // Three camera modes:
+    // 1. Surface lock: scrollOffset pinned at 0, sub rises on screen
+    // 2. Normal: scrollOffset moves, sub stays at normalSubY
+    // 3. Crush lock: scrollOffset pinned, sub descends on screen
+
+    const atSurface = scrollOffset <= 0 && subVY < 0;
+    const atCrush = crushLineScreenY <= lockThreshold && subVY > 0;
+
+    if(atCrush){
+      // Crush depth lock — sub descends on screen toward the red line
+      subY += subVY;
+    } else if(atSurface){
+      // Surface lock — pin scroll at 0, sub rises on screen
+      scrollOffset = 0;
+      subY += subVY;
+      // Clamp so sub doesn't go above screen
+      if(subY < SUB_H) subY = SUB_H;
+    } else if(Math.abs(subY - normalSubY) > 1){
+      // Returning from either lock — ease sub back to normal position
+      scrollOffset += subVY;
+      const diff = subY - normalSubY;
+      const returnSpeed = Math.min(Math.abs(diff), Math.abs(diff) * 0.05 + 0.3);
+      subY -= Math.sign(diff) * returnSpeed;
+      // Snap when close enough
+      if(Math.abs(subY - normalSubY) < 1) subY = normalSubY;
+    } else {
+      // Normal scrolling
+      scrollOffset += subVY;
+      subY = normalSubY;
+    }
+
+    // Prevent scroll going negative (surface is the ceiling)
+    if(scrollOffset < 0) scrollOffset = 0;
+
+    // Depth always derived from world position of sub
+    depth = Math.max(0, scrollOffset + (subY - normalSubY));
+
+    // Surface loss condition: sub has risen to top of screen
+    if(subY < SUB_H * 2 && scrollOffset <= 0 && hullHP > 0){
+      surfaceFade += dt * 0.6;
+      if(surfaceFade >= 1){triggerSurvived();return}
+    } else {
+      surfaceFade = Math.max(0, surfaceFade - dt * 2);
+    }
+
+    if(depth>maxDepth)maxDepth=depth;
+
+    generateWallsTo(Math.max(0,scrollOffset)+H+400);
+
+    // Invulnerability
+    if(invulnTimer>0){invulnTimer-=dt;blinkPhase+=dt*12}
+
+    // Wall collision (only when visible and not invuln)
+    if(invulnTimer<=0&&scrollOffset>=0){
+      const checkY=scrollOffset+subY;
+      const wIdx=Math.floor(checkY/SEG_H);
+      for(let i=-2;i<=2;i++){
+        const idx=wIdx+i;
+        if(idx>=0&&idx<walls.length){
+          const w=walls[idx];
+          if(subX-SUB_W/2<w.left){wallHit('left');break}
+          if(subX+SUB_W/2>w.right){wallHit('right');break}
+        }
+      }
+    }
+
+    // Obstruction collision (also takes hull damage, not instant death)
+    if(invulnTimer<=0){
+      for(const obs of obstructions){
+        const sy=obs.y-scrollOffset;
+        if(sy>-50&&sy<H+50){
+          if(subY+SUB_H/2>sy-obs.h/2&&subY-SUB_H/2<sy+obs.h/2&&
+             subX+SUB_W/2>obs.x-obs.w/2&&subX-SUB_W/2<obs.x+obs.w/2){
+            // Bounce away from obstruction
+            const pushDir=subX<obs.x?'right':'left';
+            wallHit(pushDir);
+            break;
+          }
+        }
+      }
+    }
+
+    // Milestones
+    if(milestoneQueue.length&&depth>=milestoneQueue[0].d){
+      const m=milestoneQueue.shift();milestoneText=m.t;milestoneTimer=3.2;
+    }
+    if(milestoneTimer>0)milestoneTimer-=dt;
+
+    // Waivers
+    if(!waiverActive&&depth>=nextWaiverDepth&&waiverCount<waivers.length){
+      currentWaiverText=waivers[waiverCount];waiverCount++;
+      nextWaiverDepth=depth+400+Math.random()*500;waiverActive=true;
+    }
+
+    // Shake at deep depths
+    if(depth>2800)shakeAmt=Math.min(4,(depth-2800)/150);
+    else shakeAmt*=.95;
+
+    // Auto-implode at 3346m — the real depth: burst hull pips one by one
+    if(depth>=3346){
+      state='crushing';
+      crushTimer=0;
+      crushPops=0;
+      return;
+    }
+
+    // Bubbles when diving
+    if(diving&&Math.random()<.2){
+      bubbles.push({x:subX+(Math.random()-.5)*SUB_W,y:subY-SUB_H/2,
+        vx:(Math.random()-.5)*.5,vy:-1-Math.random()*2,r:1+Math.random()*3,a:.6});
+    }
+
+    // Fish spawning — peaceful white fish that avoid the sub
+    if(fish.length<12&&Math.random()<0.02){
+      const gl=gL();
+      const side=Math.random()<.5?-1:1;
+      const fx=side<0?gl-20:gl+GAME_W+20;
+      const fy=subY+(Math.random()-.5)*H*0.8;
+      fish.push({
+        x:fx, y:fy, vx:side<0?0.5+Math.random()*1:-0.5-Math.random()*1,
+        vy:(Math.random()-.5)*0.3,
+        size:4+Math.random()*6, tailPhase:Math.random()*Math.PI*2,
+        baseVx:side<0?0.5+Math.random()*1:-0.5-Math.random()*1,
+      });
+    }
+
+    // Update fish
+    for(let i=fish.length-1;i>=0;i--){
+      const f=fish[i];
+      // Avoidance: steer away from sub
+      const dx=f.x-subX, dy=f.y-subY;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<80){
+        const flee=Math.max(0,(80-dist)/80)*2.5;
+        f.vx+=dx/dist*flee*0.15;
+        f.vy+=dy/dist*flee*0.15;
+      }else{
+        // Drift back to base speed
+        f.vx+=(f.baseVx-f.vx)*0.02;
+        f.vy+=(0-f.vy)*0.03;
+        f.vy+=Math.sin(gameTime*2+i)*0.02; // gentle bob
+      }
+      f.vx=Math.max(-3,Math.min(3,f.vx));
+      f.vy=Math.max(-1.5,Math.min(1.5,f.vy));
+      f.x+=f.vx;f.y+=f.vy;
+      f.tailPhase+=0.15;
+      // Remove if offscreen
+      const gl2=gL();
+      if(f.x<gl2-60||f.x>gl2+GAME_W+60||f.y<-40||f.y>H+40){fish.splice(i,1)}
+    }
+
+    // Update sharks — patrol left-right, reflect off walls and obstructions
+    for(const sk of sharks){
+      sk.x+=sk.vx;
+      // Bounce off patrol bounds (walls)
+      if(sk.x<=sk.leftBound){sk.x=sk.leftBound;sk.vx=Math.abs(sk.vx)}
+      if(sk.x>=sk.rightBound){sk.x=sk.rightBound;sk.vx=-Math.abs(sk.vx)}
+      // Reflect off obstructions at same depth
+      const halfSk=sk.size*0.6;
+      for(const obs of obstructions){
+        if(Math.abs(obs.y - sk.y) < obs.h/2 + halfSk){
+          const obsL=obs.x-obs.w/2, obsR=obs.x+obs.w/2;
+          if(sk.vx>0 && sk.x+halfSk>obsL && sk.x-halfSk<obsL){
+            sk.x=obsL-halfSk;sk.vx=-Math.abs(sk.vx);
+          }else if(sk.vx<0 && sk.x-halfSk<obsR && sk.x+halfSk>obsR){
+            sk.x=obsR+halfSk;sk.vx=Math.abs(sk.vx);
+          }
+        }
+      }
+      // Collision with sub (uses hull integrity system)
+      if(invulnTimer<=0){
+        const sy=sk.y-scrollOffset;
+        const halfSk=sk.size*0.6;
+        if(Math.abs(sy-subY)<SUB_H/2+halfSk && Math.abs(sk.x-subX)<SUB_W/2+halfSk){
+          const pushDir=subX<sk.x?'right':'left';
+          wallHit(pushDir);
+        }
+      }
+    }
+
+  }else if(state==='crushing'){
+    // Pop hull pips one at a time, then implode
+    crushTimer+=dt;
+    shakeAmt=4+crushPops*3;
+    const pipsToLose = 3; // always lose all 3 regardless of current HP
+    const popInterval = 0.6;
+    const nextPopTime = popInterval * (crushPops + 1);
+    if(crushPops < pipsToLose && crushTimer >= nextPopTime){
+      crushPops++;
+      hullHP = Math.max(0, 3 - crushPops);
+      flashAlpha = 0.35;
+    }
+    if(crushPops >= pipsToLose && crushTimer >= popInterval * pipsToLose + 0.5){
+      triggerDeath('depth');
+    }
+
+  }else if(state==='imploding'){
+    implosionTimer+=dt;
+    shakeAmt=Math.max(6,10-implosionTimer*3);
+    if(implosionTimer<.3)flashAlpha=1-implosionTimer/.3;else flashAlpha=0;
+    for(const c of confetti){c.x+=c.vx;c.y+=c.vy;c.vy+=.04;c.vx*=.98;c.a-=.005;c.rot+=c.rv}
+    for(const p of particles){p.x+=p.vx;p.y+=p.vy;p.vy+=.03;p.life-=dt;p.a=Math.max(0,p.life/3)}
+    if(Math.random()<.3)bubbles.push({x:subX+(Math.random()-.5)*80,y:subY+(Math.random()-.5)*60,
+      vx:(Math.random()-.5)*2,vy:-1-Math.random()*3,r:2+Math.random()*5,a:.7});
+    if(implosionTimer>2.5)showGameOver();
+  }
+}
+
+function wallHit(side){
+  hullHP--;
+  invulnTimer=INVULN_TIME;blinkPhase=0;shakeAmt=5;
+  subVX=(side==='left'?BOUNCE_VEL:-BOUNCE_VEL);
+  subX+=subVX*4;
+  if(hullHP<=0)triggerDeath('wall');
+}
+
+function triggerDeath(cause){
+  state='imploding';deathDepth=Math.floor(maxDepth);implosionTimer=0;flashAlpha=0;
+  for(let i=0;i<80;i++){const a=Math.random()*Math.PI*2,sp=1+Math.random()*6;
+    confetti.push({x:subX,y:subY,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
+      r:2+Math.random()*4,color:['#ff4444','#ffcc00','#33ff99','#ff88ff','#44aaff','#fff'][~~(Math.random()*6)],
+      a:1,rot:Math.random()*Math.PI*2,rv:(Math.random()-.5)*.3})}
+  for(let i=0;i<25;i++){const a=Math.random()*Math.PI*2,sp=.5+Math.random()*3;
+    particles.push({x:subX,y:subY,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,
+      r:1+Math.random()*3,color:'#8899aa',a:1,life:3})}
+}
+
+function triggerSurvived(){
+  state='survived';
+  document.getElementById('shame-text').textContent=shameTexts[~~(Math.random()*shameTexts.length)];
+  showScreen('survived-screen');
+}
+
+function showGameOver(){
+  state='gameover';
+  // 0m scores get no initials — shame only
+  if(deathDepth > 0 && isHighScore(deathDepth)){showInitialsScreen(deathDepth);return}
+  const quip = deathDepth === 0
+    ? "You didn't even submerge.\nThe ocean didn't notice you."
+    : deathQuips[~~(Math.random()*deathQuips.length)];
+  document.getElementById('go-quip').textContent=quip;
+  document.getElementById('go-stats').innerHTML=
+    `Final Depth: ${deathDepth}m<br>Peak Waste: $${(deathDepth*47).toLocaleString()}/sec<br>Hull Hits: ${3-Math.max(0,hullHP)}<br>Waivers Signed: ${waiverCount}`
+    + (deathDepth === 0 ? '<br><br><span style="color:#ff888888">0m scores are not eligible<br>for the Forbes Abyss List.</span>' : '');
+  showScreen('gameover-screen');
+}
+
+// ═══════════════════════════════════════
+// DRAW
+// ═══════════════════════════════════════
+function draw(){
+  ctx.save();
+  if(shakeAmt>.1)ctx.translate((Math.random()-.5)*shakeAmt*2,(Math.random()-.5)*shakeAmt*2);
+
+  // Background water
+  const wc=getWaterColor(Math.max(0,depth));
+  ctx.fillStyle=`rgb(${wc.r},${wc.g},${wc.b})`;
+  ctx.fillRect(-10,-10,W+20,H+20);
+
+  // Sky above water when near surface
+  if(scrollOffset<H*.5){
+    // The water surface is at scrollOffset=0, screen Y = -scrollOffset (relative)
+    // When scrollOffset is negative, we can see above water
+    const surfaceScreenY = -scrollOffset; // where depth=0 appears on screen
+    if(surfaceScreenY > -20) {
+      // Draw black sky above the waves
+      if(surfaceScreenY > 0) {
+        ctx.fillStyle='#111';
+        ctx.fillRect(0,0,W,surfaceScreenY);
+      }
+
+      // Draw wave lines at the surface
+      ctx.save();
+      ctx.strokeStyle='rgba(255,255,255,0.6)';
+      ctx.lineWidth=2;
+      for(let row=0;row<3;row++){
+        ctx.beginPath();
+        const waveY = surfaceScreenY + row*6 - 6;
+        const phase = gameTime*1.5 + row*1.2;
+        const amp = 3 - row*0.8;
+        for(let x=0;x<=W;x+=4){
+          const y = waveY + Math.sin(x*0.02 + phase)*amp + Math.sin(x*0.05 + phase*0.7)*amp*0.5;
+          if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        }
+        ctx.globalAlpha = 0.5 - row*0.15;
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+
+  drawWalls();
+  drawObstructions();
+  drawFish();
+  drawSharks();
+  drawBubbles();
+  if(state!=='imploding'||implosionTimer<.12)drawSubmarine();
+  drawParticles();
+
+  if(flashAlpha>0){ctx.fillStyle=`rgba(255,255,255,${flashAlpha})`;ctx.fillRect(-10,-10,W+20,H+20)}
+  if(surfaceFade>0){ctx.fillStyle=`rgba(255,255,255,${Math.min(1,surfaceFade)})`;ctx.fillRect(-10,-10,W+20,H+20)}
+
+  ctx.restore();
+
+  if(state==='playing'||state==='imploding'||state==='crushing')drawHUD();
+}
+
+function drawWalls(){
+  if(scrollOffset<0)return; // no walls above surface
+  const startIdx=Math.max(0,Math.floor(scrollOffset/SEG_H)-2);
+  const endIdx=Math.min(walls.length-1,Math.floor((scrollOffset+H)/SEG_H)+2);
+  for(let i=startIdx;i<=endIdx;i++){
+    const w=walls[i];const sy=w.y-scrollOffset;
+    const wc=getWallColor(w.y);
+    ctx.fillStyle=`rgb(${wc.r},${wc.g},${wc.b})`;
+    ctx.fillRect(0,sy,w.left,SEG_H+1);
+    ctx.fillRect(w.right,sy,W-w.right,SEG_H+1);
+    ctx.fillStyle='rgba(255,255,255,0.15)';
+    ctx.fillRect(w.left-2,sy,3,SEG_H+1);
+    ctx.fillRect(w.right-1,sy,3,SEG_H+1);
+  }
+
+  // Dashed red danger line at max depth
+  const DANGER_DEPTH = 3346;
+  const dangerScreenY = DANGER_DEPTH - scrollOffset;
+  if(dangerScreenY > -20 && dangerScreenY < H + 20){
+    // Find wall bounds at that depth
+    const wIdx = Math.floor(DANGER_DEPTH / SEG_H);
+    if(wIdx >= 0 && wIdx < walls.length){
+      const w = walls[wIdx];
+      ctx.save();
+      ctx.setLineDash([12,8]);
+      ctx.strokeStyle = 'rgba(255,50,50,' + (0.5 + Math.sin(gameTime * 4) * 0.25) + ')';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(w.left + 4, dangerScreenY);
+      ctx.lineTo(w.right - 4, dangerScreenY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // Label
+      ctx.font = '12px "VT323",monospace';
+      ctx.fillStyle = 'rgba(255,80,80,' + (0.5 + Math.sin(gameTime * 4) * 0.2) + ')';
+      ctx.textAlign = 'center';
+      ctx.fillText('— 3346m — CRUSH DEPTH —', (w.left + w.right) / 2, dangerScreenY - 6);
+      ctx.restore();
+    }
+  }
+}
+
+function drawObstructions(){
+  for(const obs of obstructions){
+    const sy=obs.y-scrollOffset;
+    if(sy<-50||sy>H+50)continue;
+    const wc=getWallColor(obs.spawnDepth);
+    const fillCol=`rgb(${wc.r},${wc.g},${wc.b})`;
+    const ep=obs.edgePoints;
+    const hw=obs.w/2, hh=obs.h/2;
+
+    ctx.save();
+    ctx.translate(obs.x, sy);
+
+    // Draw jagged shape using edge vertices
+    ctx.fillStyle=fillCol;
+    ctx.beginPath();
+    // Top edge: left to right with jitter
+    for(let i=0;i<ep.length;i++){
+      const px = -hw + obs.w * ep[i].t + ep[i].jx;
+      const py = -hh + ep[i].jx * 0.4;
+      if(i===0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    // Right side down
+    ctx.lineTo(hw + ep[ep.length-1].jx, hh);
+    // Bottom edge: right to left with jitter (reversed)
+    for(let i=ep.length-1;i>=0;i--){
+      const px = -hw + obs.w * ep[i].t - ep[i].jx * 0.7;
+      const py = hh - ep[i].jx * 0.3;
+      ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+
+    // Edge highlight matching wall style
+    ctx.strokeStyle='rgba(255,255,255,0.15)';
+    ctx.lineWidth=2;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+}
+
+function drawFish(){
+  for(const f of fish){
+    ctx.save();
+    ctx.translate(f.x,f.y);
+    const facing=f.vx>=0?1:-1;
+    ctx.scale(facing,1);
+    const s=f.size;
+    ctx.fillStyle='rgba(255,255,255,0.7)';
+    ctx.beginPath();
+    ctx.moveTo(s,0);
+    ctx.quadraticCurveTo(s*0.3,-s*0.5,-s*0.2,0);
+    ctx.quadraticCurveTo(s*0.3,s*0.5,s,0);
+    ctx.fill();
+    const tailSwing=Math.sin(f.tailPhase)*s*0.35;
+    ctx.beginPath();
+    ctx.moveTo(-s*0.2,0);
+    ctx.lineTo(-s*0.7,tailSwing-s*0.3);
+    ctx.lineTo(-s*0.7,tailSwing+s*0.3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle='rgba(0,0,0,0.5)';
+    ctx.beginPath();
+    ctx.arc(s*0.55,-s*0.08,s*0.1,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function drawSharks(){
+  for(const sk of sharks){
+    const sy=sk.y-scrollOffset;
+    if(sy<-40||sy>H+40)continue;
+    ctx.save();
+    ctx.translate(sk.x,sy);
+    const facing=sk.vx>=0?1:-1;
+    ctx.scale(facing,1);
+    const s=sk.size;
+    // Body — bright red
+    ctx.fillStyle='rgba(240,55,55,0.95)';
+    ctx.beginPath();
+    ctx.moveTo(s*1.2,0);
+    ctx.quadraticCurveTo(s*0.4,-s*0.55,-s*0.4,0);
+    ctx.quadraticCurveTo(s*0.4,s*0.55,s*1.2,0);
+    ctx.fill();
+    // Dorsal fin
+    ctx.beginPath();
+    ctx.moveTo(s*0.3,-s*0.3);
+    ctx.lineTo(s*0.1,-s*0.8);
+    ctx.lineTo(-s*0.15,-s*0.3);
+    ctx.closePath();
+    ctx.fill();
+    // Tail fin
+    const tp=gameTime*8;
+    const ts=Math.sin(tp)*s*0.2;
+    ctx.beginPath();
+    ctx.moveTo(-s*0.4,0);
+    ctx.lineTo(-s*0.9,ts-s*0.4);
+    ctx.lineTo(-s*0.9,ts+s*0.4);
+    ctx.closePath();
+    ctx.fill();
+    // Eye
+    ctx.fillStyle='rgba(255,220,100,0.9)';
+    ctx.beginPath();
+    ctx.arc(s*0.7,-s*0.1,s*0.1,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function drawBubbles(){
+  for(let i=bubbles.length-1;i>=0;i--){
+    const b=bubbles[i];b.x+=b.vx;b.y+=b.vy;b.a-=.008;
+    if(b.a<=0){bubbles.splice(i,1);continue}
+    ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(200,240,255,${b.a*.6})`;ctx.lineWidth=1;ctx.stroke();
+  }
+}
+
+function drawSubmarine(){
+  if(invulnTimer>0&&Math.sin(blinkPhase*Math.PI)>.3)return;
+  ctx.save();ctx.translate(subX,subY);
+
+  // Dive prompt: dotted circle below sub when not diving
+  if(!diving&&state==='playing'){
+    ctx.save();
+    ctx.setLineDash([5,5]);
+    ctx.strokeStyle='rgba(255,255,255,'+(0.5+Math.sin(gameTime*3)*0.2)+')';
+    ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.ellipse(0,SUB_H+22,20,20,0,0,Math.PI*2);ctx.stroke();
+    // Down arrow inside
+    ctx.setLineDash([]);
+    ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(0,SUB_H+14);ctx.lineTo(0,SUB_H+30);
+    ctx.moveTo(-6,SUB_H+24);ctx.lineTo(0,SUB_H+31);ctx.lineTo(6,SUB_H+24);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Body
+  ctx.fillStyle='#f0cc22';ctx.beginPath();ctx.ellipse(0,0,SUB_W/2,SUB_H/2,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#ffe944';ctx.beginPath();ctx.ellipse(0,-2,SUB_W/2-4,SUB_H/2-5,0,Math.PI,Math.PI*2);ctx.fill();
+
+  // Viewport
+  ctx.fillStyle='#224466';ctx.beginPath();ctx.arc(SUB_W/2-7,-1,3.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#336688';ctx.beginPath();ctx.arc(SUB_W/2-7,-2,1.8,0,Math.PI*2);ctx.fill();
+
+  // Tower
+  ctx.fillStyle='#ddcc33';ctx.fillRect(-3,-SUB_H/2-5,6,6);
+
+  // Propeller
+  const pp=gameTime*(diving?16:6);
+  ctx.strokeStyle='#887744';ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(-SUB_W/2,-3*Math.sin(pp));ctx.lineTo(-SUB_W/2-5,-5*Math.sin(pp));
+  ctx.moveTo(-SUB_W/2,3*Math.sin(pp+1));ctx.lineTo(-SUB_W/2-5,5*Math.sin(pp+1));
+  ctx.stroke();
+
+  // Damage
+  if(hullHP<3){ctx.strokeStyle='rgba(255,100,100,0.7)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(-7,-3);ctx.lineTo(-1,2);ctx.lineTo(4,-1);ctx.stroke()}
+  if(hullHP<2){ctx.beginPath();ctx.moveTo(5,-4);ctx.lineTo(9,0);ctx.lineTo(7,3);ctx.stroke()}
+
+  ctx.restore();
+}
+
+function drawParticles(){
+  for(const c of confetti){if(c.a<=0)continue;
+    ctx.save();ctx.translate(c.x,c.y);ctx.rotate(c.rot);
+    ctx.globalAlpha=Math.max(0,c.a);ctx.fillStyle=c.color;
+    ctx.fillRect(-c.r,-c.r/2,c.r*2,c.r);ctx.restore()}
+  ctx.globalAlpha=1;
+  for(const p of particles){if(p.a<=0)continue;
+    ctx.globalAlpha=Math.max(0,p.a);ctx.fillStyle=p.color;
+    ctx.fillRect(p.x-p.r/2,p.y-p.r/2,p.r,p.r)}
+  ctx.globalAlpha=1;
+}
+
+function drawHUD(){
+  // Hull icons (upper left) — 3 little subs
+  for(let i=0;i<3;i++){
+    const x=12+i*28,y=16;
+    if(i<hullHP){
+      ctx.fillStyle='#33ff99';
+      ctx.shadowColor='#33ff9966';ctx.shadowBlur=4;
+      ctx.beginPath();ctx.ellipse(x+9,y,10,5,0,0,Math.PI*2);ctx.fill();
+      ctx.fillRect(x+5,y-8,4,5);
+      ctx.shadowBlur=0;
+    }else{
+      ctx.strokeStyle='#33ff9944';ctx.lineWidth=1;
+      ctx.beginPath();ctx.ellipse(x+9,y,10,5,0,0,Math.PI*2);ctx.stroke();
+      ctx.strokeRect(x+5,y-8,4,5);
+    }
+  }
+
+  // Depth (upper right)
+  ctx.font='bold 26px "VT323",monospace';
+  ctx.textAlign='right';
+  ctx.fillStyle='#fff';
+  ctx.shadowColor='#00000088';ctx.shadowBlur=4;
+  ctx.fillText(Math.floor(Math.max(0,depth))+'m',W-14,28);
+  ctx.shadowBlur=0;
+
+  // $ wasted
+  ctx.font='15px "VT323",monospace';
+  ctx.fillStyle='#ffffff77';
+  ctx.fillText('$'+(Math.floor(Math.max(0,depth)*47)).toLocaleString()+'/sec',W-14,46);
+  ctx.textAlign='left';
+
+  // Milestone
+  if(milestoneTimer>0){
+    const a=milestoneTimer<.5?milestoneTimer/.5:(milestoneTimer>2.7?(3.2-milestoneTimer)/.5:1);
+    ctx.save();ctx.globalAlpha=Math.max(0,Math.min(1,a));
+    ctx.font='22px "VT323",monospace';ctx.fillStyle='#ffcc00';ctx.textAlign='center';
+    ctx.shadowColor='#00000088';ctx.shadowBlur=6;
+    const lines=milestoneText.split('\n');
+    lines.forEach((l,i)=>ctx.fillText(l,W/2,H/2-(lines.length-1)*14+i*28));
+    ctx.restore();
+  }
+
+  // Waiver
+  if(waiverActive){
+    ctx.save();
+    ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(0,0,W,H);
+    const bw=Math.min(W-30,400),bh=120;
+    const bx=(W-bw)/2,by=(H-bh)/2;
+    ctx.fillStyle='#1a1a2e';ctx.strokeStyle='#ff4444';ctx.lineWidth=2;
+    ctx.fillRect(bx,by,bw,bh);ctx.strokeRect(bx,by,bw,bh);
+    ctx.font='16px "VT323",monospace';ctx.fillStyle='#ff8888';ctx.textAlign='center';
+    const words=currentWaiverText.split(' ');let wLines=[],cur='';
+    for(const w of words){const t=cur?cur+' '+w:w;if(ctx.measureText(t).width>bw-30){wLines.push(cur);cur=w}else cur=t}
+    if(cur)wLines.push(cur);
+    wLines.forEach((l,i)=>ctx.fillText(l,W/2,by+28+i*20));
+    ctx.font='10px "Press Start 2P",monospace';ctx.fillStyle='#ff4444';
+    ctx.fillText('[ TAP TO ACCEPT ]',W/2,by+bh-14);
+    ctx.restore();
+  }
+
+  // Dive hint
+  if(depth<50&&state==='playing'&&!waiverActive){
+    ctx.save();ctx.globalAlpha=.4+Math.sin(gameTime*3)*.3;
+    ctx.font='15px "VT323",monospace';ctx.fillStyle='#fff';ctx.textAlign='center';
+    ctx.fillText('HOLD TO DIVE \u25BC',W/2,H*.55);
+    ctx.fillText('\u25C0 \u25B6 TO STEER',W/2,H*.55+20);
+    ctx.restore();
+  }
+}
+
+// ═══════════════════════════════════════
+// MAIN LOOP
+// ═══════════════════════════════════════
+let lastTime=0;
+function loop(time=0){
+  const dt=Math.min(.05,(time-lastTime)/1000);
+  lastTime=time;
+  if(state==='playing'||state==='imploding'||state==='crushing'){update(dt);draw()}
+  if(state==='playing'||state==='imploding'||state==='crushing')requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>
