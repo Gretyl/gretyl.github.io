@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Predator-Prey Dynamics — Resnick</title>
+<style>
+:root { --bg: #1a1a2e; --surface: #16213e; --text: #e4e4e4; --text-muted: #8899aa; --accent: #22d3ee; --border: #2a2a4a; --sans: system-ui, -apple-system, sans-serif; --mono: 'SF Mono', 'Cascadia Code', monospace; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 1.5rem; gap: 1rem; }
+h1 { color: var(--accent); font-size: 1.4rem; }
+p.desc { color: var(--text-muted); max-width: 640px; text-align: center; font-size: 0.9rem; line-height: 1.5; }
+canvas { border: 1px solid var(--border); border-radius: 6px; }
+.row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+.controls { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: center; }
+.controls label { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
+.controls input[type=range] { width: 80px; }
+button { padding: 0.4rem 1rem; background: var(--surface); color: var(--accent); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-family: var(--sans); font-size: 0.85rem; }
+button:hover { background: var(--border); }
+.stats { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<h1>Predator-Prey Dynamics</h1>
+<p class="desc">Sheep (white) eat grass (green), wolves (red) eat sheep. Both reproduce and die. Population oscillations emerge — classic Lotka-Volterra dynamics from individual agent rules.</p>
+<div class="row">
+  <canvas id="world" width="500" height="500"></canvas>
+  <canvas id="graph" width="300" height="500"></canvas>
+</div>
+<div class="controls">
+  <button id="playPause">Pause</button>
+  <button id="resetBtn">Reset</button>
+  <label>Sheep <input type="range" id="numSheep" min="10" max="300" value="100"><span id="numSheepVal">100</span></label>
+  <label>Wolves <input type="range" id="numWolves" min="5" max="100" value="30"><span id="numWolvesVal">30</span></label>
+  <label>Speed <input type="range" id="speed" min="1" max="20" value="5"><span id="speedVal">5</span></label>
+</div>
+<div class="stats" id="stats">Tick: 0</div>
+
+<script type="module">
+import { createState, step, populations } from './sim/predator-prey.js';
+
+const world = document.getElementById('world');
+const wctx = world.getContext('2d');
+const graph = document.getElementById('graph');
+const gctx = graph.getContext('2d');
+const W = 100, H = 100;
+let state, running = true, ticksPerFrame = 5;
+const popHistory = { sheep: [], wolves: [], grass: [] };
+const MAX_HISTORY = graph.width;
+
+function init() {
+  state = createState({
+    width: W, height: H,
+    numSheep: +document.getElementById('numSheep').value,
+    numWolves: +document.getElementById('numWolves').value,
+    seed: Date.now(),
+  });
+  popHistory.sheep.length = 0;
+  popHistory.wolves.length = 0;
+  popHistory.grass.length = 0;
+}
+init();
+
+function drawWorld() {
+  const cw = world.width / W, ch = world.height / H;
+  wctx.fillStyle = '#0a0a1a';
+  wctx.fillRect(0, 0, world.width, world.height);
+
+  // Grass
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (state.grass[y * W + x] === 0) {
+        wctx.fillStyle = 'rgba(34, 139, 34, 0.4)';
+        wctx.fillRect(x * cw, y * ch, cw, ch);
+      }
+    }
+  }
+
+  // Sheep
+  wctx.fillStyle = '#ffffff';
+  for (const s of state.sheep) wctx.fillRect(s.x * cw, s.y * ch, cw, ch);
+
+  // Wolves
+  wctx.fillStyle = '#ff4444';
+  for (const w of state.wolves) wctx.fillRect(w.x * cw, w.y * ch, cw, ch);
+}
+
+function drawGraph() {
+  gctx.fillStyle = '#0a0a1a';
+  gctx.fillRect(0, 0, graph.width, graph.height);
+
+  const maxPop = Math.max(
+    Math.max(...popHistory.sheep, 1),
+    Math.max(...popHistory.wolves, 1),
+    Math.max(...popHistory.grass.map(g => g / 10), 1),
+  );
+  const h = graph.height;
+
+  function drawLine(data, color, scale = 1) {
+    gctx.strokeStyle = color;
+    gctx.lineWidth = 1.5;
+    gctx.beginPath();
+    for (let i = 0; i < data.length; i++) {
+      const x = i;
+      const y = h - (data[i] * scale / maxPop) * h;
+      if (i === 0) gctx.moveTo(x, y); else gctx.lineTo(x, y);
+    }
+    gctx.stroke();
+  }
+
+  drawLine(popHistory.sheep, '#ffffff');
+  drawLine(popHistory.wolves, '#ff4444');
+  drawLine(popHistory.grass, '#228B22', 1/10);
+
+  // Legend
+  gctx.font = '11px system-ui';
+  gctx.fillStyle = '#ffffff'; gctx.fillText('Sheep', 5, 15);
+  gctx.fillStyle = '#ff4444'; gctx.fillText('Wolves', 55, 15);
+  gctx.fillStyle = '#228B22'; gctx.fillText('Grass/10', 115, 15);
+}
+
+function record() {
+  const p = populations(state);
+  popHistory.sheep.push(p.sheep);
+  popHistory.wolves.push(p.wolves);
+  popHistory.grass.push(p.grass);
+  if (popHistory.sheep.length > MAX_HISTORY) {
+    popHistory.sheep.shift();
+    popHistory.wolves.shift();
+    popHistory.grass.shift();
+  }
+}
+
+function loop() {
+  if (running) {
+    for (let i = 0; i < ticksPerFrame; i++) { step(state); record(); }
+  }
+  drawWorld();
+  drawGraph();
+  const p = populations(state);
+  document.getElementById('stats').textContent = `Tick: ${state.tick} | Sheep: ${p.sheep} | Wolves: ${p.wolves} | Grass: ${p.grass}`;
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+document.getElementById('playPause').onclick = () => { running = !running; document.getElementById('playPause').textContent = running ? 'Pause' : 'Play'; };
+document.getElementById('resetBtn').onclick = init;
+document.getElementById('numSheep').oninput = (e) => { document.getElementById('numSheepVal').textContent = e.target.value; init(); };
+document.getElementById('numWolves').oninput = (e) => { document.getElementById('numWolvesVal').textContent = e.target.value; init(); };
+document.getElementById('speed').oninput = (e) => { ticksPerFrame = +e.target.value; document.getElementById('speedVal').textContent = e.target.value; };
+</script>
+</body>
+</html>

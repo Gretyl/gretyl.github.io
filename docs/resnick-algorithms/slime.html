@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slime Mold Aggregation — Resnick</title>
+<style>
+:root { --bg: #1a1a2e; --surface: #16213e; --text: #e4e4e4; --text-muted: #8899aa; --accent: #22d3ee; --border: #2a2a4a; --sans: system-ui, -apple-system, sans-serif; --mono: 'SF Mono', 'Cascadia Code', monospace; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 1.5rem; gap: 1rem; }
+h1 { color: var(--accent); font-size: 1.4rem; }
+p.desc { color: var(--text-muted); max-width: 640px; text-align: center; font-size: 0.9rem; line-height: 1.5; }
+canvas { border: 1px solid var(--border); border-radius: 6px; }
+.controls { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: center; }
+.controls label { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
+.controls input[type=range] { width: 90px; }
+button { padding: 0.4rem 1rem; background: var(--surface); color: var(--accent); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-family: var(--sans); font-size: 0.85rem; }
+button:hover { background: var(--border); }
+.stats { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<h1>Slime Mold Aggregation</h1>
+<p class="desc">Each cell secretes pheromone and sniffs ahead in three directions, turning toward the strongest signal. Diffusion and evaporation shape the landscape. Clusters and trails emerge.</p>
+<canvas id="canvas" width="600" height="600"></canvas>
+<div class="controls">
+  <button id="playPause">Pause</button>
+  <button id="resetBtn">Reset</button>
+  <label>Agents <input type="range" id="numAgents" min="100" max="5000" value="1500"><span id="numAgentsVal">1500</span></label>
+  <label>Evaporation <input type="range" id="evap" min="1" max="50" value="10"><span id="evapVal">0.10</span></label>
+  <label>Sensor Angle <input type="range" id="sAngle" min="1" max="30" value="6"><span id="sAngleVal">0.6</span></label>
+</div>
+<div class="stats" id="stats">Tick: 0</div>
+
+<script type="module">
+import { createState, step, totalPheromone } from './sim/slime.js';
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = 200, H = 200;
+let state, running = true;
+
+function init() {
+  state = createState({
+    width: W, height: H,
+    numAgents: +document.getElementById('numAgents').value,
+    evapRate: +document.getElementById('evap').value / 100,
+    sensorAngle: +document.getElementById('sAngle').value / 10,
+    seed: Date.now(),
+  });
+}
+init();
+
+function draw() {
+  const imageData = ctx.createImageData(canvas.width, canvas.height);
+  const d = imageData.data;
+  const scaleX = canvas.width / W, scaleY = canvas.height / H;
+
+  // Render pheromone as a heatmap
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const ph = Math.min(1, state.pheromone[y * W + x] / 30);
+      const r = Math.floor(ph * 100);
+      const g = Math.floor(ph * 255);
+      const b = Math.floor(ph * 80);
+      const px = Math.floor(x * scaleX), py = Math.floor(y * scaleY);
+      const pw = Math.ceil(scaleX), ph2 = Math.ceil(scaleY);
+      for (let dy = 0; dy < ph2 && py + dy < canvas.height; dy++) {
+        for (let dx = 0; dx < pw && px + dx < canvas.width; dx++) {
+          const idx = ((py + dy) * canvas.width + (px + dx)) * 4;
+          d[idx] = r; d[idx+1] = g; d[idx+2] = b; d[idx+3] = 255;
+        }
+      }
+    }
+  }
+
+  // Draw agents as bright dots
+  for (const a of state.agents) {
+    const px = Math.floor(a.x * scaleX);
+    const py = Math.floor(a.y * scaleY);
+    if (px >= 0 && px < canvas.width && py >= 0 && py < canvas.height) {
+      const idx = (py * canvas.width + px) * 4;
+      d[idx] = 255; d[idx+1] = 255; d[idx+2] = 255; d[idx+3] = 255;
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  document.getElementById('stats').textContent = `Tick: ${state.tick} | Agents: ${state.agents.length}`;
+}
+
+function loop() {
+  if (running) step(state);
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+document.getElementById('playPause').onclick = () => { running = !running; document.getElementById('playPause').textContent = running ? 'Pause' : 'Play'; };
+document.getElementById('resetBtn').onclick = init;
+document.getElementById('numAgents').oninput = (e) => { document.getElementById('numAgentsVal').textContent = e.target.value; init(); };
+document.getElementById('evap').oninput = (e) => { document.getElementById('evapVal').textContent = (e.target.value / 100).toFixed(2); state.evapRate = e.target.value / 100; };
+document.getElementById('sAngle').oninput = (e) => { document.getElementById('sAngleVal').textContent = (e.target.value / 10).toFixed(1); state.sensorAngle = e.target.value / 10; };
+</script>
+</body>
+</html>

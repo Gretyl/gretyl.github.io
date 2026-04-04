@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Termite Wood Gathering — Resnick</title>
+<style>
+:root { --bg: #1a1a2e; --surface: #16213e; --text: #e4e4e4; --text-muted: #8899aa; --accent: #22d3ee; --border: #2a2a4a; --sans: system-ui, -apple-system, sans-serif; --mono: 'SF Mono', 'Cascadia Code', monospace; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 1.5rem; gap: 1rem; }
+h1 { color: var(--accent); font-size: 1.4rem; }
+p.desc { color: var(--text-muted); max-width: 640px; text-align: center; font-size: 0.9rem; line-height: 1.5; }
+canvas { border: 1px solid var(--border); border-radius: 6px; image-rendering: pixelated; }
+.controls { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: center; }
+.controls label { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
+.controls input[type=range] { width: 90px; }
+button { padding: 0.4rem 1rem; background: var(--surface); color: var(--accent); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-family: var(--sans); font-size: 0.85rem; }
+button:hover { background: var(--border); }
+.stats { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<h1>Termite Wood Gathering</h1>
+<p class="desc">Termites wander randomly, picking up wood chips and dropping them near other chips. No termite knows the plan — but organized piles emerge from these simple local rules.</p>
+<canvas id="canvas" width="600" height="600"></canvas>
+<div class="controls">
+  <button id="playPause">Pause</button>
+  <button id="stepBtn">Step</button>
+  <button id="resetBtn">Reset</button>
+  <label>Termites <input type="range" id="numTermites" min="10" max="200" value="80"><span id="numTermitesVal">80</span></label>
+  <label>Wood <input type="range" id="numWood" min="50" max="1000" value="400"><span id="numWoodVal">400</span></label>
+  <label>Speed <input type="range" id="speed" min="1" max="30" value="10"><span id="speedVal">10</span></label>
+</div>
+<div class="stats" id="stats">Tick: 0 | Piles: 0</div>
+
+<script type="module">
+import { createState, step, countPiles } from './sim/termites.js';
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = 150, H = 150;
+let state, running = true, ticksPerFrame = 10;
+
+function init() {
+  state = createState({
+    width: W, height: H,
+    numTermites: +document.getElementById('numTermites').value,
+    numWood: +document.getElementById('numWood').value,
+    seed: Date.now(),
+  });
+}
+init();
+
+function draw() {
+  const cellW = canvas.width / W, cellH = canvas.height / H;
+  ctx.fillStyle = '#0a0a1a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw wood
+  ctx.fillStyle = '#8B4513';
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (state.grid[y * W + x] === 1) {
+        ctx.fillRect(x * cellW, y * cellH, cellW, cellH);
+      }
+    }
+  }
+
+  // Draw termites
+  for (const t of state.termites) {
+    ctx.fillStyle = t.carrying ? '#ff6b6b' : '#22d3ee';
+    ctx.fillRect(t.x * cellW, t.y * cellH, cellW, cellH);
+  }
+
+  const piles = state.tick % 50 === 0 ? countPiles(state) : null;
+  if (piles !== null) document.getElementById('stats').textContent = `Tick: ${state.tick} | Piles: ${piles}`;
+  else document.getElementById('stats').textContent = `Tick: ${state.tick}`;
+}
+
+function loop() {
+  if (running) for (let i = 0; i < ticksPerFrame; i++) step(state);
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+document.getElementById('playPause').onclick = () => { running = !running; document.getElementById('playPause').textContent = running ? 'Pause' : 'Play'; };
+document.getElementById('stepBtn').onclick = () => { running = false; document.getElementById('playPause').textContent = 'Play'; step(state); };
+document.getElementById('resetBtn').onclick = init;
+
+for (const [id, valId] of [['numTermites','numTermitesVal'],['numWood','numWoodVal'],['speed','speedVal']]) {
+  document.getElementById(id).oninput = (e) => {
+    document.getElementById(valId).textContent = e.target.value;
+    if (id === 'speed') ticksPerFrame = +e.target.value;
+    else init();
+  };
+}
+</script>
+</body>
+</html>

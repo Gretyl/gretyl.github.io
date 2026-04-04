@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forest Fire Spread — Resnick</title>
+<style>
+:root { --bg: #1a1a2e; --surface: #16213e; --text: #e4e4e4; --text-muted: #8899aa; --accent: #22d3ee; --border: #2a2a4a; --sans: system-ui, -apple-system, sans-serif; --mono: 'SF Mono', 'Cascadia Code', monospace; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 1.5rem; gap: 1rem; }
+h1 { color: var(--accent); font-size: 1.4rem; }
+p.desc { color: var(--text-muted); max-width: 640px; text-align: center; font-size: 0.9rem; line-height: 1.5; }
+canvas { border: 1px solid var(--border); border-radius: 6px; image-rendering: pixelated; }
+.controls { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: center; }
+.controls label { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
+.controls input[type=range] { width: 100px; }
+button { padding: 0.4rem 1rem; background: var(--surface); color: var(--accent); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-family: var(--sans); font-size: 0.85rem; }
+button:hover { background: var(--border); }
+.stats { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<h1>Forest Fire Spread</h1>
+<p class="desc">Fire spreads between adjacent trees. At low density it burns out locally; above the percolation threshold, it sweeps the entire forest. Click the canvas to ignite, or use the button to light the left edge.</p>
+<canvas id="canvas" width="600" height="600"></canvas>
+<div class="controls">
+  <button id="igniteBtn">Ignite Left Edge</button>
+  <button id="resetBtn">Reset</button>
+  <label>Density <input type="range" id="density" min="0" max="100" value="60"><span id="densityVal">0.60</span></label>
+  <label>Speed <input type="range" id="speed" min="1" max="20" value="3"><span id="speedVal">3</span></label>
+</div>
+<div class="stats" id="stats">Click canvas or press Ignite to start</div>
+
+<script type="module">
+import { createState, step, ignite, igniteLeftEdge, cellCounts, percolates, EMPTY, TREE, BURNING, BURNED } from './sim/fire.js';
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = 200, H = 200;
+let state, ticksPerFrame = 3;
+const COLORS = { [EMPTY]: '#1a1a1a', [TREE]: '#228B22', [BURNING]: '#ff4500', [BURNED]: '#333' };
+
+function init() {
+  state = createState({ width: W, height: H, density: +document.getElementById('density').value / 100, seed: Date.now() });
+}
+init();
+
+function draw() {
+  const cellW = canvas.width / W, cellH = canvas.height / H;
+  const imageData = ctx.createImageData(canvas.width, canvas.height);
+  const d = imageData.data;
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const cell = state.grid[y * W + x];
+      let r, g, b;
+      if (cell === EMPTY) { r = 26; g = 26; b = 26; }
+      else if (cell === TREE) { r = 34; g = 139; b = 34; }
+      else if (cell === BURNING) { r = 255; g = 69; b = 0; }
+      else { r = 51; g = 51; b = 51; }
+      // Fill the cell area
+      const px = Math.floor(x * cellW), py = Math.floor(y * cellH);
+      const pw = Math.ceil(cellW), ph = Math.ceil(cellH);
+      for (let dy = 0; dy < ph && py + dy < canvas.height; dy++) {
+        for (let dx = 0; dx < pw && px + dx < canvas.width; dx++) {
+          const idx = ((py + dy) * canvas.width + (px + dx)) * 4;
+          d[idx] = r; d[idx+1] = g; d[idx+2] = b; d[idx+3] = 255;
+        }
+      }
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+  const c = cellCounts(state);
+  const perc = percolates(state) ? ' | PERCOLATED' : '';
+  document.getElementById('stats').textContent = `Tick: ${state.tick} | Trees: ${c.tree} | Burning: ${c.burning} | Burned: ${c.burned}${perc}`;
+}
+
+function loop() {
+  if (state.active) for (let i = 0; i < ticksPerFrame; i++) step(state);
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+canvas.onclick = (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) / canvas.width * W);
+  const y = Math.floor((e.clientY - rect.top) / canvas.height * H);
+  ignite(state, x, y);
+};
+
+document.getElementById('igniteBtn').onclick = () => igniteLeftEdge(state);
+document.getElementById('resetBtn').onclick = init;
+document.getElementById('density').oninput = (e) => { document.getElementById('densityVal').textContent = (e.target.value / 100).toFixed(2); init(); };
+document.getElementById('speed').oninput = (e) => { ticksPerFrame = +e.target.value; document.getElementById('speedVal').textContent = e.target.value; };
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boids Flocking — Resnick</title>
+<style>
+:root { --bg: #1a1a2e; --surface: #16213e; --text: #e4e4e4; --text-muted: #8899aa; --accent: #22d3ee; --border: #2a2a4a; --sans: system-ui, -apple-system, sans-serif; --mono: 'SF Mono', 'Cascadia Code', monospace; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 1.5rem; gap: 1rem; }
+h1 { color: var(--accent); font-size: 1.4rem; }
+p.desc { color: var(--text-muted); max-width: 640px; text-align: center; font-size: 0.9rem; line-height: 1.5; }
+canvas { border: 1px solid var(--border); border-radius: 6px; }
+.controls { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: center; }
+.controls label { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
+.controls input[type=range] { width: 90px; }
+button { padding: 0.4rem 1rem; background: var(--surface); color: var(--accent); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-family: var(--sans); font-size: 0.85rem; }
+button:hover { background: var(--border); }
+.stats { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<h1>Boids Flocking</h1>
+<p class="desc">Each boid follows three simple rules — separate, align, cohere — using only local neighbors. Coordinated flocking emerges without any leader.</p>
+<canvas id="canvas" width="800" height="600"></canvas>
+<div class="controls">
+  <button id="playPause">Pause</button>
+  <button id="resetBtn">Reset</button>
+  <label>Boids <input type="range" id="numBoids" min="10" max="300" value="150"><span id="numBoidsVal">150</span></label>
+  <label>Separation <input type="range" id="sepW" min="0" max="50" value="15"><span id="sepWVal">1.5</span></label>
+  <label>Alignment <input type="range" id="aliW" min="0" max="50" value="10"><span id="aliWVal">1.0</span></label>
+  <label>Cohesion <input type="range" id="cohW" min="0" max="50" value="10"><span id="cohWVal">1.0</span></label>
+</div>
+<div class="stats" id="stats">Tick: 0</div>
+
+<script type="module">
+import { createState, step } from './sim/boids.js';
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let state, running = true;
+
+function getParams() {
+  return {
+    numBoids: +document.getElementById('numBoids').value,
+    width: canvas.width, height: canvas.height,
+    maxSpeed: 4, perceptionRadius: 50, separationRadius: 25,
+    separationWeight: +document.getElementById('sepW').value / 10,
+    alignmentWeight: +document.getElementById('aliW').value / 10,
+    cohesionWeight: +document.getElementById('cohW').value / 10,
+    seed: Date.now(),
+  };
+}
+
+function init() { state = createState(getParams()); }
+init();
+
+function draw() {
+  ctx.fillStyle = '#0a0a1a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  for (const b of state.boids) {
+    const angle = Math.atan2(b.vy, b.vx);
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(8, 0);
+    ctx.lineTo(-4, -3);
+    ctx.lineTo(-4, 3);
+    ctx.closePath();
+    ctx.fillStyle = '#22d3ee';
+    ctx.fill();
+    ctx.restore();
+  }
+  document.getElementById('stats').textContent = `Tick: ${state.tick}`;
+}
+
+function loop() {
+  if (running) step(state);
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+document.getElementById('playPause').onclick = () => { running = !running; document.getElementById('playPause').textContent = running ? 'Pause' : 'Play'; };
+document.getElementById('resetBtn').onclick = init;
+
+for (const [id, valId] of [['numBoids','numBoidsVal'],['sepW','sepWVal'],['aliW','aliWVal'],['cohW','cohWVal']]) {
+  document.getElementById(id).oninput = (e) => {
+    document.getElementById(valId).textContent = id === 'numBoids' ? e.target.value : (e.target.value / 10).toFixed(1);
+    if (id === 'numBoids') init();
+    else { state.separationWeight = +document.getElementById('sepW').value / 10; state.alignmentWeight = +document.getElementById('aliW').value / 10; state.cohesionWeight = +document.getElementById('cohW').value / 10; }
+  };
+}
+</script>
+</body>
+</html>

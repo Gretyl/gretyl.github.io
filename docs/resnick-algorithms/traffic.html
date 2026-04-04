@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traffic Jam Formation — Resnick</title>
+<style>
+:root {
+  --bg: #1a1a2e; --surface: #16213e; --text: #e4e4e4;
+  --text-muted: #8899aa; --accent: #22d3ee; --border: #2a2a4a;
+  --mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  --sans: system-ui, -apple-system, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 1.5rem; gap: 1rem; }
+h1 { color: var(--accent); font-size: 1.4rem; }
+p.desc { color: var(--text-muted); max-width: 640px; text-align: center; font-size: 0.9rem; line-height: 1.5; }
+canvas { border: 1px solid var(--border); border-radius: 6px; }
+.controls { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: center; }
+.controls label { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
+.controls input[type=range] { width: 100px; }
+button { padding: 0.4rem 1rem; background: var(--surface); color: var(--accent); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-family: var(--sans); font-size: 0.85rem; }
+button:hover { background: var(--border); }
+.stats { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<h1>Traffic Jam Formation</h1>
+<p class="desc">Cars on a circular road follow simple rules: accelerate, brake for the car ahead, and occasionally dawdle. Spontaneous traffic jams emerge and propagate backward — no external cause needed.</p>
+<canvas id="canvas" width="800" height="400"></canvas>
+<div class="controls">
+  <button id="playPause">Pause</button>
+  <button id="stepBtn">Step</button>
+  <button id="resetBtn">Reset</button>
+  <label>Cars <input type="range" id="numCars" min="5" max="80" value="30"><span id="numCarsVal">30</span></label>
+  <label>Max Speed <input type="range" id="maxSpeed" min="1" max="10" value="5"><span id="maxSpeedVal">5</span></label>
+  <label>Dawdle <input type="range" id="dawdle" min="0" max="100" value="30"><span id="dawdleVal">0.30</span></label>
+  <label>Speed <input type="range" id="speed" min="1" max="20" value="5"><span id="speedVal">5</span></label>
+</div>
+<div class="stats" id="stats">Tick: 0 | Avg speed: 0.0 | Density: 0.00</div>
+
+<script type="module">
+import { createState, step, avgSpeed, density } from './sim/traffic.js';
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const ROAD_LENGTH = 200;
+let state, running = true, ticksPerFrame = 5;
+// space-time history: each row is a snapshot of the road
+const history = [];
+const MAX_HISTORY = canvas.height;
+
+function init() {
+  state = createState({
+    roadLength: ROAD_LENGTH,
+    numCars: +document.getElementById('numCars').value,
+    maxSpeed: +document.getElementById('maxSpeed').value,
+    dawdleProb: +document.getElementById('dawdle').value / 100,
+    seed: Date.now(),
+  });
+  history.length = 0;
+}
+init();
+
+function recordSnapshot() {
+  const row = new Uint8Array(ROAD_LENGTH);
+  for (let i = 0; i < state.positions.length; i++) {
+    row[state.positions[i]] = state.speeds[i] + 1; // 0 = empty, 1+ = car with speed
+  }
+  history.push(row);
+  if (history.length > MAX_HISTORY) history.shift();
+}
+
+function draw() {
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = '#0a0a1a';
+  ctx.fillRect(0, 0, W, H);
+  const cellW = W / ROAD_LENGTH;
+  const cellH = 1;
+
+  // Draw space-time diagram (history)
+  for (let row = 0; row < history.length; row++) {
+    const y = H - history.length + row;
+    for (let x = 0; x < ROAD_LENGTH; x++) {
+      if (history[row][x] > 0) {
+        const speed = history[row][x] - 1;
+        const frac = speed / state.maxSpeed;
+        const r = Math.round(255 * (1 - frac));
+        const g = Math.round(255 * frac);
+        ctx.fillStyle = `rgb(${r},${g},80)`;
+        ctx.fillRect(x * cellW, y, Math.max(cellW, 1), cellH);
+      }
+    }
+  }
+
+  // Stats
+  const avg = avgSpeed(state).toFixed(1);
+  const d = density(state).toFixed(2);
+  document.getElementById('stats').textContent = `Tick: ${state.tick} | Avg speed: ${avg} | Density: ${d}`;
+}
+
+function tick() {
+  step(state);
+  recordSnapshot();
+}
+
+function loop() {
+  if (running) {
+    for (let i = 0; i < ticksPerFrame; i++) tick();
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+document.getElementById('playPause').onclick = () => {
+  running = !running;
+  document.getElementById('playPause').textContent = running ? 'Pause' : 'Play';
+};
+document.getElementById('stepBtn').onclick = () => { running = false; document.getElementById('playPause').textContent = 'Play'; tick(); };
+document.getElementById('resetBtn').onclick = init;
+
+for (const id of ['numCars', 'maxSpeed', 'dawdle', 'speed']) {
+  document.getElementById(id).oninput = (e) => {
+    if (id === 'dawdle') {
+      document.getElementById('dawdleVal').textContent = (e.target.value / 100).toFixed(2);
+    } else if (id === 'speed') {
+      ticksPerFrame = +e.target.value;
+      document.getElementById('speedVal').textContent = e.target.value;
+    } else {
+      document.getElementById(id + 'Val').textContent = e.target.value;
+    }
+    if (id !== 'speed') init();
+  };
+}
+</script>
+</body>
+</html>

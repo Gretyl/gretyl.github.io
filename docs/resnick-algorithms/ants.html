@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ant Foraging — Resnick</title>
+<style>
+:root { --bg: #1a1a2e; --surface: #16213e; --text: #e4e4e4; --text-muted: #8899aa; --accent: #22d3ee; --border: #2a2a4a; --sans: system-ui, -apple-system, sans-serif; --mono: 'SF Mono', 'Cascadia Code', monospace; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 1.5rem; gap: 1rem; }
+h1 { color: var(--accent); font-size: 1.4rem; }
+p.desc { color: var(--text-muted); max-width: 640px; text-align: center; font-size: 0.9rem; line-height: 1.5; }
+canvas { border: 1px solid var(--border); border-radius: 6px; }
+.controls { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: center; }
+.controls label { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
+.controls input[type=range] { width: 90px; }
+button { padding: 0.4rem 1rem; background: var(--surface); color: var(--accent); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-family: var(--sans); font-size: 0.85rem; }
+button:hover { background: var(--border); }
+.stats { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<h1>Ant Foraging</h1>
+<p class="desc">Ants leave the nest (blue), find food (green), and return laying pheromone trails (yellow glow). Other ants follow pheromone gradients — efficient paths emerge without central planning.</p>
+<canvas id="canvas" width="600" height="600"></canvas>
+<div class="controls">
+  <button id="playPause">Pause</button>
+  <button id="resetBtn">Reset</button>
+  <label>Ants <input type="range" id="numAnts" min="10" max="200" value="80"><span id="numAntsVal">80</span></label>
+  <label>Evaporation <input type="range" id="evap" min="1" max="100" value="20"><span id="evapVal">0.02</span></label>
+  <label>Speed <input type="range" id="speed" min="1" max="20" value="5"><span id="speedVal">5</span></label>
+</div>
+<div class="stats" id="stats">Tick: 0 | Delivered: 0</div>
+
+<script type="module">
+import { createState, step } from './sim/ants.js';
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = 120, H = 120;
+let state, running = true, ticksPerFrame = 5;
+
+function init() {
+  state = createState({
+    width: W, height: H,
+    numAnts: +document.getElementById('numAnts').value,
+    evaporationRate: +document.getElementById('evap').value / 1000,
+    seed: Date.now(),
+  });
+}
+init();
+
+function draw() {
+  const cellW = canvas.width / W, cellH = canvas.height / H;
+  ctx.fillStyle = '#0a0a1a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw pheromone
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const ph = state.pheromone[y * W + x];
+      if (ph > 0.1) {
+        const intensity = Math.min(1, ph / 20);
+        ctx.fillStyle = `rgba(255, 200, 0, ${intensity * 0.6})`;
+        ctx.fillRect(x * cellW, y * cellH, cellW, cellH);
+      }
+    }
+  }
+
+  // Draw nest
+  ctx.fillStyle = '#4488ff';
+  ctx.fillRect((state.nestX - 2) * cellW, (state.nestY - 2) * cellH, 5 * cellW, 5 * cellH);
+
+  // Draw food zone
+  ctx.fillStyle = 'rgba(0, 200, 0, 0.3)';
+  ctx.beginPath();
+  ctx.arc(state.foodX * cellW, state.foodY * cellH, state.foodRadius * cellW, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Draw ants
+  for (const a of state.ants) {
+    ctx.fillStyle = a.hasFood ? '#ff6b6b' : '#ffffff';
+    ctx.fillRect(a.x * cellW, a.y * cellH, cellW, cellH);
+  }
+
+  document.getElementById('stats').textContent = `Tick: ${state.tick} | Delivered: ${state.foodDelivered} | Remaining: ${state.foodRemaining}`;
+}
+
+function loop() {
+  if (running) for (let i = 0; i < ticksPerFrame; i++) step(state);
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+document.getElementById('playPause').onclick = () => { running = !running; document.getElementById('playPause').textContent = running ? 'Pause' : 'Play'; };
+document.getElementById('resetBtn').onclick = init;
+document.getElementById('numAnts').oninput = (e) => { document.getElementById('numAntsVal').textContent = e.target.value; init(); };
+document.getElementById('evap').oninput = (e) => { document.getElementById('evapVal').textContent = (e.target.value / 1000).toFixed(3); state.evaporationRate = e.target.value / 1000; };
+document.getElementById('speed').oninput = (e) => { ticksPerFrame = +e.target.value; document.getElementById('speedVal').textContent = e.target.value; };
+</script>
+</body>
+</html>
