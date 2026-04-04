@@ -21,7 +21,7 @@ Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, 
 - **Entries** section is for self-contained subproject directories under `docs/` (e.g., `resnick-algorithms/`, `functional-data-structures/`). Each entry has an `index.md` (Jekyll front matter + content adapted from README.md), a `_summary.md` (used by cog to generate homepage blurbs), and optionally `demo.md`, `notes.md`, and other supporting files
 - Homepage summaries in `docs/index.html` are auto-generated from `_summary.md` files via [cogapp](https://pypi.org/project/cogapp/). Run `cd docs && uvx --from cogapp cog -r index.html` to regenerate after adding or updating entries
 - Navigation in `docs/_config.yml` must be updated when adding new entries (add to the `Entries` sublist)
-- All Jekyll-rendered pages should include `{% include analytics.html %}` for Google Analytics
+- **Analytics:** Jekyll-rendered pages (with front matter) use `{% include analytics.html %}`. Standalone HTML files (no front matter) must inline the raw GA4 snippet in `<head>` instead — Jekyll does not process Liquid tags in files without front matter, so `{% include %}` would appear as literal text
 
 ## Commits
 
