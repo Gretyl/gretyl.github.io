@@ -50,7 +50,13 @@ The `-w` and `-h` flags set the viewport size. Use `960` width to see the deskto
 
 ### 4. Commit the screenshot for PR review
 
-Save screenshots to `previews/` and push to the feature branch so reviewers can see them in the PR diff without deploying.
+PNGs in `previews/` are gitignored by default to avoid shipping accidental screenshots. To include one for PR review, force-add it:
+
+```bash
+git add -f previews/my-preview.png
+```
+
+Remove preview PNGs before merging — they are ephemeral review artifacts, not permanent repo content.
 
 ## Image processing
 
