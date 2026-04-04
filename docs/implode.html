@@ -25,7 +25,6 @@
 
   #scores-screen{background:#0a0a12}
   #scores-screen h2{font-family:'Press Start 2P',monospace;font-size:clamp(14px,3.5vw,20px);color:#ffcc00;margin-bottom:6px}
-  #scores-screen .sub{font-family:'VT323',monospace;font-size:18px;color:#ff888888;margin-bottom:18px}
   .score-table{font-family:'VT323',monospace;font-size:clamp(18px,4vw,24px);color:#33ff99;line-height:2;margin-bottom:24px;text-shadow:0 0 8px #33ff9944}
   .score-row{display:flex;justify-content:space-between;width:min(300px,80vw)}
   .score-rank{color:#ffcc00;width:40px;text-align:left}
@@ -74,7 +73,6 @@
 
 <div id="scores-screen" class="screen hidden">
   <h2>FORBES ABYSS LIST</h2>
-  <div class="sub">Ranked by shallowest demise</div>
   <div id="score-list" class="score-table"></div>
   <button class="btn btn-small" id="btn-scores-back">BACK</button>
   <button class="btn btn-small" id="btn-unplug" style="display:none;position:fixed;bottom:16px;left:16px;background:#444;box-shadow:0 3px 0 #222,0 5px 12px #00000066;font-size:clamp(7px,1.8vw,9px);padding:8px 14px;pointer-events:auto">UNPLUG CABINET</button>
@@ -398,12 +396,14 @@ function initGame(){
 // INPUT
 // ═══════════════════════════════════════
 let inputDown=false,inputX=null,keys={};
+let usingTouch=false; // guard against double-processing on touch devices
+
 window.addEventListener('keydown',e=>{keys[e.key]=true});
 window.addEventListener('keyup',e=>{keys[e.key]=false});
-canvas.addEventListener('mousedown',e=>{inputDown=true;inputX=e.clientX});
-canvas.addEventListener('mousemove',e=>{if(inputDown)inputX=e.clientX});
-canvas.addEventListener('mouseup',()=>{inputDown=false;inputX=null});
-canvas.addEventListener('touchstart',e=>{inputDown=true;inputX=e.touches[0].clientX;e.preventDefault()},{passive:false});
+canvas.addEventListener('mousedown',e=>{if(usingTouch)return;inputDown=true;inputX=e.clientX});
+canvas.addEventListener('mousemove',e=>{if(usingTouch)return;if(inputDown)inputX=e.clientX});
+canvas.addEventListener('mouseup',()=>{if(usingTouch)return;inputDown=false;inputX=null});
+canvas.addEventListener('touchstart',e=>{usingTouch=true;inputDown=true;inputX=e.touches[0].clientX;e.preventDefault()},{passive:false});
 canvas.addEventListener('touchmove',e=>{inputX=e.touches[0].clientX;e.preventDefault()},{passive:false});
 canvas.addEventListener('touchend',e=>{inputDown=false;inputX=null;e.preventDefault()},{passive:false});
 
@@ -646,8 +646,8 @@ function update(dt){
     // Invulnerability
     if(invulnTimer>0){invulnTimer-=dt;blinkPhase+=dt*12}
 
-    // Wall collision (only when visible and not invuln)
-    if(invulnTimer<=0&&scrollOffset>=0){
+    // Wall collision (only when submerged and not invuln)
+    if(depth>0&&invulnTimer<=0&&scrollOffset>=0){
       const checkY=scrollOffset+subY;
       const wIdx=Math.floor(checkY/SEG_H);
       for(let i=-2;i<=2;i++){
@@ -660,8 +660,8 @@ function update(dt){
       }
     }
 
-    // Obstruction collision (also takes hull damage, not instant death)
-    if(invulnTimer<=0){
+    // Obstruction collision (only when submerged)
+    if(depth>0&&invulnTimer<=0){
       for(const obs of obstructions){
         const sy=obs.y-scrollOffset;
         if(sy>-50&&sy<H+50){
@@ -763,8 +763,8 @@ function update(dt){
           }
         }
       }
-      // Collision with sub (uses hull integrity system)
-      if(invulnTimer<=0){
+      // Collision with sub (only when submerged)
+      if(depth>0&&invulnTimer<=0){
         const sy=sk.y-scrollOffset;
         const halfSk=sk.size*0.6;
         if(Math.abs(sy-subY)<SUB_H/2+halfSk && Math.abs(sk.x-subX)<SUB_W/2+halfSk){
