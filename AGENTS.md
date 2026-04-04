@@ -22,6 +22,7 @@ Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, 
 - Homepage summaries in `docs/index.html` are auto-generated from `_summary.md` files via [cogapp](https://pypi.org/project/cogapp/). Run `cd docs && uvx --from cogapp cog -r index.html` to regenerate after adding or updating entries
 - Navigation in `docs/_config.yml` must be updated when adding new entries (add to the `Entries` sublist)
 - **Analytics:** Jekyll-rendered pages (with front matter) use `{% include analytics.html %}`. Standalone HTML files (no front matter) must inline the raw GA4 snippet in `<head>` instead — Jekyll does not process Liquid tags in files without front matter, so `{% include %}` would appear as literal text
+- **GitHub Pages + Jekyll:** This site uses the `jekyll-remote-theme` plugin with `vaibhavvikas/jekyll-theme-minimalistic`. For layout, includes, and deployment details, see the [GitHub Pages documentation](https://docs.github.com/en/pages)
 
 ## Branching workflow
 
