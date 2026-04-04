@@ -1,0 +1,6 @@
+Exploring browser directory access, this investigation delivers a single-file [webkitdirectory demo](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/webkitdirectory) showcasing three input modes (input picker, `showDirectoryPicker()`, drag/drop) and normalizing them for SPA workflows. The demo details directory tree reconstruction, statistical dashboards, file previews, and manifests for raw file data, highlighting how frontend tools like [File System Access API](https://web.dev/file-system-access/) enable rich client-side exploration but remain fundamentally read-only. A design proposal examines strategies for syncing client snapshots to server state, dissecting ingestion patterns, architectural tradeoffs, and security implications for self-hosted SPAs. The key engineering challenge shifts from client file picking to durable, scalable sync protocols and careful handling of user data boundaries.
+
+Key findings:
+- Directory access is readily available, but only as a read-only snapshot.
+- Most complexity arises in synchronizing ephemeral client state with persistent server-side state.
+- Progressive enhancement with `showDirectoryPicker()` offers bidirectional sync where supported.

@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>webkitdirectory Demo — What JS Can Do With Directory Selection</title>
+<style>
+:root {
+  color-scheme: dark light;
+  --bg: #1a1a2e;
+  --surface: #16213e;
+  --surface2: #0f3460;
+  --text: #e4e4e4;
+  --text-muted: #8899aa;
+  --accent: #e94560;
+  --accent2: #533483;
+  --border: #2a2a4a;
+  --green: #4ecca3;
+  --blue: #6c9bcf;
+  --orange: #f0a500;
+  --radius: 8px;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --surface2: #eaeaea;
+    --text: #1a1a2e;
+    --text-muted: #666;
+    --border: #ddd;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+h1 {
+  font-size: 1.8rem;
+  margin: 0 0 0.25rem;
+}
+h1 code {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+}
+.subtitle {
+  color: var(--text-muted);
+  margin: 0 0 2rem;
+}
+h2 {
+  font-size: 1.2rem;
+  margin: 2rem 0 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--border);
+}
+h2 .badge {
+  font-size: 0.7rem;
+  background: var(--accent2);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  vertical-align: middle;
+  margin-left: 8px;
+  font-weight: normal;
+}
+
+/* ---------- Picker area ---------- */
+.picker-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.pick-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.pick-btn:hover { opacity: 0.85; }
+.pick-btn.secondary {
+  background: var(--accent2);
+}
+.pick-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+#hidden-input { display: none; }
+
+/* ---------- Drop zone ---------- */
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: 1.5rem;
+}
+.drop-zone.active {
+  border-color: var(--accent);
+  background: rgba(233, 69, 96, 0.06);
+}
+
+/* ---------- Stats ---------- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+}
+.stat-card .value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.stat-card .label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---------- Type breakdown ---------- */
+.type-bar {
+  display: flex;
+  height: 24px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  background: var(--surface);
+}
+.type-bar div {
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+.type-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+.type-legend span::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* ---------- Tree ---------- */
+.tree-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  max-height: 400px;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+.tree-container .dir { color: var(--blue); font-weight: 600; cursor: pointer; }
+.tree-container .file { color: var(--text-muted); cursor: pointer; }
+.tree-container .file:hover, .tree-container .dir:hover { color: var(--accent); }
+.tree-container ul {
+  list-style: none;
+  padding-left: 1.2rem;
+  margin: 0;
+}
+.tree-container > ul { padding-left: 0; }
+.tree-container li { position: relative; }
+.tree-container li::before {
+  content: '';
+  position: absolute;
+  left: -0.9rem;
+  top: 0;
+  height: 100%;
+  border-left: 1px solid var(--border);
+}
+.tree-container li:last-child::before { height: 0.8em; }
+.tree-container .size-hint {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+.collapsed > ul { display: none; }
+
+/* ---------- File preview ---------- */
+.preview-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  min-height: 100px;
+  display: none;
+}
+.preview-panel.visible { display: block; }
+.preview-panel h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--green);
+  font-family: var(--font-mono);
+}
+.preview-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+.preview-content {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 1rem;
+  max-height: 300px;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.preview-content img {
+  max-width: 100%;
+  max-height: 280px;
+  border-radius: 4px;
+}
+
+/* ---------- Raw file list ---------- */
+.file-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+table.file-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+table.file-table th, table.file-table td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+table.file-table th {
+  background: var(--surface2);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: sticky;
+  top: 0;
+}
+table.file-table tr:hover td { background: rgba(233, 69, 96, 0.04); }
+.path-col { font-family: var(--font-mono); font-size: 0.8rem; }
+.num-col { text-align: right !important; font-family: var(--font-mono); }
+
+/* ---------- API info ---------- */
+.api-info {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+.api-info code {
+  background: var(--surface2);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+.api-info .supported { color: var(--green); }
+.api-info .unsupported { color: var(--accent); }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1><code>&lt;input webkitdirectory&gt;</code> Demo</h1>
+  <p class="subtitle">Everything JavaScript can do once you pick a directory</p>
+
+  <!-- API support detection -->
+  <div class="api-info" id="api-info"></div>
+
+  <!-- Picker controls -->
+  <div class="picker-row">
+    <button class="pick-btn" id="btn-webkit" onclick="pickViaInput()">
+      Pick Directory (webkitdirectory)
+    </button>
+    <button class="pick-btn secondary" id="btn-fsa" onclick="pickViaFSA()">
+      Pick Directory (showDirectoryPicker)
+    </button>
+  </div>
+  <input type="file" id="hidden-input" webkitdirectory multiple>
+
+  <!-- Drop zone -->
+  <div class="drop-zone" id="drop-zone">
+    Drop a folder here
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid hidden" id="stats-grid">
+    <div class="stat-card"><div class="value" id="stat-files">0</div><div class="label">Files</div></div>
+    <div class="stat-card"><div class="value" id="stat-dirs">0</div><div class="label">Directories</div></div>
+    <div class="stat-card"><div class="value" id="stat-size">0</div><div class="label">Total Size</div></div>
+    <div class="stat-card"><div class="value" id="stat-depth">0</div><div class="label">Max Depth</div></div>
+  </div>
+
+  <!-- Type breakdown bar -->
+  <div class="hidden" id="type-section">
+    <h2>File Types</h2>
+    <div class="type-bar" id="type-bar"></div>
+    <div class="type-legend" id="type-legend"></div>
+  </div>
+
+  <!-- Tree view -->
+  <div class="hidden" id="tree-section">
+    <h2>Directory Tree <span class="badge">click to expand/collapse, click file to preview</span></h2>
+    <div class="tree-container" id="tree"></div>
+  </div>
+
+  <!-- File preview -->
+  <div class="preview-panel" id="preview-panel">
+    <h3 id="preview-name"></h3>
+    <div class="preview-meta" id="preview-meta"></div>
+    <div class="preview-content" id="preview-content"></div>
+  </div>
+
+  <!-- Raw table -->
+  <div class="hidden" id="table-section">
+    <h2>All Files <span class="badge">webkitRelativePath</span></h2>
+    <div class="file-table-wrap" style="max-height:350px;overflow:auto">
+      <table class="file-table">
+        <thead><tr>
+          <th>Path</th><th>Type</th><th class="num-col">Size</th><th>Modified</th>
+        </tr></thead>
+        <tbody id="file-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── Globals ────────────────────────────────────────────────────────
+let allFiles = [];      // Array of File objects from the last pick
+let fileMap = new Map(); // webkitRelativePath → File
+
+// ─── Detect API support ─────────────────────────────────────────────
+const supportsWebkitDir = 'webkitdirectory' in document.createElement('input');
+const supportsFSA = 'showDirectoryPicker' in window;
+
+document.getElementById('api-info').innerHTML = [
+  `<b>webkitdirectory:</b> <span class="${supportsWebkitDir ? 'supported' : 'unsupported'}">${supportsWebkitDir ? 'supported' : 'not supported'}</span>`,
+  `<b>showDirectoryPicker:</b> <span class="${supportsFSA ? 'supported' : 'unsupported'}">${supportsFSA ? 'supported' : 'not supported'}</span>`,
+  `<b>DataTransferItem.webkitGetAsEntry:</b> <span class="${'webkitGetAsEntry' in DataTransferItem.prototype ? 'supported' : 'unsupported'}">${'webkitGetAsEntry' in DataTransferItem.prototype ? 'supported' : 'not supported'}</span>`,
+].join(' &nbsp;|&nbsp; ');
+
+if (!supportsFSA) document.getElementById('btn-fsa').disabled = true;
+
+// ─── Pick via <input webkitdirectory> ───────────────────────────────
+const hiddenInput = document.getElementById('hidden-input');
+
+function pickViaInput() {
+  hiddenInput.value = '';
+  hiddenInput.click();
+}
+
+hiddenInput.addEventListener('change', () => {
+  processFiles(Array.from(hiddenInput.files));
+});
+
+// ─── Pick via File System Access API ────────────────────────────────
+async function pickViaFSA() {
+  if (!supportsFSA) return;
+  try {
+    const dirHandle = await window.showDirectoryPicker({ mode: 'read' });
+    const files = await collectFSAFiles(dirHandle, dirHandle.name);
+    processFiles(files);
+  } catch (err) {
+    if (err.name !== 'AbortError') console.error(err);
+  }
+}
+
+async function collectFSAFiles(dirHandle, basePath) {
+  const files = [];
+  for await (const entry of dirHandle.values()) {
+    const entryPath = `${basePath}/${entry.name}`;
+    if (entry.kind === 'file') {
+      const file = await entry.getFile();
+      // Polyfill webkitRelativePath for consistent handling
+      Object.defineProperty(file, 'webkitRelativePath', {
+        configurable: true, enumerable: true, get: () => entryPath,
+      });
+      files.push(file);
+    } else if (entry.kind === 'directory') {
+      files.push(...await collectFSAFiles(entry, entryPath));
+    }
+  }
+  return files;
+}
+
+// ─── Drag & Drop ────────────────────────────────────────────────────
+const dropZone = document.getElementById('drop-zone');
+
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('active'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('active'));
+dropZone.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('active');
+  const items = [...e.dataTransfer.items];
+  const files = [];
+
+  for (const item of items) {
+    const entry = item.webkitGetAsEntry?.() ?? item.getAsEntry?.();
+    if (entry) {
+      await readEntry(entry, '', files);
+    }
+  }
+  if (files.length) processFiles(files);
+});
+
+function readEntry(entry, path, acc) {
+  return new Promise((resolve) => {
+    if (entry.isFile) {
+      entry.file((f) => {
+        Object.defineProperty(f, 'webkitRelativePath', {
+          configurable: true, enumerable: true, get: () => path + f.name,
+        });
+        acc.push(f);
+        resolve();
+      });
+    } else if (entry.isDirectory) {
+      const reader = entry.createReader();
+      const dirPath = path + entry.name + '/';
+      const readBatch = () => {
+        reader.readEntries(async (entries) => {
+          if (entries.length === 0) { resolve(); return; }
+          for (const e of entries) await readEntry(e, dirPath, acc);
+          readBatch(); // readEntries may paginate
+        });
+      };
+      readBatch();
+    }
+  });
+}
+
+// ─── Process files ──────────────────────────────────────────────────
+function processFiles(files) {
+  allFiles = files.sort((a, b) =>
+    (a.webkitRelativePath || a.name).localeCompare(b.webkitRelativePath || b.name)
+  );
+  fileMap = new Map(allFiles.map(f => [f.webkitRelativePath || f.name, f]));
+
+  renderStats();
+  renderTypeBar();
+  renderTree();
+  renderTable();
+
+  // Unhide sections
+  for (const id of ['stats-grid', 'type-section', 'tree-section', 'table-section']) {
+    document.getElementById(id).classList.remove('hidden');
+  }
+}
+
+// ─── Stats ──────────────────────────────────────────────────────────
+function renderStats() {
+  const totalSize = allFiles.reduce((s, f) => s + f.size, 0);
+  const dirs = new Set();
+  let maxDepth = 0;
+
+  for (const f of allFiles) {
+    const parts = (f.webkitRelativePath || f.name).split('/');
+    maxDepth = Math.max(maxDepth, parts.length - 1);
+    for (let i = 1; i < parts.length; i++) {
+      dirs.add(parts.slice(0, i).join('/'));
+    }
+  }
+
+  document.getElementById('stat-files').textContent = allFiles.length.toLocaleString();
+  document.getElementById('stat-dirs').textContent = dirs.size.toLocaleString();
+  document.getElementById('stat-size').textContent = humanSize(totalSize);
+  document.getElementById('stat-depth').textContent = maxDepth;
+}
+
+function humanSize(bytes) {
+  if (bytes === 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+  return (bytes / 1024 ** i).toFixed(i ? 1 : 0) + ' ' + units[i];
+}
+
+// ─── Type breakdown ─────────────────────────────────────────────────
+const TYPE_COLORS = [
+  '#e94560', '#4ecca3', '#6c9bcf', '#f0a500', '#533483',
+  '#00b8a9', '#f67280', '#c3aed6', '#355c7d', '#f8b500',
+];
+
+function categorize(file) {
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  const mime = file.type || '';
+  if (mime.startsWith('image/')) return 'Images';
+  if (mime.startsWith('video/')) return 'Video';
+  if (mime.startsWith('audio/')) return 'Audio';
+  if (mime.startsWith('text/') || ['js','ts','jsx','tsx','py','rb','rs','go','c','cpp','h','css','html','htm','xml','json','yaml','yml','toml','md','txt','sh','bat','sql','csv','log','ini','cfg','conf','env','lock'].includes(ext)) return 'Text/Code';
+  if (['pdf'].includes(ext)) return 'PDF';
+  if (['zip','gz','tar','bz2','7z','rar','xz'].includes(ext)) return 'Archives';
+  if (['woff','woff2','ttf','otf','eot'].includes(ext)) return 'Fonts';
+  return 'Other';
+}
+
+function renderTypeBar() {
+  const groups = {};
+  for (const f of allFiles) {
+    const cat = categorize(f);
+    groups[cat] = (groups[cat] || 0) + f.size;
+  }
+  const total = allFiles.reduce((s, f) => s + f.size, 0) || 1;
+  const sorted = Object.entries(groups).sort((a, b) => b[1] - a[1]);
+
+  const bar = document.getElementById('type-bar');
+  const legend = document.getElementById('type-legend');
+  bar.innerHTML = '';
+  legend.innerHTML = '';
+
+  sorted.forEach(([cat, size], i) => {
+    const color = TYPE_COLORS[i % TYPE_COLORS.length];
+    const pct = (size / total * 100);
+    const seg = document.createElement('div');
+    seg.style.width = pct + '%';
+    seg.style.background = color;
+    seg.title = `${cat}: ${humanSize(size)} (${pct.toFixed(1)}%)`;
+    bar.appendChild(seg);
+
+    const item = document.createElement('span');
+    item.style.cssText = `--dot-color:${color}`;
+    item.innerHTML = `<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${color};margin-right:4px;vertical-align:middle"></span>${cat} ${pct.toFixed(1)}%`;
+    legend.appendChild(item);
+  });
+}
+
+// ─── Tree view ──────────────────────────────────────────────────────
+function buildTree(files) {
+  const root = { __files: [] };
+  for (const f of files) {
+    const parts = (f.webkitRelativePath || f.name).split('/');
+    let node = root;
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (!node[parts[i]]) node[parts[i]] = { __files: [] };
+      node = node[parts[i]];
+    }
+    node.__files.push(f);
+  }
+  return root;
+}
+
+function renderTree() {
+  const tree = buildTree(allFiles);
+  const container = document.getElementById('tree');
+  container.innerHTML = '';
+  container.appendChild(treeToDOM(tree, true));
+}
+
+function treeToDOM(node, isRoot) {
+  const ul = document.createElement('ul');
+  // directories first
+  const dirKeys = Object.keys(node).filter(k => k !== '__files').sort();
+  for (const dir of dirKeys) {
+    const li = document.createElement('li');
+    const span = document.createElement('span');
+    span.className = 'dir';
+    span.textContent = dir + '/';
+    span.addEventListener('click', (e) => {
+      e.stopPropagation();
+      li.classList.toggle('collapsed');
+    });
+    li.appendChild(span);
+    li.appendChild(treeToDOM(node[dir], false));
+    ul.appendChild(li);
+  }
+  // files
+  for (const f of (node.__files || [])) {
+    const li = document.createElement('li');
+    const span = document.createElement('span');
+    span.className = 'file';
+    span.textContent = f.name;
+    const hint = document.createElement('span');
+    hint.className = 'size-hint';
+    hint.textContent = humanSize(f.size);
+    span.appendChild(hint);
+    span.addEventListener('click', (e) => { e.stopPropagation(); previewFile(f); });
+    li.appendChild(span);
+    ul.appendChild(li);
+  }
+  return ul;
+}
+
+// ─── File preview ───────────────────────────────────────────────────
+async function previewFile(file) {
+  const panel = document.getElementById('preview-panel');
+  const nameEl = document.getElementById('preview-name');
+  const metaEl = document.getElementById('preview-meta');
+  const contentEl = document.getElementById('preview-content');
+
+  nameEl.textContent = file.webkitRelativePath || file.name;
+  metaEl.textContent = [
+    `Type: ${file.type || 'unknown'}`,
+    `Size: ${humanSize(file.size)}`,
+    `Modified: ${new Date(file.lastModified).toLocaleString()}`,
+  ].join(' · ');
+
+  contentEl.innerHTML = '';
+
+  if (file.type.startsWith('image/')) {
+    const url = URL.createObjectURL(file);
+    const img = document.createElement('img');
+    img.src = url;
+    img.onload = () => URL.revokeObjectURL(url);
+    contentEl.appendChild(img);
+  } else if (file.type.startsWith('video/')) {
+    contentEl.textContent = `[Video file — ${humanSize(file.size)}]`;
+  } else if (file.type.startsWith('audio/')) {
+    const url = URL.createObjectURL(file);
+    const audio = document.createElement('audio');
+    audio.controls = true;
+    audio.src = url;
+    contentEl.appendChild(audio);
+  } else if (file.size > 1024 * 512) {
+    contentEl.textContent = `[File too large to preview — ${humanSize(file.size)}]`;
+  } else {
+    try {
+      const text = await file.text();
+      contentEl.textContent = text.slice(0, 50000);
+    } catch {
+      contentEl.textContent = '[Could not read file contents]';
+    }
+  }
+
+  panel.classList.add('visible');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ─── File table ─────────────────────────────────────────────────────
+function renderTable() {
+  const tbody = document.getElementById('file-tbody');
+  tbody.innerHTML = '';
+
+  for (const f of allFiles) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="path-col">${escHtml(f.webkitRelativePath || f.name)}</td>
+      <td>${escHtml(f.type || '—')}</td>
+      <td class="num-col">${humanSize(f.size)}</td>
+      <td>${new Date(f.lastModified).toLocaleDateString()}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
