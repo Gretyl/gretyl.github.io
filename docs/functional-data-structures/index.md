@@ -3,6 +3,8 @@ layout: default
 title: Purely Functional Data Structures
 ---
 
+{% include analytics.html %}
+
 A `collections`-style Python module implementing six core data structures from
 Chris Okasaki's *Purely Functional Data Structures* (1998). All structures are
 persistent and immutable — operations return new instances, leaving originals

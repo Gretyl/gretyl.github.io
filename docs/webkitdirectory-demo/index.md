@@ -3,6 +3,8 @@ layout: default
 title: webkitdirectory Demo
 ---
 
+{% include analytics.html %}
+
 A self-contained HTML demo exploring everything JavaScript can do with
 `<input type="file" webkitdirectory>` — the browser's directory picker.
 

@@ -3,6 +3,8 @@ layout: default
 title: Resnick Algorithm Artifacts
 ---
 
+{% include analytics.html %}
+
 Interactive standalone simulations of the core algorithms from Mitchel Resnick's
 *Turtles, Termites, and Traffic Jams: Explorations in Massively Parallel
 Microworlds* (1994).

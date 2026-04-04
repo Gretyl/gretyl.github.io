@@ -3,7 +3,7 @@ plugins:
   - jekyll-remote-theme
 
 title: Gretyl
-description: Arcade and tools
+description: Arcade, tools, and entries
 
 navigation:
   - name: Arcade
@@ -18,3 +18,12 @@ navigation:
     sublist:
       - name: Shadertoy Harness
         link: ./tools/shadertoy.html
+  - name: Entries
+    link: ./#entries
+    sublist:
+      - name: Resnick Algorithms
+        link: ./resnick-algorithms/
+      - name: Functional Data Structures
+        link: ./functional-data-structures/
+      - name: webkitdirectory Demo
+        link: ./webkitdirectory-demo/
