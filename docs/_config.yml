@@ -14,6 +14,13 @@ navigation:
         link: /artemis-trail.html
       - name: Implode
         link: /implode.html
+  - name: Entries
+    link: /#entries
+    sublist:
+      - name: Resnick Algorithms
+        link: /resnick-algorithms/
+      - name: Functional Data Structures
+        link: /functional-data-structures/
   - name: Tools
     link: /#tools
     sublist:
@@ -23,10 +30,8 @@ navigation:
         link: /tools/shadertoy.html
       - name: webkitdirectory Demo
         link: /tools/webkitdirectory-demo/
-  - name: Entries
-    link: /#entries
+  - name: Tutorials
+    link: /#tutorials
     sublist:
-      - name: Resnick Algorithms
-        link: /resnick-algorithms/
-      - name: Functional Data Structures
-        link: /functional-data-structures/
+      - name: Greed
+        link: /tutorials/greed.html
