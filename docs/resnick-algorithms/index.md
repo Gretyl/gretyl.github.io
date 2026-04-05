@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Resnick Algorithm Artifacts
+title: Resnick Algorithms
 ---
 
 {% include analytics.html %}
@@ -34,6 +34,13 @@ Each simulation has a strict two-layer split:
 
 - **`*.html`** — Self-contained interactive artifacts. Import from `sim/` via
   ES modules. Own the Canvas rendering, UI controls, and animation loop.
+
+## Changelogs
+
+Each HTML artifact includes an inline changelog section visible at the bottom
+of the page. These record post-release bug fixes with enough detail to
+understand the problem, diagnosis, and resolution -- no commit log or issue
+tracker required. See `predator-prey.html` and `termites.html` for examples.
 
 ## Running
 
