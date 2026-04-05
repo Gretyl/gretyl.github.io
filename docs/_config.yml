@@ -4,7 +4,7 @@ plugins:
 
 logo: assets/avatar.png
 title: Gretyl
-description: Arcade, tools, and entries
+description: Arcade, tools and entries
 
 navigation:
   - name: Arcade
