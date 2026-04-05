@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenGraph Tag Generator</title>
+  <style>
+    :root {
+      --bg: #f5f5f5;
+      --surface: #ffffff;
+      --surface2: #e8e8e8;
+      --text: #1a1a1a;
+      --text-muted: #666666;
+      --accent: #0d9488;
+      --accent-hover: #0f766e;
+      --border: #d4d4d4;
+      --code-bg: #f0f0f0;
+      --tag-color: #be185d;
+      --attr-color: #0d9488;
+      --val-color: #7c3aed;
+      --green: #16a34a;
+      --radius: 8px;
+      --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      --card-bg: #282c37;
+      --card-text: #d9e1e8;
+      --card-muted: #8899a6;
+      --card-border: #393f4f;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a2e;
+        --surface: #16213e;
+        --surface2: #0f3460;
+        --text: #e4e4e4;
+        --text-muted: #8899aa;
+        --accent: #22d3ee;
+        --accent-hover: #06b6d4;
+        --border: #2a2a4a;
+        --code-bg: #0d1117;
+        --tag-color: #ff6b6b;
+        --attr-color: #22d3ee;
+        --val-color: #c084fc;
+        --green: #4ecca3;
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 2rem 1.5rem;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 1.5rem;
+    }
+
+    header h1 {
+      margin: 0 0 0.25rem;
+      font-size: 1.5rem;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      max-width: 640px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .panel-right {
+      position: sticky;
+      top: 2rem;
+    }
+
+    fieldset {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin: 0 0 1.25rem;
+    }
+
+    legend {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0 0.5rem;
+    }
+
+    .field {
+      margin-bottom: 1rem;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .field .hint {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: var(--accent);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 3.5rem;
+    }
+
+    .field select {
+      cursor: pointer;
+    }
+
+    /* Mastodon card preview */
+    .mastodon-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      font-family: system-ui, -apple-system, sans-serif;
+      margin-bottom: 1.25rem;
+    }
+
+    .mastodon-card .card-image {
+      width: 100%;
+      aspect-ratio: 1.91 / 1;
+      background: #1a1a2e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .mastodon-card .card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .mastodon-card .card-image .placeholder {
+      color: var(--card-muted);
+      font-size: 0.85rem;
+    }
+
+    .mastodon-card .card-body {
+      padding: 0.85rem 1rem;
+    }
+
+    .mastodon-card .card-domain {
+      font-size: 0.75rem;
+      color: var(--card-muted);
+      text-transform: lowercase;
+      margin-bottom: 0.25rem;
+    }
+
+    .mastodon-card .card-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--card-text);
+      margin-bottom: 0.25rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .mastodon-card .card-description {
+      font-size: 0.8rem;
+      color: var(--card-muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .mastodon-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    /* Output section */
+    .output-section {
+      margin-top: 0;
+    }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .output-header h2 {
+      margin: 0;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .copy-btn {
+      background: var(--surface);
+      color: var(--accent);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--surface2);
+    }
+
+    .copy-btn.copied {
+      color: var(--green);
+    }
+
+    pre.output {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .tag { color: var(--tag-color); }
+    .attr { color: var(--attr-color); }
+    .val { color: var(--val-color); }
+    .punct { color: var(--text-muted); }
+
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 1rem; }
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .panel-right {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>OpenGraph Tag Generator</h1>
+      <p>OpenGraph meta tags control how your page appears when shared on social
+        platforms like Mastodon, Slack, Discord, and others. Fill in the fields
+        below to generate the tags and preview how your link card will look.</p>
+    </header>
+
+    <div class="layout">
+      <div class="panel-left">
+        <fieldset>
+          <legend>OpenGraph Properties</legend>
+
+          <div class="field">
+            <label for="og-title">Page Title</label>
+            <span class="hint">The headline shown on the link card</span>
+            <input type="text" id="og-title" placeholder="My Page Title">
+          </div>
+
+          <div class="field">
+            <label for="og-description">Description</label>
+            <span class="hint">A brief summary shown below the title (1-2 sentences)</span>
+            <textarea id="og-description" rows="2" placeholder="A brief description of this page..."></textarea>
+          </div>
+
+          <div class="field">
+            <label for="og-url">Page URL</label>
+            <span class="hint">The canonical URL; the domain appears on the card</span>
+            <input type="url" id="og-url" placeholder="https://example.com/page">
+          </div>
+
+          <div class="field">
+            <label for="og-image">Image URL</label>
+            <span class="hint">The preview image shown at the top of the card</span>
+            <input type="url" id="og-image" placeholder="https://example.com/image.jpg">
+          </div>
+
+          <div class="field">
+            <label for="og-default-image">Default Image</label>
+            <span class="hint">Fallback image used when no image URL is provided</span>
+            <input type="url" id="og-default-image" value="https://gretyl.maplecrew.org/assets/avatar.png">
+          </div>
+
+          <div class="field">
+            <label for="og-site-name">Site Name</label>
+            <span class="hint">Your site's name, shown alongside the domain</span>
+            <input type="text" id="og-site-name" placeholder="My Website">
+          </div>
+
+          <div class="field">
+            <label for="og-type">Type</label>
+            <span class="hint">The content type (most pages use 'website')</span>
+            <select id="og-type">
+              <option value="website" selected>website</option>
+              <option value="article">article</option>
+              <option value="product">product</option>
+              <option value="profile">profile</option>
+            </select>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="panel-right">
+        <div class="mastodon-label">Mastodon Card Preview</div>
+        <div class="mastodon-card" id="mastodon-card">
+          <div class="card-image" id="card-image">
+            <span class="placeholder" id="image-placeholder">No image</span>
+            <img id="card-img" style="display:none" alt="">
+          </div>
+          <div class="card-body">
+            <div class="card-domain" id="card-domain">example.com</div>
+            <div class="card-title" id="card-title">Page Title</div>
+            <div class="card-description" id="card-description">Page description will appear here</div>
+          </div>
+        </div>
+
+        <div class="output-section">
+          <div class="output-header">
+            <h2>Generated Meta Tags</h2>
+            <button class="copy-btn" id="copy-btn">Copy to Clipboard</button>
+          </div>
+          <pre class="output" id="output"><code id="output-code"><span class="empty-state">Fill in the fields to generate tags...</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const el = (id) => document.getElementById(id);
+
+    const fields = [
+      'og-title', 'og-description', 'og-url',
+      'og-image', 'og-default-image', 'og-site-name', 'og-type'
+    ];
+
+    let outputRaw = '';
+    let imageDebounce = null;
+
+    function esc(s) {
+      return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+              .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function meta(property, content) {
+      return `<meta property="${property}" content="${content}">`;
+    }
+
+    function highlight(raw) {
+      return raw.split('\n').map(line => {
+        let s = line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return s.replace(
+          /&lt;(meta)\s+(property)="([^"]+)"\s+(content)="([^"]*)"&gt;/g,
+          '<span class="punct">&lt;</span><span class="tag">$1</span> ' +
+          '<span class="attr">$2</span>=&quot;<span class="val">$3</span>&quot; ' +
+          '<span class="attr">$4</span>=&quot;<span class="val">$5</span>&quot;' +
+          '<span class="punct">&gt;</span>'
+        );
+      }).join('\n');
+    }
+
+    function extractDomain(url) {
+      try {
+        return new URL(url).hostname;
+      } catch {
+        return '';
+      }
+    }
+
+    function updateOutput() {
+      const title = el('og-title').value.trim();
+      const desc = el('og-description').value.trim();
+      const url = el('og-url').value.trim();
+      const image = el('og-image').value.trim();
+      const defaultImage = el('og-default-image').value.trim();
+      const resolvedImage = image || defaultImage;
+      const siteName = el('og-site-name').value.trim();
+      const type = el('og-type').value;
+
+      // Build meta tags
+      const lines = [];
+      if (title)         lines.push(meta('og:title', esc(title)));
+      if (desc)          lines.push(meta('og:description', esc(desc)));
+      if (url)           lines.push(meta('og:url', esc(url)));
+      if (resolvedImage) lines.push(meta('og:image', esc(resolvedImage)));
+      if (siteName)      lines.push(meta('og:site_name', esc(siteName)));
+      lines.push(meta('og:type', type));
+
+      if (lines.length === 0) {
+        el('output-code').innerHTML = '<span class="empty-state">Fill in the fields to generate tags...</span>';
+        outputRaw = '';
+      } else {
+        outputRaw = lines.join('\n');
+        el('output-code').innerHTML = highlight(outputRaw);
+      }
+
+      // Update Mastodon preview
+      const domain = extractDomain(url);
+      el('card-domain').textContent = domain || 'example.com';
+      el('card-title').textContent = title || 'Page Title';
+      el('card-description').textContent = desc || 'Page description will appear here';
+
+      // Image preview with debounce (use resolved image for preview)
+      clearTimeout(imageDebounce);
+      imageDebounce = setTimeout(() => updateImage(resolvedImage), 300);
+    }
+
+    function updateImage(url) {
+      const img = el('card-img');
+      const placeholder = el('image-placeholder');
+      if (url) {
+        img.src = url;
+        img.onload = () => {
+          img.style.display = 'block';
+          placeholder.style.display = 'none';
+        };
+        img.onerror = () => {
+          img.style.display = 'none';
+          placeholder.style.display = '';
+          placeholder.textContent = 'Image failed to load';
+        };
+      } else {
+        img.style.display = 'none';
+        placeholder.style.display = '';
+        placeholder.textContent = 'No image';
+      }
+    }
+
+    // Copy to clipboard
+    el('copy-btn').addEventListener('click', () => {
+      if (!outputRaw) return;
+      const btn = el('copy-btn');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(outputRaw).then(() => flashCopied(btn));
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = outputRaw;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        flashCopied(btn);
+      }
+    });
+
+    function flashCopied(btn) {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy to Clipboard';
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+
+    // Bind input events
+    fields.forEach(id => {
+      el(id).addEventListener('input', updateOutput);
+    });
+  </script>
+</body>
+</html>
