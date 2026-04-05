@@ -527,6 +527,9 @@
     fields.forEach(id => {
       el(id).addEventListener('input', updateOutput);
     });
+
+    // Reflect default field values (e.g. default image) on initial load
+    updateOutput();
   </script>
 </body>
 </html>
