@@ -158,14 +158,22 @@ export function step(state) {
     moveAgent(w, width, height, rng);
     w.energy--;
 
-    // Try to eat a sheep
-    const key = w.y * width + w.x;
-    const prey = sheepByCell.get(key);
-    if (prey && prey.length > 0) {
-      const si = prey.pop();
-      if (!eatenSheepIndices.has(si)) {
-        eatenSheepIndices.add(si);
-        w.energy += wolfGainFromSheep;
+    // Try to eat a sheep — check current cell and all 8 neighbours
+    let ate = false;
+    for (let dy = -1; dy <= 1 && !ate; dy++) {
+      for (let dx = -1; dx <= 1 && !ate; dx++) {
+        const nx = wrap(w.x + dx, width);
+        const ny = wrap(w.y + dy, height);
+        const key = ny * width + nx;
+        const prey = sheepByCell.get(key);
+        if (prey && prey.length > 0) {
+          const si = prey.pop();
+          if (!eatenSheepIndices.has(si)) {
+            eatenSheepIndices.add(si);
+            w.energy += wolfGainFromSheep;
+            ate = true;
+          }
+        }
       }
     }
 
