@@ -17,6 +17,8 @@ navigation:
   - name: Tools
     link: /#tools
     sublist:
+      - name: OpenGraph Preview
+        link: /tools/opengraph-preview.html
       - name: Shadertoy Harness
         link: /tools/shadertoy.html
       - name: webkitdirectory Demo
