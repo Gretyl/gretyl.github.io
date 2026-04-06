@@ -16,7 +16,7 @@ Everything — image (if any) and tags — lands in a single commit.
 
 If the default site avatar (`assets/avatar.png`) works for the card, skip to Step 2.
 
-Otherwise, create or obtain an image for the page. Aim for **1200 × 630 px** (the 1.91:1 ratio that Mastodon and Discord expect). Save it to `docs/assets/` with a descriptive name.
+Otherwise, create or obtain an image for the page. Aim for **1200 × 630 px** (the 1.91:1 ratio that Mastodon and Discord expect). Save it to `docs/assets/og/` with a descriptive name — this is where all OpenGraph assets (images and videos) live.
 
 #### 1a. Capture a screenshot with rodney (optional)
 
@@ -27,7 +27,7 @@ uvx rodney start
 uvx rodney open "file://$(pwd)/docs/path/to/page.html"
 uvx rodney waitload
 uvx rodney sleep 1
-uvx rodney screenshot -w 1200 -h 630 docs/assets/my-preview.png
+uvx rodney screenshot -w 1200 -h 630 docs/assets/og/my-preview.png
 uvx rodney stop
 ```
 
@@ -38,7 +38,7 @@ For pages that need interaction before they look right (e.g., a game's title scr
 ```bash
 uvx rodney js "document.querySelector('.start-btn').click()"
 uvx rodney sleep 1
-uvx rodney screenshot -w 1200 -h 630 docs/assets/my-preview.png
+uvx rodney screenshot -w 1200 -h 630 docs/assets/og/my-preview.png
 ```
 
 ### 2. Generate the tags
@@ -50,13 +50,15 @@ Open [`docs/tools/opengraph-preview.html`](https://gretyl.maplecrew.org/tools/op
 | Page Title    | The headline you want on the card                        |
 | Description   | 1–2 sentence summary (emoji OK)                         |
 | Page URL      | `https://gretyl.maplecrew.org/<path-to-page>`           |
-| Image URL     | `https://gretyl.maplecrew.org/assets/<image-file>`, or leave blank to use the default avatar |
+| Image URL     | `https://gretyl.maplecrew.org/assets/og/<image-file>`, or leave blank to use the default avatar |
 | Site Name     | `Gretyl`                                                 |
 | Type          | `website` (default) or `article` (for tutorials/guides)  |
 
-Files in `docs/assets/` are hosted at `https://gretyl.maplecrew.org/assets/<filename>`. You can construct the URL before the image is deployed; it will resolve once the commit reaches `main`.
+Files in `docs/assets/og/` are hosted at `https://gretyl.maplecrew.org/assets/og/<filename>`. You can construct the URL before the image is deployed; it will resolve once the commit reaches `main`.
 
 If Image URL is left blank, the tool falls back to the Default Image field (`assets/avatar.png`).
+
+The tool also has optional **Video** fields (URL, type, width, height). See the video section below before using them.
 
 The tool shows a live Mastodon-style card preview. Once you're happy with the layout and copy, click **Copy** to grab the generated HTML.
 
@@ -72,7 +74,7 @@ Paste the tags immediately after the opening `<head>` tag, **before** `<meta cha
 <meta property="og:title" content="The Artemis Trail">
 <meta property="og:description" content="Lunar mission simulator, in the style of Oregon Trail.">
 <meta property="og:url" content="https://gretyl.maplecrew.org/artemis-trail.html">
-<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og-artemis-trail.png">
+<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/artemis-trail.png">
 <meta property="og:site_name" content="Gretyl">
 <meta property="og:type" content="website">
 
@@ -89,14 +91,24 @@ docs(og): add preview card for <page>
 
 ## Tag reference
 
-| Property         | Required | Notes                                          |
-|------------------|----------|-------------------------------------------------|
-| `og:title`       | yes      | Card headline                                   |
-| `og:description` | yes      | Short summary; emoji and `&amp;` escapes are OK |
-| `og:url`         | yes      | Canonical URL on `gretyl.maplecrew.org`         |
-| `og:image`       | yes      | Absolute URL to image in `docs/assets/`, or `assets/avatar.png` as fallback |
-| `og:site_name`   | yes      | Always `Gretyl`                                 |
-| `og:type`        | yes      | `website` for games/tools, `article` for tutorials |
+| Property           | Required | Notes                                          |
+|--------------------|----------|-------------------------------------------------|
+| `og:title`         | yes      | Card headline                                   |
+| `og:description`   | yes      | Short summary; emoji and `&amp;` escapes are OK |
+| `og:url`           | yes      | Canonical URL on `gretyl.maplecrew.org`         |
+| `og:image`         | yes      | Absolute URL to image in `docs/assets/og/`, or `assets/avatar.png` as fallback |
+| `og:site_name`     | yes      | Always `Gretyl`                                 |
+| `og:type`          | yes      | `website` for games/tools, `article` for tutorials |
+| `og:video`         | no       | Direct URL to video file or embed player        |
+| `og:video:type`    | no       | MIME type — `video/mp4`, `video/webm`, or `text/html` for iframe embeds |
+| `og:video:width`   | no       | Width in pixels                                 |
+| `og:video:height`  | no       | Height in pixels                                |
+
+## Video
+
+**Video is supplemental.** Every card must have an `og:image` — it serves as the poster frame and fallback. Add `og:video` only when you also have a working image preview.
+
+When including video, provide all four `og:video` properties. Store video files in `docs/assets/og/` alongside images.
 
 ## Worked example — GREED tutorial
 
@@ -108,7 +120,7 @@ docs(og): add preview card for <page>
 +<meta property="og:title" content="GREED -- A Classic Dice Game of Risk &amp; Reward">
 +<meta property="og:description" content="Score points and get greedy -- want to push your luck? 🎲">
 +<meta property="og:url" content="https://gretyl.maplecrew.org/tutorials/greed.html">
-+<meta property="og:image" content="https://gretyl.maplecrew.org/assets/GREED.png">
++<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/greed.png">
 +<meta property="og:type" content="article">
 +<meta property="og:site_name" content="Gretyl">
 +
