@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+<meta property="og:title" content="OpenGraph Preview Tool">
+<meta property="og:description" content="Generate and preview OpenGraph meta tags for social cards on Mastodon, Discord, and Slack.">
+<meta property="og:url" content="https://gretyl.maplecrew.org/tools/opengraph-preview.html">
+<meta property="og:image" content="https://gretyl.maplecrew.org/assets/avatar.png">
+<meta property="og:site_name" content="Gretyl">
+<meta property="og:type" content="website">
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OpenGraph Tag Generator</title>
@@ -368,6 +376,48 @@
             </select>
           </div>
         </fieldset>
+
+        <fieldset>
+          <legend>Video (optional)</legend>
+
+          <!--
+            Well-supported embedded video formats for og:video:type:
+              • video/mp4    — MP4/H.264, universally supported
+              • video/webm   — WebM/VP8/VP9, broad browser support
+              • video/ogg    — Ogg Theora, open-source alternative
+              • text/html    — iframe/embed players (YouTube, Vimeo)
+          -->
+
+          <div class="field">
+            <label for="og-video">Video URL</label>
+            <span class="hint">Direct URL to the video file or embed player</span>
+            <input type="url" id="og-video" placeholder="https://gretyl.maplecrew.org/assets/og/mamamoo-um-oh-ah-yeh.mp4">
+          </div>
+
+          <div class="field">
+            <label for="og-video-type">Video Type</label>
+            <span class="hint">MIME type of the video resource</span>
+            <select id="og-video-type">
+              <option value="video/mp4" selected>video/mp4 — MP4/H.264 (universal)</option>
+              <option value="video/webm">video/webm — WebM/VP8/VP9</option>
+              <option value="video/ogg">video/ogg — Ogg Theora</option>
+              <option value="text/html">text/html — iframe embed (YouTube, Vimeo)</option>
+
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="og-video-width">Video Width</label>
+            <span class="hint">Width in pixels (e.g. 1280)</span>
+            <input type="number" id="og-video-width" placeholder="1280" min="1">
+          </div>
+
+          <div class="field">
+            <label for="og-video-height">Video Height</label>
+            <span class="hint">Height in pixels (e.g. 720)</span>
+            <input type="number" id="og-video-height" placeholder="720" min="1">
+          </div>
+        </fieldset>
       </div>
 
       <div class="panel-right">
@@ -400,7 +450,8 @@
 
     const fields = [
       'og-title', 'og-description', 'og-url',
-      'og-image', 'og-default-image', 'og-site-name', 'og-type'
+      'og-image', 'og-default-image', 'og-site-name', 'og-type',
+      'og-video', 'og-video-type', 'og-video-width', 'og-video-height'
     ];
 
     let outputRaw = '';
@@ -445,6 +496,10 @@
       const resolvedImage = image || defaultImage;
       const siteName = el('og-site-name').value.trim();
       const type = el('og-type').value;
+      const video = el('og-video').value.trim();
+      const videoType = el('og-video-type').value;
+      const videoWidth = el('og-video-width').value.trim();
+      const videoHeight = el('og-video-height').value.trim();
 
       // Build meta tags
       const lines = [];
@@ -454,6 +509,12 @@
       if (resolvedImage) lines.push(meta('og:image', esc(resolvedImage)));
       if (siteName)      lines.push(meta('og:site_name', esc(siteName)));
       lines.push(meta('og:type', type));
+      if (video) {
+        lines.push(meta('og:video', esc(video)));
+        lines.push(meta('og:video:type', esc(videoType)));
+        if (videoWidth)  lines.push(meta('og:video:width', esc(videoWidth)));
+        if (videoHeight) lines.push(meta('og:video:height', esc(videoHeight)));
+      }
 
       if (lines.length === 0) {
         el('output-code').innerHTML = '<span class="empty-state">Fill in the fields to generate tags...</span>';
@@ -527,6 +588,9 @@
     fields.forEach(id => {
       el(id).addEventListener('input', updateOutput);
     });
+
+    // Reflect default field values (e.g. default image) on initial load
+    updateOutput();
   </script>
 </body>
 </html>

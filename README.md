@@ -1,16 +1,17 @@
 # gretyl.github.io
 
-Personal GitHub Pages site with interactive tools and experiments, served via Jekyll with the [Minimal](https://github.com/pages-themes/minimal) theme.
+A portfolio of curated software — experiments in hosting and iterating on
+interactive artifacts with JavaScript-enabled interactivity, some with embedded
+metadata for social media previews.
 
-## Arcade
+## Navigation
 
-- [Artemis Trail](docs/artemis-trail.html) — interactive lunar mission simulator
-- [Implode](docs/implode.html) — promoting the ethical consumption of billionaires
-
-## Tools
-
-- [Shadertoy Harness](docs/tools/shadertoy.html) — shader IDE with `@slider` annotations for live parameter tuning
+- **Arcade** — standalone games, vibe coded and playable in the browser
+- **Tools** — utility applications for creative and development workflows
+- **Entries** — documented subprojects with demos, notes, and interactive examples
 
 ## Development
 
-Static HTML and vanilla JS — no build step, no dependencies. All publishable content lives in `docs/`. Push to `main` and GitHub Pages deploys automatically via Jekyll.
+Static HTML and vanilla JS — no build step, no dependencies. All publishable
+content lives in `docs/`. Push to `main` and GitHub Pages deploys automatically
+via Jekyll.

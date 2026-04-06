@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+<meta property="og:title" content="Termite Wood Gathering">
+<meta property="og:description" content="Termites randomly pick up and drop wood chips — organized piles emerge spontaneously.">
+<meta property="og:url" content="https://gretyl.maplecrew.org/resnick-algorithms/termites.html">
+<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/termites.png">
+<meta property="og:site_name" content="Gretyl">
+<meta property="og:type" content="website">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Termite Wood Gathering — Resnick</title>
@@ -17,6 +25,11 @@ canvas { border: 1px solid var(--border); border-radius: 6px; image-rendering: p
 button { padding: 0.4rem 1rem; background: var(--surface); color: var(--accent); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-family: var(--sans); font-size: 0.85rem; }
 button:hover { background: var(--border); }
 .stats { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); }
+.changelog { max-width: 640px; font-size: 0.8rem; line-height: 1.6; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 1rem; }
+.changelog h2 { color: var(--accent); font-size: 0.95rem; margin-bottom: 0.5rem; }
+.changelog dt { color: var(--text); font-family: var(--mono); font-size: 0.75rem; margin-top: 0.75rem; }
+.changelog dd { margin-left: 0; }
+.changelog code { font-family: var(--mono); background: var(--surface); padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.75rem; }
 </style>
 </head>
 <body>
@@ -32,6 +45,27 @@ button:hover { background: var(--border); }
   <label>Speed <input type="range" id="speed" min="1" max="30" value="10"><span id="speedVal">10</span></label>
 </div>
 <div class="stats" id="stats">Tick: 0 | Piles: 0</div>
+
+<section class="changelog">
+  <h2>Changelog</h2>
+  <dl>
+    <dt>2026-04-05 &mdash; fix: stats display flicker during animation</dt>
+    <dd>
+      <strong>Bug:</strong> the stats line below the controls flickered
+      between &ldquo;Tick: X | Piles: Y&rdquo; and &ldquo;Tick: X&rdquo;
+      during auto-animation. <code>countPiles()</code> was only called
+      every 50th tick for performance, and on all other ticks the pile
+      count was omitted from the display. At ~60&nbsp;fps with multiple
+      ticks per frame, the two formats alternated rapidly.
+    </dd>
+    <dd>
+      <strong>Fix:</strong> cached the last computed pile count in a
+      variable so the display always shows both tick and pile counts.
+      <code>countPiles()</code> still runs every 50&nbsp;ticks; the
+      cached value persists between updates.
+    </dd>
+  </dl>
+</section>
 
 <script type="module">
 import { createState, step, countPiles } from './sim/termites.js';
@@ -51,6 +85,7 @@ function init() {
 }
 init();
 
+let lastPiles = 0;
 function draw() {
   const cellW = canvas.width / W, cellH = canvas.height / H;
   ctx.fillStyle = '#0a0a1a';
@@ -72,9 +107,8 @@ function draw() {
     ctx.fillRect(t.x * cellW, t.y * cellH, cellW, cellH);
   }
 
-  const piles = state.tick % 50 === 0 ? countPiles(state) : null;
-  if (piles !== null) document.getElementById('stats').textContent = `Tick: ${state.tick} | Piles: ${piles}`;
-  else document.getElementById('stats').textContent = `Tick: ${state.tick}`;
+  if (state.tick % 50 === 0) lastPiles = countPiles(state);
+  document.getElementById('stats').textContent = `Tick: ${state.tick} | Piles: ${lastPiles}`;
 }
 
 function loop() {

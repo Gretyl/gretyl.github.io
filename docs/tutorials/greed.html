@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta property="og:title" content="GREED -- A Classic Dice Game of Risk &amp; Reward">
+<meta property="og:description" content="Score points and get greedy -- want to push your luck? 🎲">
+<meta property="og:url" content="https://gretyl.maplecrew.org/tutorials/greed.html">
+<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/greed.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Gretyl">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GREED — Learn to Play</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface-raised: #242424;
+    --border: #2e2e2e;
+    --text: #e8e4dd;
+    --text-dim: #8a857e;
+    --accent: #e8442a;
+    --accent-glow: rgba(232, 68, 42, 0.25);
+    --gold: #f0c040;
+    --gold-dim: rgba(240, 192, 64, 0.15);
+    --green: #4ade80;
+    --green-dim: rgba(74, 222, 128, 0.12);
+    --red: #f87171;
+    --red-dim: rgba(248, 113, 113, 0.12);
+    --blue: #60a5fa;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    line-height: 1.65;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* --- Hero --- */
+  .hero {
+    position: relative;
+    text-align: center;
+    padding: 80px 24px 60px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60%; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(3.5rem, 10vw, 7rem);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--text);
+    position: relative;
+  }
+  .hero h1 span {
+    display: block;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    font-size: 0.18em;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+  .hero-dice {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 36px;
+    position: relative;
+  }
+  .hero-dice svg {
+    filter: drop-shadow(0 4px 20px rgba(232,68,42,0.2));
+    animation: float 4s ease-in-out infinite;
+  }
+  .hero-dice svg:nth-child(2) { animation-delay: -0.6s; }
+  .hero-dice svg:nth-child(3) { animation-delay: -1.2s; }
+  .hero-dice svg:nth-child(4) { animation-delay: -1.8s; }
+  .hero-dice svg:nth-child(5) { animation-delay: -2.4s; }
+  .hero-dice svg:nth-child(6) { animation-delay: -3.0s; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* --- Layout --- */
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 24px 100px;
+  }
+
+  /* --- Sections --- */
+  section {
+    margin-top: 64px;
+  }
+  section h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  section h2 .num {
+    color: var(--accent);
+    font-weight: 900;
+    margin-right: 6px;
+  }
+  .section-sub {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    margin-bottom: 28px;
+  }
+
+  p { margin-bottom: 16px; }
+
+  /* --- Mnemonic Card --- */
+  .mnemonic {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .mnemonic::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+  }
+  .mnemonic-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  .mnemonic-steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .mstep {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .mstep-letter {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 2.6rem;
+    line-height: 1;
+  }
+  .mstep-letter.r { color: var(--accent); }
+  .mstep-letter.s { color: var(--gold); }
+  .mstep-letter.d { color: var(--green); }
+  .mstep-word {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+  }
+  .mstep-desc {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    max-width: 110px;
+    line-height: 1.4;
+  }
+  .marrow {
+    font-size: 1.6rem;
+    color: var(--border);
+    margin-top: -14px;
+  }
+
+  /* --- Scoring Table --- */
+  .score-grid {
+    display: grid;
+    gap: 2px;
+    background: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 20px 0;
+  }
+  .score-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    background: var(--surface);
+  }
+  .score-row.header {
+    background: var(--surface-raised);
+  }
+  .score-row > div {
+    padding: 12px 18px;
+    font-size: 0.92rem;
+  }
+  .score-row .pts {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    color: var(--gold);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .score-row.header .pts {
+    color: var(--text-dim);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .score-row.header > div:first-child {
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+  }
+
+  .combo-dice {
+    display: inline-flex;
+    gap: 4px;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  .combo-dice svg { vertical-align: middle; }
+
+  /* --- Interactive Walkthrough --- */
+  .walkthrough {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .wt-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .wt-badge {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+  .wt-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .wt-body {
+    padding: 24px;
+  }
+  .wt-scene {
+    display: none;
+    animation: fadeSlide 0.35s ease;
+  }
+  .wt-scene.active { display: block; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .wt-dice-tray {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .wt-die-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: transform 0.2s;
+  }
+  .wt-die-wrap.kept { transform: translateY(-8px); }
+  .wt-die-wrap.kept .wt-die-label { color: var(--gold); }
+  .wt-die-wrap.farkle svg rect { stroke: var(--red); stroke-width: 2; }
+  .wt-die-label {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    min-height: 16px;
+  }
+
+  .wt-narration {
+    background: var(--surface-raised);
+    border-left: 3px solid var(--accent);
+    padding: 14px 18px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    margin: 16px 0;
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+
+  .wt-points {
+    text-align: center;
+    margin: 16px 0;
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+  .wt-points .val { color: var(--gold); }
+  .wt-points .farkled { color: var(--red); }
+
+  .wt-nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+  }
+  .wt-btn {
+    background: var(--surface-raised);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 10px 22px;
+    border-radius: var(--radius-sm);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .wt-btn:hover { background: var(--border); }
+  .wt-btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .wt-btn.primary:hover { filter: brightness(1.15); }
+  .wt-btn:disabled { opacity: 0.3; cursor: default; }
+  .wt-step-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 24px 16px;
+  }
+  .wt-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.2s;
+  }
+  .wt-dot.active { background: var(--accent); width: 24px; border-radius: 4px; }
+
+  /* --- Gambit Cards --- */
+  .gambit-grid {
+    display: grid;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .gambit {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .gambit:hover { border-color: #444; }
+  .gambit-tag {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .gambit-tag.risk { color: var(--red); }
+  .gambit-tag.safe { color: var(--green); }
+  .gambit-tag.endgame { color: var(--blue); }
+  .gambit h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+  }
+  .gambit p {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+  }
+  .gambit-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, margin 0.35s ease;
+    margin-top: 0;
+  }
+  .gambit.open .gambit-detail {
+    max-height: 300px;
+    margin-top: 14px;
+  }
+  .gambit-detail-inner {
+    background: var(--surface-raised);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  /* --- Risk Meter --- */
+  .risk-meter {
+    margin: 24px 0;
+  }
+  .risk-meter-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+  .risk-bar {
+    height: 8px;
+    background: var(--surface);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .risk-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--green), var(--gold), var(--red));
+    transition: width 0.4s ease;
+  }
+  .risk-ticks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+  }
+  .risk-tick {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .risk-tick-num {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text);
+  }
+  .risk-tick-pct {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+  }
+  .risk-tick-label {
+    font-size: 0.68rem;
+    color: var(--text-dim);
+  }
+
+  /* --- Victory --- */
+  .victory-box {
+    background: linear-gradient(135deg, var(--surface) 0%, #1e1a14 100%);
+    border: 1px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .victory-box::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, var(--gold-dim) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .victory-box h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 2.8rem;
+    color: var(--gold);
+    position: relative;
+  }
+  .victory-box p {
+    position: relative;
+    color: var(--text-dim);
+    max-width: 480px;
+    margin: 12px auto 0;
+    font-size: 0.95rem;
+  }
+
+  /* --- Farkle Probabilities mini-game --- */
+  .prob-interactive {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .prob-question {
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    color: var(--text-dim);
+  }
+  .prob-dice-select {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .prob-die-btn {
+    width: 52px; height: 52px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    border: 2px solid var(--border);
+    color: var(--text);
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .prob-die-btn:hover { border-color: var(--accent); }
+  .prob-die-btn.selected {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: #fff;
+  }
+  .prob-result {
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .prob-pct {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 2.2rem;
+  }
+  .prob-verdict {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* --- Push-Your-Luck Flow --- */
+  .luck-flow {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 24px;
+    margin: 24px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .luck-flow::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--green), var(--gold), var(--red));
+  }
+  .luck-flow-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-dim);
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .luck-flow-track {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: center;
+  }
+  .lf-node {
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 20px;
+    text-align: center;
+    width: 100%;
+    max-width: 420px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    position: relative;
+  }
+  .lf-node strong { font-weight: 700; }
+  .lf-node.start { border-color: var(--green); }
+  .lf-node.start strong { color: var(--green); }
+  .lf-node.decision { border-color: var(--gold); }
+  .lf-node.decision strong { color: var(--gold); }
+  .lf-node.danger { border-color: var(--red); }
+  .lf-node.danger strong { color: var(--red); }
+  .lf-node.reward { border-color: var(--accent); }
+  .lf-node.reward strong { color: var(--accent); }
+  .lf-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    padding: 6px 0;
+    gap: 2px;
+  }
+  .lf-arrow-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  .lf-branch {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 12px;
+    width: 100%;
+    max-width: 520px;
+    align-items: start;
+  }
+  .lf-branch-or {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    padding-top: 14px;
+  }
+  .lf-branch .lf-node { max-width: none; }
+
+  /* --- Streak Doubling Callout --- */
+  .streak-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 24px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .streak-box::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--gold), var(--accent));
+  }
+  .streak-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .streak-example {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .streak-roll {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface-raised);
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+  }
+  .streak-roll-num {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    min-width: 24px;
+    text-align: center;
+  }
+  .streak-roll-type {
+    flex: 1;
+    font-size: 0.88rem;
+  }
+  .streak-roll-pts {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    color: var(--gold);
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
+  .streak-total {
+    text-align: right;
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 1.3rem;
+    color: var(--accent);
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* --- Entry Score Callout --- */
+  .entry-callout {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin: 24px 0;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .entry-icon {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    background: var(--gold-dim);
+    border: 1px solid rgba(240, 192, 64, 0.25);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 1.2rem;
+    color: var(--gold);
+  }
+  .entry-body h4 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+    color: var(--gold);
+  }
+  .entry-body p {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 0;
+    line-height: 1.6;
+  }
+  .entry-body .entry-rule {
+    color: var(--text);
+  }
+
+  /* --- Footer --- */
+  .footer {
+    text-align: center;
+    padding: 40px 24px;
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    border-top: 1px solid var(--border);
+    margin-top: 80px;
+  }
+
+  /* Utility */
+  .mt-sm { margin-top: 12px; }
+  .mt-md { margin-top: 24px; }
+  .highlight { color: var(--gold); font-weight: 600; }
+  .highlight-red { color: var(--red); font-weight: 600; }
+  .highlight-green { color: var(--green); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <h1>GREED
+    <span>A Classic Dice Game of Risk &amp; Reward</span>
+  </h1>
+  <div class="hero-dice" id="heroDice"></div>
+</div>
+
+<div class="container">
+
+  <!-- ===== MNEMONIC: RSD ===== -->
+  <section>
+    <h2><span class="num">01</span> The Core Loop</h2>
+    <p class="section-sub">Your entire turn in three letters — commit this to memory.</p>
+
+    <div class="mnemonic">
+      <div class="mnemonic-label">Remember: R → S → D</div>
+      <div class="mnemonic-steps">
+        <div class="mstep">
+          <div class="mstep-letter r">R</div>
+          <div class="mstep-word">Roll</div>
+          <div class="mstep-desc">Throw all remaining dice</div>
+        </div>
+        <div class="marrow">→</div>
+        <div class="mstep">
+          <div class="mstep-letter s">S</div>
+          <div class="mstep-word">Set Aside</div>
+          <div class="mstep-desc">Keep at least one scoring die</div>
+        </div>
+        <div class="marrow">→</div>
+        <div class="mstep">
+          <div class="mstep-letter d">D</div>
+          <div class="mstep-word">Decide</div>
+          <div class="mstep-desc">Bank points or push your luck</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="mt-md">Every single turn follows this loop. <strong>Roll</strong> your dice, <strong>Set aside</strong> at least one scorer, then <strong>Decide</strong>: stop and bank your points safely, or roll again — risking everything you've built this turn.</p>
+
+    <div class="luck-flow">
+      <div class="luck-flow-label">How pushing your luck works</div>
+      <div class="luck-flow-track">
+        <div class="lf-node start"><strong>R — Roll</strong> all six dice (or whatever you have left)</div>
+        <div class="lf-arrow"><span class="lf-arrow-icon">↓</span></div>
+        <div class="lf-branch">
+          <div class="lf-node danger"><strong>No scorers?</strong><br>That's a <strong>Farkle</strong> — you lose every point from this turn. Turn over.</div>
+          <div class="lf-branch-or">or</div>
+          <div class="lf-node start"><strong>S — Set Aside</strong> at least one scoring die. Points accumulate but aren't safe yet.</div>
+        </div>
+        <div class="lf-arrow"><span class="lf-arrow-icon">↓</span> <span>if you scored…</span></div>
+        <div class="lf-node decision"><strong>D — Decide:</strong> STOP and bank all turn points safely? Or CONTINUE rolling the remaining dice?</div>
+        <div class="lf-arrow"><span class="lf-arrow-icon">↓</span> <span>if you continue…</span></div>
+        <div class="lf-node reward"><strong>All 6 dice set aside?</strong> That's <strong>Hot Dice!</strong> Pick up all six and keep rolling — your accumulated points carry forward. You <em>must</em> keep going.</div>
+        <div class="lf-arrow"><span class="lf-arrow-icon">↺</span> <span>back to Roll</span></div>
+      </div>
+    </div>
+
+    <p>This is the heart of Greed: every time you choose "continue" at the <strong style="color:var(--gold)">D</strong> step, you're betting all unbanked points on the next roll. The tension ratchets up as your dice dwindle — and if you Farkle, the whole turn's haul evaporates. But banking too early means watching opponents pile up monster turns. That push-and-pull <em>is</em> the game.</p>
+    <p><strong class="highlight">Hot Dice</strong> flips the script: if you manage to score with all six dice across your rolls, you're forced to pick them all back up and roll again. It's thrilling — and terrifying, because now you're risking an even bigger pile of points with a fresh set of six.</p>
+  </section>
+
+  <!-- ===== ENTRY SCORE ===== -->
+  <section>
+    <h2><span class="num">02</span> Getting on the Board</h2>
+    <p class="section-sub">Before you can start accumulating score, there's a gate to clear.</p>
+
+    <div class="entry-callout">
+      <div class="entry-icon">500</div>
+      <div class="entry-body">
+        <h4>Minimum Entry Score</h4>
+        <p><span class="entry-rule">Many groups require your first banking turn to total at least <strong>500 points</strong>.</span> Until you hit that threshold in a single turn, any points you score are thrown away. This means your early turns are naturally more aggressive — you <em>have</em> to push your luck to break in. Once you're on the board, you can bank freely at any amount.</p>
+      </div>
+    </div>
+
+    <p>The entry rule transforms opening strategy. While veteran players with established scores can comfortably bank 200-point turns, newcomers to the scoresheet must keep rolling until they accumulate 500+. This often means riding 3 or even 2 dice — exactly the danger zone — just to get started. It's a shared rite of passage: everyone sweats the entry turn.</p>
+
+  <!-- ===== SCORING ===== -->
+  <section>
+    <h2><span class="num">03</span> Scoring Combos</h2>
+    <p class="section-sub">What's worth points? Here's every combination at a glance.</p>
+
+    <div class="score-grid">
+      <div class="score-row header">
+        <div>Combination</div>
+        <div class="pts">Points</div>
+      </div>
+      <div class="score-row"><div><span class="combo-dice" id="d1x1"></span> Single 1</div><div class="pts">100</div></div>
+      <div class="score-row"><div><span class="combo-dice" id="d5x1"></span> Single 5</div><div class="pts">50</div></div>
+      <div class="score-row"><div><span class="combo-dice" id="d3oak"></span> Three of a Kind (2–6)</div><div class="pts">Face × 100</div></div>
+      <div class="score-row"><div><span class="combo-dice" id="d1x3"></span> Three 1s</div><div class="pts">1,000</div></div>
+      <div class="score-row"><div>Four of a Kind</div><div class="pts">3oaK × 2</div></div>
+      <div class="score-row"><div>Five of a Kind</div><div class="pts">3oaK × 4</div></div>
+      <div class="score-row"><div>Six of a Kind</div><div class="pts">3oaK × 8</div></div>
+      <div class="score-row"><div>Straight (1–2–3–4–5–6)</div><div class="pts">2,000</div></div>
+      <div class="score-row"><div>Three Pairs ("Doubles")</div><div class="pts">1,500</div></div>
+    </div>
+    <p style="font-size:0.85rem; color:var(--text-dim);">A single die can only count toward one combination per roll. A 5 used in a three-of-a-kind can't also score as a single 5.</p>
+
+    <div class="streak-box">
+      <div class="streak-label">Streak Doubling — Back-to-Back Bonus</div>
+      <p style="font-size:0.92rem; margin-bottom:16px;">When you roll the <em>same full-hand type</em> on consecutive Hot Dice rolls, each repeat scores <strong class="highlight">double the previous</strong>. Straights and Doubles (three pairs) each have their own streak — and the points escalate fast.</p>
+
+      <p style="font-size:0.82rem; color:var(--text-dim); margin-bottom:8px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em;">Example: Three consecutive straights</p>
+      <div class="streak-example">
+        <div class="streak-roll">
+          <div class="streak-roll-num">1st</div>
+          <div class="streak-roll-type">Straight → base value</div>
+          <div class="streak-roll-pts">2,000</div>
+        </div>
+        <div class="streak-roll">
+          <div class="streak-roll-num">2nd</div>
+          <div class="streak-roll-type">Straight again → doubled</div>
+          <div class="streak-roll-pts">4,000</div>
+        </div>
+        <div class="streak-roll">
+          <div class="streak-roll-num">3rd</div>
+          <div class="streak-roll-type">Straight <em>again</em> → doubled again</div>
+          <div class="streak-roll-pts">8,000</div>
+        </div>
+        <div class="streak-total">= 14,000 points</div>
+      </div>
+
+      <p style="font-size:0.82rem; color:var(--text-dim); margin-bottom:8px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em;">Example: Two consecutive Doubles (three pairs)</p>
+      <div class="streak-example">
+        <div class="streak-roll">
+          <div class="streak-roll-num">1st</div>
+          <div class="streak-roll-type">Three Pairs → base value</div>
+          <div class="streak-roll-pts">1,500</div>
+        </div>
+        <div class="streak-roll">
+          <div class="streak-roll-num">2nd</div>
+          <div class="streak-roll-type">Three Pairs again → doubled</div>
+          <div class="streak-roll-pts">3,000</div>
+        </div>
+        <div class="streak-total">= 4,500 points</div>
+      </div>
+
+      <p style="font-size:0.88rem; margin-bottom:0;">Since straights and three pairs use all six dice, each one triggers <strong class="highlight">Hot Dice</strong> — which is exactly how streaks become possible. You score the full hand, pick up all six, and if lightning strikes twice (or thrice), the doubling kicks in. Rare, legendary, and potentially game-ending in a single turn.</p>
+    </div>
+  </section>
+
+  <!-- ===== GUIDED WALKTHROUGH ===== -->
+  <section>
+    <h2><span class="num">04</span> A Turn in Action</h2>
+    <p class="section-sub">Walk through a realistic turn step by step. Follow the R→S→D loop.</p>
+
+    <div class="walkthrough">
+      <div class="wt-header">
+        <div class="wt-badge">Guided Play</div>
+        <div class="wt-title">Sample Turn — It's Your Roll</div>
+      </div>
+      <div class="wt-body" id="wtBody">
+        <!-- Scenes injected by JS -->
+      </div>
+      <div class="wt-step-dots" id="wtDots"></div>
+      <div class="wt-nav">
+        <button class="wt-btn" id="wtPrev" disabled>← Back</button>
+        <button class="wt-btn primary" id="wtNext">Next →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DECISION TREE: RISK METER ===== -->
+  <section>
+    <h2><span class="num">05</span> Know Your Odds</h2>
+    <p class="section-sub">The "D" in R→S→D is where the game lives. How risky is that next roll?</p>
+
+    <div class="prob-interactive">
+      <div class="prob-question">How many dice are you about to roll?</div>
+      <div class="prob-dice-select">
+        <button class="prob-die-btn" data-n="1">1</button>
+        <button class="prob-die-btn" data-n="2">2</button>
+        <button class="prob-die-btn selected" data-n="3">3</button>
+        <button class="prob-die-btn" data-n="4">4</button>
+        <button class="prob-die-btn" data-n="5">5</button>
+        <button class="prob-die-btn" data-n="6">6</button>
+      </div>
+      <div class="prob-result" id="probResult"></div>
+    </div>
+
+    <div class="risk-meter mt-md">
+      <div class="risk-meter-label"><span>Safer</span><span>Riskier</span></div>
+      <div class="risk-bar"><div class="risk-bar-fill" style="width:100%"></div></div>
+      <div class="risk-ticks">
+        <div class="risk-tick"><span class="risk-tick-num">6</span><span class="risk-tick-pct">~2%</span><span class="risk-tick-label">Farkle</span></div>
+        <div class="risk-tick"><span class="risk-tick-num">5</span><span class="risk-tick-pct">~8%</span><span class="risk-tick-label"></span></div>
+        <div class="risk-tick"><span class="risk-tick-num">4</span><span class="risk-tick-pct">~16%</span><span class="risk-tick-label"></span></div>
+        <div class="risk-tick"><span class="risk-tick-num">3</span><span class="risk-tick-pct">~28%</span><span class="risk-tick-label"></span></div>
+        <div class="risk-tick"><span class="risk-tick-num">2</span><span class="risk-tick-pct">~44%</span><span class="risk-tick-label"></span></div>
+        <div class="risk-tick"><span class="risk-tick-num">1</span><span class="risk-tick-pct">~67%</span><span class="risk-tick-label">Farkle</span></div>
+      </div>
+    </div>
+    <p style="font-size:0.88rem;">The rule of thumb: <strong class="highlight-green">4+ dice? Usually safe to push.</strong> <strong class="highlight">3 dice? Weigh your banked points.</strong> <strong class="highlight-red">1–2 dice? Bank unless you're desperate.</strong></p>
+  </section>
+
+  <!-- ===== VICTORY ===== -->
+  <section>
+    <h2><span class="num">06</span> Winning the Game</h2>
+    <p class="section-sub">How the endgame triggers — and the rule that catches people off guard.</p>
+
+    <div class="victory-box">
+      <h3>10,000</h3>
+      <p>The first player to reach 10,000 points <em>triggers</em> the final round — but doesn't automatically win. Every other player gets one last turn to try to <strong>exceed</strong> the leader's score. Ties don't count: you must beat the leader outright.</p>
+    </div>
+    <p class="mt-md">This is why Greed stays tense to the very end. A massive final-round push — fueled by desperation and Hot Dice — can steal a win from the leader. Conversely, stopping at exactly 10,000 can leave you vulnerable.</p>
+  </section>
+
+  <!-- ===== GAMBITS ===== -->
+  <section>
+    <h2><span class="num">07</span> Clever Gambits</h2>
+    <p class="section-sub">Strategic patterns that separate lucky rollers from Greed veterans. Tap to expand.</p>
+
+    <div class="gambit-grid">
+      <div class="gambit" onclick="this.classList.toggle('open')">
+        <div class="gambit-tag safe">Conservative</div>
+        <h3>The 300 Floor</h3>
+        <p>Bank any turn worth 300+ points. Slow and steady wins races.</p>
+        <div class="gambit-detail"><div class="gambit-detail-inner">
+          Many beginners chase huge turns. But consistent 300–500 point turns compound fast. With 6 dice, your first roll almost always yields at least 100–200 points — banking at 300 means you're stopping after scoring on just one or two re-rolls. You avoid Farkles and grind toward 10,000 reliably. Use the R→S→D mnemonic: if your "D" decision feels greedy, it probably is.
+        </div></div>
+      </div>
+
+      <div class="gambit" onclick="this.classList.toggle('open')">
+        <div class="gambit-tag risk">Aggressive</div>
+        <h3>The Hot Dice Chase</h3>
+        <p>When you've set aside 4–5 dice, always push for the sixth.</p>
+        <div class="gambit-detail"><div class="gambit-detail-inner">
+          If you've already set aside 5 dice, your 6th die has a 1-in-3 chance of scoring (any 1 or 5). That's a 33% chance to trigger Hot Dice — picking up all six and continuing with your banked turn points. The reward is enormous: you get a fresh set of 6 dice with all your accumulated points. The risk is a 67% Farkle, but the expected value is often positive if your turn total is under ~600.
+        </div></div>
+      </div>
+
+      <div class="gambit" onclick="this.classList.toggle('open')">
+        <div class="gambit-tag risk">Aggressive</div>
+        <h3>The Selective Set-Aside</h3>
+        <p>Don't keep every scorer — sometimes keep fewer to roll more dice.</p>
+        <div class="gambit-detail"><div class="gambit-detail-inner">
+          You're only required to keep <em>at least one</em> scoring die. If you roll three 5s (150 pts) and a 1 (100 pts) with 4 dice, keeping all four leaves you with just 2 dice to re-roll — very risky. Instead, keep only the 1 (100 pts) and re-roll 3 dice. You sacrifice 150 points but dramatically improve your odds on the next roll. Think of it as buying more dice with points. Use this when your remaining dice count would drop below 3.
+        </div></div>
+      </div>
+
+      <div class="gambit" onclick="this.classList.toggle('open')">
+        <div class="gambit-tag endgame">Endgame</div>
+        <h3>The Final-Round All-In</h3>
+        <p>Trailing in the last round? Push every roll — you have nothing to lose.</p>
+        <div class="gambit-detail"><div class="gambit-detail-inner">
+          When the leader hits 10,000 and you're behind, your final turn is the ultimate push-your-luck scenario. There's no penalty for Farkling since you'd lose anyway. Roll every chance, keep minimum scoring dice to maximise re-rolls, and pray for Hot Dice. This is where Greed earns its name: desperate final rounds produce the game's most memorable moments. In R→S→D terms, your "D" is always "continue" until you either win or bust.
+        </div></div>
+      </div>
+
+      <div class="gambit" onclick="this.classList.toggle('open')">
+        <div class="gambit-tag safe">Positional</div>
+        <h3>The Gatekeeper</h3>
+        <p>If you're close to 10,000, stop just below to deny others the final round.</p>
+        <div class="gambit-detail"><div class="gambit-detail-inner">
+          Counter-intuitive but powerful: if you're at ~9,600 and score 350 on your first roll, banking puts you at 9,950 — still under 10,000, so no final round triggers. Next turn you only need 50+ points to cross the line. This keeps pressure off opponents who might catch up in a final round while giving you an easy finish. The risk: someone else might cross 10,000 before your next turn.
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== POST-GAME ===== -->
+  <section>
+    <h2><span class="num">08</span> After You Play</h2>
+    <p class="section-sub">Questions for your post-game review — the fastest way to improve.</p>
+    <p>After your first game, reflect on these using the R→S→D framework:</p>
+    <p><strong style="color:var(--accent)">R — Roll:</strong> Did you get Hot Dice? How did that change the turn's stakes?</p>
+    <p><strong style="color:var(--gold)">S — Set Aside:</strong> Were there moments you kept too many dice? Too few? Did the Selective Set-Aside gambit occur to you?</p>
+    <p><strong style="color:var(--green)">D — Decide:</strong> What was your banking threshold? Did it shift as scores changed? Did you adjust in the final round?</p>
+    <p class="mt-md" style="color:var(--text-dim); font-size:0.9rem;">Great Greed players don't just get lucky — they know when 300 banked points beats the dream of 2,000 that vanish in a Farkle.</p>
+  </section>
+
+</div>
+
+<div class="footer">
+  Greed is a public-domain dice game. Agree on house rules before you play!
+</div>
+
+<script>
+// ===== SVG Dice Generator =====
+function dieSVG(face, size = 48, opts = {}) {
+  const bg = opts.bg || '#1a1a1a';
+  const fg = opts.fg || '#e8e4dd';
+  const stroke = opts.stroke || '#2e2e2e';
+  const r = size * 0.18;
+  const pip = (cx, cy) => `<circle cx="${cx}" cy="${cy}" r="${size*0.08}" fill="${fg}"/>`;
+  const s = size;
+  const positions = {
+    1: [[s/2, s/2]],
+    2: [[s*0.3, s*0.3],[s*0.7, s*0.7]],
+    3: [[s*0.3, s*0.3],[s/2, s/2],[s*0.7, s*0.7]],
+    4: [[s*0.3, s*0.3],[s*0.7, s*0.3],[s*0.3, s*0.7],[s*0.7, s*0.7]],
+    5: [[s*0.3, s*0.3],[s*0.7, s*0.3],[s/2, s/2],[s*0.3, s*0.7],[s*0.7, s*0.7]],
+    6: [[s*0.3, s*0.28],[s*0.7, s*0.28],[s*0.3, s/2],[s*0.7, s/2],[s*0.3, s*0.72],[s*0.7, s*0.72]]
+  };
+  const pips = (positions[face]||[]).map(p => pip(p[0], p[1])).join('');
+  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="2" width="${s-4}" height="${s-4}" rx="${r}" fill="${bg}" stroke="${stroke}" stroke-width="1.5"/>
+    ${pips}
+  </svg>`;
+}
+
+function miniDie(face, size) {
+  return dieSVG(face, size || 26, { bg: '#242424', stroke: '#333' });
+}
+
+// Hero dice
+document.getElementById('heroDice').innerHTML = [1,5,3,3,3,2].map((f,i) =>
+  dieSVG(f, 56, { bg: '#1e1a14', fg: '#e8e4dd', stroke: '#3a3020' })
+).join('');
+
+// Scoring table inline dice
+document.getElementById('d1x1').innerHTML = miniDie(1);
+document.getElementById('d5x1').innerHTML = miniDie(5);
+document.getElementById('d3oak').innerHTML = [4,4,4].map(f => miniDie(f)).join('');
+document.getElementById('d1x3').innerHTML = [1,1,1].map(f => miniDie(f)).join('');
+
+// ===== Guided Walkthrough =====
+const scenes = [
+  {
+    phase: 'R',
+    title: 'Roll — 6 dice',
+    dice: [{v:1,kept:false},{v:3,kept:false},{v:3,kept:false},{v:3,kept:false},{v:5,kept:false},{v:2,kept:false}],
+    narration: 'You roll all six dice. Scan for scoring combos: you see <strong>three 3s</strong> (300 pts), a <strong>single 1</strong> (100 pts), and a <strong>single 5</strong> (50 pts). The 2 scores nothing.',
+    points: null
+  },
+  {
+    phase: 'S',
+    title: 'Set Aside — keep the three 3s',
+    dice: [{v:1,kept:false},{v:3,kept:true},{v:3,kept:true},{v:3,kept:true},{v:5,kept:false},{v:2,kept:false}],
+    narration: 'You set aside the three 3s for <strong class="highlight">300 points</strong>. You <em>could</em> also keep the 1 and 5, but that would leave only 1 die to re-roll — a 67% Farkle chance. Smart play: keep just the trio.',
+    points: 'Turn total: <span class="val">300</span>'
+  },
+  {
+    phase: 'D',
+    title: 'Decide — push with 3 dice',
+    dice: [{v:1,kept:false},{v:3,kept:true},{v:3,kept:true},{v:3,kept:true},{v:5,kept:false},{v:2,kept:false}],
+    narration: 'Three dice left means a ~28% Farkle chance. That\'s manageable. You <strong>decide to continue</strong> and roll the remaining three dice.',
+    points: 'Turn total: <span class="val">300</span> — rolling 3 dice…'
+  },
+  {
+    phase: 'R',
+    title: 'Roll — 3 remaining dice',
+    dice: [{v:1,kept:false},{v:5,kept:false},{v:4,kept:false}],
+    narration: 'You roll the three remaining dice: <strong>1, 5, 4</strong>. The 1 is worth 100, the 5 is worth 50, and the 4 scores nothing.',
+    points: 'Potential: <span class="val">300 + 150 = 450</span>'
+  },
+  {
+    phase: 'S',
+    title: 'Set Aside — keep the 1 and 5',
+    dice: [{v:1,kept:true},{v:5,kept:true},{v:4,kept:false}],
+    narration: 'You keep the 1 (100) and the 5 (50). That\'s 150 more, bringing you to <strong class="highlight">450</strong> for the turn. Only 1 die remains — very dangerous territory.',
+    points: 'Turn total: <span class="val">450</span>'
+  },
+  {
+    phase: 'D',
+    title: 'Decide — bank it!',
+    dice: [{v:1,kept:true},{v:5,kept:true},{v:4,kept:false}],
+    narration: 'One die left = ~67% chance of Farkle. With 450 points on the line, the math is clear: <strong class="highlight-green">bank it</strong>. You stop and add 450 to your score. A clean, disciplined turn.',
+    points: '<span class="val">+450</span> banked! ✓'
+  }
+];
+
+const wtBody = document.getElementById('wtBody');
+const wtDots = document.getElementById('wtDots');
+const wtPrev = document.getElementById('wtPrev');
+const wtNext = document.getElementById('wtNext');
+let currentScene = 0;
+
+function renderScene(idx) {
+  const sc = scenes[idx];
+  const phaseColors = { R: 'var(--accent)', S: 'var(--gold)', D: 'var(--green)' };
+  let html = `<div class="wt-scene active">`;
+  html += `<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;color:${phaseColors[sc.phase]};margin-bottom:12px;">${sc.phase} — ${sc.title}</div>`;
+  html += `<div class="wt-dice-tray">`;
+  sc.dice.forEach(d => {
+    html += `<div class="wt-die-wrap ${d.kept ? 'kept' : ''}">
+      ${dieSVG(d.v, 52, { bg: d.kept ? '#2a2215' : '#1a1a1a', stroke: d.kept ? '#6b5c2e' : '#2e2e2e' })}
+      <div class="wt-die-label">${d.kept ? 'kept' : ''}</div>
+    </div>`;
+  });
+  html += `</div>`;
+  html += `<div class="wt-narration">${sc.narration}</div>`;
+  if (sc.points) html += `<div class="wt-points">${sc.points}</div>`;
+  html += `</div>`;
+  wtBody.innerHTML = html;
+
+  // Dots
+  wtDots.innerHTML = scenes.map((_, i) =>
+    `<div class="wt-dot ${i === idx ? 'active' : ''}"></div>`
+  ).join('');
+
+  wtPrev.disabled = idx === 0;
+  wtNext.textContent = idx === scenes.length - 1 ? 'Restart ↺' : 'Next →';
+}
+
+wtNext.addEventListener('click', () => {
+  if (currentScene === scenes.length - 1) currentScene = 0;
+  else currentScene++;
+  renderScene(currentScene);
+});
+wtPrev.addEventListener('click', () => {
+  if (currentScene > 0) currentScene--;
+  renderScene(currentScene);
+});
+renderScene(0);
+
+// ===== Probability Interactive =====
+const farkleProbs = { 1: 67, 2: 44, 3: 28, 4: 16, 5: 8, 6: 2 };
+const verdicts = {
+  1: { text: 'DANGER ZONE', color: 'var(--red)' },
+  2: { text: 'HIGH RISK', color: 'var(--red)' },
+  3: { text: 'COIN FLIP-ISH', color: 'var(--gold)' },
+  4: { text: 'FAIRLY SAFE', color: 'var(--green)' },
+  5: { text: 'COMFORTABLE', color: 'var(--green)' },
+  6: { text: 'NEAR-CERTAIN', color: 'var(--green)' }
+};
+
+const probBtns = document.querySelectorAll('.prob-die-btn');
+const probResult = document.getElementById('probResult');
+
+function showProb(n) {
+  const p = farkleProbs[n];
+  const v = verdicts[n];
+  probResult.innerHTML = `
+    <div class="prob-pct" style="color:${v.color}">~${p}%</div>
+    <div class="prob-verdict" style="color:${v.color}">${v.text}</div>
+    <div style="font-size:0.82rem;color:var(--text-dim);margin-top:4px;">Chance of Farkling with ${n} ${n===1?'die':'dice'}</div>
+  `;
+}
+
+probBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    probBtns.forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    showProb(parseInt(btn.dataset.n));
+  });
+});
+showProb(3);
+</script>
+
+</body>
+</html>

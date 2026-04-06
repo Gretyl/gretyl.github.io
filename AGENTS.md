@@ -23,6 +23,8 @@ Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, 
 - Navigation in `docs/_config.yml` must be updated when adding new entries (add to the `Entries` sublist)
 - **Analytics:** Jekyll-rendered pages (with front matter) use `{% include analytics.html %}`. Standalone HTML files (no front matter) must inline the raw GA4 snippet in `<head>` instead — Jekyll does not process Liquid tags in files without front matter, so `{% include %}` would appear as literal text
 - **GitHub Pages + Jekyll:** This site uses the `jekyll-remote-theme` plugin with `vaibhavvikas/jekyll-theme-minimalistic`. For layout, includes, and deployment details, see the [GitHub Pages documentation](https://docs.github.com/en/pages)
+- **Tools** section is for utility applications under `docs/tools/`. Tools can be single-file HTML or directory-based (e.g., `webkitdirectory-demo/`). Follow the same standalone-file conventions as Arcade pages
+- **Social preview cards:** Follow [EMBEDDING.md](EMBEDDING.md) when adding OpenGraph `<meta>` tags to standalone HTML pages
 
 ## Branching workflow
 
