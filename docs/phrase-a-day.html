@@ -163,7 +163,7 @@
 // AA-large is 3.0 and AAA-large is 4.5 — we use ~7.0 as a comfortable floor.
 const MIN_CONTRAST = 6.969;
 
-// Seedable PRNG (mulberry32) so the year shuffle is deterministic.
+// Seedable PRNG (mulberry32) — used for hash-based ordering and corner RNG.
 function mulberry32(seed) {
   return function() {
     let t = seed += 0x6D2B79F5;
@@ -173,19 +173,19 @@ function mulberry32(seed) {
   };
 }
 
-function shuffle(array, rng) {
-  const a = array.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+// Hash-based ordering: each phrase gets a deterministic score from its own
+// number, independent of how many phrases exist. Adding phrases inserts them
+// at their hash-determined position without disturbing the existing order.
+const SEED = 696969;
+function stableOrder(phrases) {
+  return phrases.slice().sort((a, b) => {
+    return mulberry32(SEED + a.num)() - mulberry32(SEED + b.num)();
+  });
 }
 
-function dayOfYear(date) {
-  const start = new Date(date.getFullYear(), 0, 0);
-  const diff = date - start;
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
+const EPOCH = new Date(2026, 3, 9);  // April 9, 2026 — first commit
+function daysSinceEpoch(date) {
+  return Math.floor((date - EPOCH) / 86400000);
 }
 
 // --- WCAG contrast helpers ---
@@ -222,7 +222,7 @@ function parsePhrases(markdown) {
     const n = parseInt(m[1], 10);
     const text = m[2].trim();
     if (!text) continue;
-    phrases.push(text);
+    phrases.push({ text, num: n });
     if (n > totalCount) totalCount = n;
   }
   return { phrases, totalCount };
@@ -244,86 +244,90 @@ async function init() {
   }
 
   const now = new Date();
-  const year = now.getFullYear();
-  const rng = mulberry32(year+367);
-  const shuffled = shuffle(phrases, rng);
-  const idx = (dayOfYear(now) - 1) % shuffled.length;
-  const phrase = shuffled[idx];
-  const altIdx = (idx + 366) % shuffled.length;
-  const altPhrase = shuffled[altIdx];
+  const ordered = stableOrder(phrases);
+  // Compute all per-day state from a date: phrase, palette, speaker corners.
+  // Closes over ordered so rollover can recompute without re-fetching.
+  function computeDay(date) {
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const dayNum = daysSinceEpoch(date);
+    const idx = dayNum % ordered.length;
+    const altIdx = (idx + Math.floor(ordered.length / 2)) % ordered.length;
 
-  const dateStr = now.toLocaleDateString(undefined, {
-    weekday: "long", month: "long", day: "numeric", year: "numeric"
-  });
+    const hue = ((idx * 47) + (dayNum * 31)) % 360;
+    const altHue = (hue + 180 + (idx * 13) % 60 - 30) % 360;
+    const jitter = (idx * 7) % 8;
+
+    let bgL, fgL, bgS, fgS;
+    if (prefersDark) {
+      bgL = 6 + jitter;
+      fgL = 86 + (jitter % 6);
+      bgS = 30 + (idx * 11) % 20;
+      fgS = 60 + (idx * 17) % 25;
+    } else {
+      bgL = 90 + (jitter % 6);
+      fgL = 10 + jitter;
+      bgS = 35 + (idx * 11) % 20;
+      fgS = 65 + (idx * 17) % 25;
+    }
+
+    const step = prefersDark ? 1 : -1;
+    while (
+      contrastRatio([hue, bgS, bgL], [altHue, fgS, fgL]) < MIN_CONTRAST &&
+      fgL + step >= 0 && fgL + step <= 100
+    ) {
+      fgL += step;
+    }
+
+    const corners = ["tl", "tr", "bl", "br"];
+    const cornerRng = mulberry32(idx * 1000 + dayNum);
+
+    return {
+      idx,
+      phrase: ordered[idx].text,
+      phraseNum: ordered[idx].num,
+      altIdx,
+      altPhrase: ordered[altIdx].text,
+      altPhraseNum: ordered[altIdx].num,
+      dateStr: date.toLocaleDateString(undefined, {
+        weekday: "long", month: "long", day: "numeric", year: "numeric"
+      }),
+      isoDate: date.toISOString().slice(0, 10),
+      bg: `hsl(${hue}, ${bgS}%, ${bgL}%)`,
+      fg: `hsl(${altHue}, ${fgS}%, ${fgL}%)`,
+      cornerA: corners[Math.floor(cornerRng() * 4)],
+      cornerB: corners[Math.floor(cornerRng() * 4)]
+    };
+  }
+
+  let day = computeDay(now);
 
   const dateEl = document.getElementById("date");
-  dateEl.textContent = dateStr;
-  dateEl.setAttribute("datetime", now.toISOString().slice(0, 10));
+  dateEl.textContent = day.dateStr;
+  dateEl.setAttribute("datetime", day.isoDate);
 
   const phraseEl = document.getElementById("phrase");
   const footerEl = document.getElementById("footer");
-  phraseEl.textContent = phrase;
-  footerEl.textContent = `№ ${idx + 1} of ${totalCount}`;
-
-  // Deterministic color pair from the day's index within this year's permutation.
-  // Hue rotates around the wheel; foreground hue is offset so the two never blend.
-  // Lightness pair is anchored to the OS dark/light preference but still varies
-  // per day so each day feels visually distinct.
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const hue = ((idx * 47) + (year * 31)) % 360;
-  const altHue = (hue + 180 + (idx * 13) % 60 - 30) % 360;
-  const jitter = (idx * 7) % 8;
-
-  let bgL, fgL, bgS, fgS;
-  if (prefersDark) {
-    bgL = 6 + jitter;
-    fgL = 86 + (jitter % 6);
-    bgS = 30 + (idx * 11) % 20;
-    fgS = 60 + (idx * 17) % 25;
-  } else {
-    bgL = 90 + (jitter % 6);
-    fgL = 10 + jitter;
-    bgS = 35 + (idx * 11) % 20;
-    fgS = 65 + (idx * 17) % 25;
-  }
-
-  // Push foreground lightness toward the extreme until contrast clears MIN_CONTRAST.
-  // In dark mode, push fgL up toward 100; in light mode, push it down toward 0.
-  const step = prefersDark ? 1 : -1;
-  while (
-    contrastRatio([hue, bgS, bgL], [altHue, fgS, fgL]) < MIN_CONTRAST &&
-    fgL + step >= 0 && fgL + step <= 100
-  ) {
-    fgL += step;
-  }
-
-  const bg = `hsl(${hue}, ${bgS}%, ${bgL}%)`;
-  const fg = `hsl(${altHue}, ${fgS}%, ${fgL}%)`;
+  phraseEl.textContent = day.phrase;
+  footerEl.textContent = `№ ${day.phraseNum} of ${totalCount}`;
 
   function applyPalette(background, foreground) {
     document.body.style.backgroundColor = background;
     document.body.style.color = foreground;
   }
-  applyPalette(bg, fg);
+  applyPalette(day.bg, day.fg);
 
   let showingAlt = false;
 
   // Speaker button: reads the current phrase aloud via the device's TTS.
-  // Corner is randomized per phrase using the same seeded RNG, so position
-  // is stable for a given (year, idx) pair but changes when you toggle.
   const speakerEl = document.getElementById("speaker");
   const hasSpeech = "speechSynthesis" in window;
   if (!hasSpeech) speakerEl.hidden = true;
-  const corners = ["tl", "tr", "bl", "br"];
-  const cornerRng = mulberry32(year * 1000 + idx);
-  const cornerA = corners[Math.floor(cornerRng() * 4)];
-  const cornerB = corners[Math.floor(cornerRng() * 4)];
 
   function placeSpeaker(corner) {
     speakerEl.classList.remove("tl", "tr", "bl", "br");
     speakerEl.classList.add(corner);
   }
-  placeSpeaker(cornerA);
+  placeSpeaker(day.cornerA);
 
   function speak(text) {
     if (!hasSpeech) return;
@@ -339,7 +343,7 @@ async function init() {
 
   speakerEl.addEventListener("click", (e) => {
     e.stopPropagation();
-    speak(showingAlt ? altPhrase : phrase);
+    speak(showingAlt ? day.altPhrase : day.phrase);
   });
 
   // Easter egg: tap the phrase to crossfade between today's phrase and its
@@ -352,15 +356,47 @@ async function init() {
     phraseEl.classList.add("fading");
     setTimeout(() => {
       showingAlt = !showingAlt;
-      phraseEl.textContent = showingAlt ? altPhrase : phrase;
+      phraseEl.textContent = showingAlt ? day.altPhrase : day.phrase;
       footerEl.textContent = showingAlt
-        ? `№ ${altIdx + 1} of ${totalCount}`
-        : `№ ${idx + 1} of ${totalCount}`;
-      applyPalette(showingAlt ? fg : bg, showingAlt ? bg : fg);
-      placeSpeaker(showingAlt ? cornerB : cornerA);
+        ? `№ ${day.altPhraseNum} of ${totalCount}`
+        : `№ ${day.phraseNum} of ${totalCount}`;
+      applyPalette(showingAlt ? day.fg : day.bg, showingAlt ? day.bg : day.fg);
+      placeSpeaker(showingAlt ? day.cornerB : day.cornerA);
       phraseEl.classList.remove("fading");
     }, 600);
   });
+
+  // Soft rollover: crossfade to the next day's phrase at midnight.
+  // The permutation is fixed, so no year-boundary reload is needed.
+  function rollover() {
+    const rollNow = new Date();
+    const next = computeDay(rollNow);
+    if (next.idx === day.idx) return;
+    showingAlt = false;
+    if (hasSpeech) speechSynthesis.cancel();
+    speakerEl.classList.remove("speaking");
+    phraseEl.classList.add("fading");
+    setTimeout(() => {
+      day = next;
+      phraseEl.textContent = day.phrase;
+      footerEl.textContent = `№ ${day.phraseNum} of ${totalCount}`;
+      dateEl.textContent = day.dateStr;
+      dateEl.setAttribute("datetime", day.isoDate);
+      applyPalette(day.bg, day.fg);
+      placeSpeaker(day.cornerA);
+      phraseEl.classList.remove("fading");
+    }, 600);
+  }
+
+  function msUntilMidnight() {
+    const mnow = new Date();
+    const midnight = new Date(mnow.getFullYear(), mnow.getMonth(), mnow.getDate() + 1);
+    return midnight - mnow;
+  }
+  function scheduleRollover() {
+    setTimeout(() => { rollover(); scheduleRollover(); }, msUntilMidnight() + 1000);
+  }
+  scheduleRollover();
 
   // React to OS theme changes mid-session by reloading so the palette recomputes.
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {

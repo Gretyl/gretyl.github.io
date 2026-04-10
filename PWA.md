@@ -156,7 +156,7 @@ self.addEventListener('fetch', (event) => {
 
 **Extra assets:** if the page loads data files at runtime, add them to the `APP_FILES` array so they're cached too (e.g., Phrase a Day caches `/assets/phrases.md`).
 
-**Cache versioning:** bump the `-v1` suffix when you make breaking changes to force a cache refresh.
+**Cache versioning:** bump the version suffix in `CACHE_NAME` (e.g., `v1.02` → `v1.03`) whenever you change the HTML or any asset listed in `APP_FILES`. The `activate` handler evicts old caches whose name doesn't match, so bumping the version guarantees offline users pick up the new code on their next visit. The service worker uses a **network-first** strategy for app files, so online users always get the latest — but without a version bump, stale entries linger in the cache and will be served if the user goes offline before the cache is naturally overwritten.
 
 Register the service worker at the end of `<body>` in the HTML file:
 

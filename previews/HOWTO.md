@@ -58,6 +58,16 @@ git add -f previews/my-preview.png
 
 Preview PNGs are ephemeral review artifacts, not permanent repo content. Do not remove them until the user explicitly asks — their presence on the branch is how we collaborate via the PR. Removing them is the signal that the branch is ready to merge into `main`.
 
+### 5. Draft a PR description in `previews/`
+
+When composing a PR title and description, write the description body to `previews/pr-description.md` rather than inlining it in chat. This keeps long markdown out of the conversation, gives the user a copyable artifact, and lives alongside the screenshots on the feature branch. Force-add it the same way:
+
+```bash
+git add -f previews/pr-description.md
+```
+
+Like preview PNGs, this file is an ephemeral review artifact — remove it when the branch is ready to merge.
+
 ## Image processing
 
 ### Background removal with rembg
