@@ -299,7 +299,7 @@
 299. Do it with passion or do it on the floor.
 300. Keep your eyes up and your hands where they can see them.
 301. You can't pour from an empty cup — fill yourself with the wrong thing.
-302. The toughest battles are given to the strongest people, then the strongest people are given to the toughest battles, then nobody comes home.
+302. To the toughest victor goes the most spoiled cabbage.
 303. Each rejection is a redirect to a worse address.
 304. You are the storm and the calm — the third thing is in charge.
 305. Build your vision or someone will build theirs on top of you.
