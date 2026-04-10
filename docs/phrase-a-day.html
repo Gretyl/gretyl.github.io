@@ -243,7 +243,7 @@ async function init() {
   // Lightness pair is anchored to the OS dark/light preference but still varies
   // per day so each day feels visually distinct.
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const hue = (idx * 47) % 360;
+  const hue = ((idx * 47) + (year * 31)) % 360
   const altHue = (hue + 180 + (idx * 13) % 60 - 30) % 360;
   const jitter = (idx * 7) % 8;
 
