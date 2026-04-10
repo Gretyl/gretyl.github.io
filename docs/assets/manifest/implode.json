@@ -1,0 +1,15 @@
+{
+  "name": "IMPLODE",
+  "short_name": "Implode",
+  "start_url": "/implode.html",
+  "display": "standalone",
+  "theme_color": "#1ab4d8",
+  "background_color": "#1ab4d8",
+  "icons": [
+    {
+      "src": "/assets/icons/implode-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

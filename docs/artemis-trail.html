@@ -10,6 +10,13 @@
 <meta property="og:site_name" content="Gretyl">
 <meta property="og:type" content="website">
 
+<link rel="apple-touch-icon" href="/assets/icons/artemis-trail-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Artemis Trail">
+<link rel="manifest" href="/assets/manifest/artemis-trail.json">
+
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-05N3959YM1"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -19,7 +26,7 @@
 </script>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>The Artemis Trail</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap');
@@ -32,7 +39,7 @@ html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'VT
 #crt{width:100%;height:100%;background:var(--bg);color:var(--green);position:relative;overflow:hidden}
 #crt::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,var(--scanline) 0px,var(--scanline) 1px,transparent 1px,transparent 3px);pointer-events:none;z-index:10}
 #crt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,0.6) 100%);pointer-events:none;z-index:11}
-#screen{position:relative;z-index:5;width:100%;height:100%;display:flex;flex-direction:column;padding:20px;overflow-y:auto}
+#screen{position:relative;z-index:5;width:100%;height:100%;display:flex;flex-direction:column;padding:20px;padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));overflow-y:auto}
 #screen::-webkit-scrollbar{width:0}
 .subtitle{text-align:center;font-size:28px;color:var(--amber);text-shadow:0 0 15px rgba(255,176,0,0.4);margin-bottom:4px;letter-spacing:6px}
 .credits{text-align:center;font-size:18px;color:var(--green-dim);margin-bottom:20px}
@@ -559,6 +566,10 @@ window.startGame=startGame;window.advance=advance;window.showLog=showLog;
 window.endGame=endGame;window.showTitle=showTitle;
 
 init();showTitle();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw-artemis-trail.js');
+}
 </script>
 </body>
 </html>

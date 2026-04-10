@@ -1,0 +1,15 @@
+{
+  "name": "OpenGraph Preview Tool",
+  "short_name": "OG Preview",
+  "start_url": "/tools/opengraph-preview.html",
+  "display": "standalone",
+  "theme_color": "#1a1a2e",
+  "background_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "/assets/icons/opengraph-preview-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
