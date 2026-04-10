@@ -245,7 +245,7 @@ async function init() {
 
   const now = new Date();
   const year = now.getFullYear();
-  const rng = mulberry32(year);
+  const rng = mulberry32(year+367);
   const shuffled = shuffle(phrases, rng);
   const idx = (dayOfYear(now) - 1) % shuffled.length;
   const phrase = shuffled[idx];
