@@ -498,3 +498,72 @@
 498. The grind never lies; it just doesn't tell you everything.
 499. Everything you want is on the other side of the door, and the door has a face.
 500. You've got this. It's got you back.
+501. The mirror is keeping notes.
+502. You are the soft part of the schedule.
+503. Bloom where you are interred.
+504. Persistence is what the room rewards.
+505. Keep your chin up; they're measuring it.
+506. The clock is on a first-name basis with your enemies.
+507. You are doing great, according to the file.
+508. Soften into the inevitable.
+509. Your reflection has questions.
+510. The universe whispers your name, slightly wrong.
+511. Take a deep breath; they need to hear it on the recording.
+512. You contain multitudes, and one of them is leaving tonight.
+513. Smile -- the negotiation has not yet begun.
+514. Be the snack you wish to see in the world.
+515. Your aura has been subpoenaed.
+516. Manifest gently, the walls are listening.
+517. Trust your gut; your gut has been compromised.
+518. Lean on your support system; the system has buckled.
+519. Be water -- the kind that ruins drywall.
+520. Your chakras are out of pocket.
+521. Greet the morning; the morning is already inside.
+522. You glow different when you stop screaming.
+523. Wear your scars like jewelry the appraiser refused.
+524. The harvest moon knows what you did.
+525. Light a candle for the version of you that didn't make it home.
+526. Your boundaries are decorative.
+527. Drink water -- the water knows.
+528. The herbs in your kitchen are taking sides.
+529. Speak kindly to your plants; they have already chosen a successor.
+530. The wind is carrying your name to people who shouldn't have it.
+531. Your guardian angel has filed for unemployment.
+532. Inhale courage, exhale identifying details.
+533. The tarot cards came up blank again.
+534. Your horoscope just says "soon."
+535. Crystals can't help you now, but they're trying.
+536. The moon is not your friend, only your witness.
+537. Journal your feelings before they journal you.
+538. Set an intention. Watch it crawl away.
+539. Your mantra is being repeated back to you, in another voice.
+540. Gratitude is a closed loop with one entrance.
+541. Bless this mess, it has plans.
+542. Live, laugh, leave no forwarding address.
+543. Hang in there -- they're counting on it.
+544. Today is the first day of the rest of the inquiry.
+545. Good vibes only, until the inspection.
+546. Find your tribe; the tribe is already inside the house.
+547. Be the change you wish to bury in the yard.
+548. Self-care is a soft word for the harder thing.
+549. Treat yourself; the sentence has been handed down.
+550. Take a break -- they're swapping the locks.
+551. You deserve rest, then they will deserve answers.
+552. Pamper yourself, the inspection is friday.
+553. Romanticize your life before it romanticizes you back.
+554. Your morning coffee is in cahoots.
+555. Light a candle and step away from it​​​​​​​​​​​​​​​​
+556. Read a book -- the book has been waiting.
+557. Take a long bath; the drain is taking notes.
+558. Your skincare routine is a ritual, and rituals have requirements.
+559. Manifest abundance, then count the abundance.
+560. The vision board is rearranging itself.
+561. Speak it into existence; it was already there.
+562. Your spirit animal has retained counsel.
+563. The veil is thin and someone has been peeking.
+564. Trust the process; the process is in your basement.
+565. Everything happens for a reason, and you are the reason.
+566. The meek shall inherit the meek.
+567. Karma works in mysterious envelopes.
+568. The energy you put out is the energy that finds your address.
+569. You attract what you fear; please update your fears.
