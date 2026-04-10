@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phrase a Day</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500&display=swap" rel="stylesheet">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Georgia, "Times New Roman", serif;
+    overflow: hidden;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 5vh 6vw;
+    box-sizing: border-box;
+    text-align: center;
+  }
+  .date {
+    font-size: clamp(0.8rem, 1.6vw, 1.1rem);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 4vh;
+  }
+  .phrase {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: clamp(1.8rem, 5.5vw, 4.5rem);
+    line-height: 1.2;
+    font-style: italic;
+    font-weight: 400;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+    max-width: 22ch;
+    text-wrap: balance;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: inherit;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: opacity 0.6s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .phrase:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 0.5rem;
+  }
+  .phrase.fading {
+    opacity: 0;
+  }
+  .footer {
+    position: fixed;
+    bottom: 2vh;
+    font-size: 0.75rem;
+    opacity: 0.7;
+    letter-spacing: 0.15em;
+  }
+  .speaker {
+    position: fixed;
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.5rem;
+    opacity: 0.6;
+    cursor: pointer;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    transition: opacity 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .speaker:hover { opacity: 0.95; }
+  .speaker:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+    opacity: 0.95;
+  }
+  .speaker.speaking { opacity: 1; }
+  .speaker.tl { top: 2vh; left: 2vw; }
+  .speaker.tr { top: 2vh; right: 2vw; }
+  .speaker.bl { bottom: 2vh; left: 2vw; }
+  .speaker.br { bottom: 2vh; right: 2vw; }
+  @media (prefers-reduced-motion: reduce) {
+    html, body, .phrase, .speaker {
+      transition: none !important;
+    }
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+</head>
+<body>
+  <button class="speaker" id="speaker" type="button" aria-label="Read phrase aloud">
+    <span aria-hidden="true">🔊</span>
+  </button>
+  <time class="date" id="date"></time>
+  <button
+    class="phrase"
+    id="phrase"
+    type="button"
+    aria-live="polite"
+    aria-label="Tap to reveal a different phrase"
+  ></button>
+  <div class="footer" id="footer" aria-hidden="true"></div>
+
+<script>
+
+// Minimum WCAG contrast ratio between foreground and background.
+// 4.5 = AA normal text, 7.0 = AAA normal text. Since our text is large,
+// AA-large is 3.0 and AAA-large is 4.5 — we use ~7.0 as a comfortable floor.
+const MIN_CONTRAST = 6.969;
+
+// Seedable PRNG (mulberry32) so the year shuffle is deterministic.
+function mulberry32(seed) {
+  return function() {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function shuffle(array, rng) {
+  const a = array.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function dayOfYear(date) {
+  const start = new Date(date.getFullYear(), 0, 0);
+  const diff = date - start;
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+}
+
+// --- WCAG contrast helpers ---
+function hslToRgb(h, s, l) {
+  s /= 100; l /= 100;
+  const k = n => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return [f(0), f(8), f(4)];
+}
+function relLuminance(h, s, l) {
+  const [r, g, b] = hslToRgb(h, s, l);
+  const lin = c => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+function contrastRatio(hsl1, hsl2) {
+  const L1 = relLuminance(...hsl1);
+  const L2 = relLuminance(...hsl2);
+  const [hi, lo] = L1 > L2 ? [L1, L2] : [L2, L1];
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+// Parse phrases.md. Each line looks like "1. The phrase text here."
+// Returns { phrases: [...], totalCount: N } where totalCount is the maximum
+// non-empty row index found in the file — so adding new phrases bumps the
+// "of NNN" counter visibly even before all slots are filled.
+function parsePhrases(markdown) {
+  const lineRegex = /^(\d+)\.\s+(.*\S.*)$/;
+  const phrases = [];
+  let totalCount = 0;
+  for (const line of markdown.split(/\r?\n/)) {
+    const m = line.match(lineRegex);
+    if (!m) continue;
+    const n = parseInt(m[1], 10);
+    const text = m[2].trim();
+    if (!text) continue;
+    phrases.push(text);
+    if (n > totalCount) totalCount = n;
+  }
+  return { phrases, totalCount };
+}
+
+async function init() {
+  let phrases, totalCount;
+  try {
+    const res = await fetch("assets/phrases.md");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const md = await res.text();
+    ({ phrases, totalCount } = parsePhrases(md));
+    if (phrases.length === 0) throw new Error("No phrases found in phrases.md");
+  } catch (err) {
+    document.getElementById("phrase").textContent =
+      "Could not load assets/phrases.md — make sure it ships with this page.";
+    document.getElementById("footer").textContent = String(err);
+    return;
+  }
+
+  const now = new Date();
+  const year = now.getFullYear();
+  const rng = mulberry32(year);
+  const shuffled = shuffle(phrases, rng);
+  const idx = (dayOfYear(now) - 1) % shuffled.length;
+  const phrase = shuffled[idx];
+  const altIdx = (idx + 366) % shuffled.length;
+  const altPhrase = shuffled[altIdx];
+
+  const dateStr = now.toLocaleDateString(undefined, {
+    weekday: "long", month: "long", day: "numeric", year: "numeric"
+  });
+
+  const dateEl = document.getElementById("date");
+  dateEl.textContent = dateStr;
+  dateEl.setAttribute("datetime", now.toISOString().slice(0, 10));
+
+  const phraseEl = document.getElementById("phrase");
+  const footerEl = document.getElementById("footer");
+  phraseEl.textContent = phrase;
+  footerEl.textContent = `№ ${idx + 1} of ${totalCount}`;
+
+  // Deterministic color pair from the day's index within this year's permutation.
+  // Hue rotates around the wheel; foreground hue is offset so the two never blend.
+  // Lightness pair is anchored to the OS dark/light preference but still varies
+  // per day so each day feels visually distinct.
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const hue = (idx * 47) % 360;
+  const altHue = (hue + 180 + (idx * 13) % 60 - 30) % 360;
+  const jitter = (idx * 7) % 8;
+
+  let bgL, fgL, bgS, fgS;
+  if (prefersDark) {
+    bgL = 6 + jitter;
+    fgL = 86 + (jitter % 6);
+    bgS = 30 + (idx * 11) % 20;
+    fgS = 60 + (idx * 17) % 25;
+  } else {
+    bgL = 90 + (jitter % 6);
+    fgL = 10 + jitter;
+    bgS = 35 + (idx * 11) % 20;
+    fgS = 65 + (idx * 17) % 25;
+  }
+
+  // Push foreground lightness toward the extreme until contrast clears MIN_CONTRAST.
+  // In dark mode, push fgL up toward 100; in light mode, push it down toward 0.
+  const step = prefersDark ? 1 : -1;
+  while (
+    contrastRatio([hue, bgS, bgL], [altHue, fgS, fgL]) < MIN_CONTRAST &&
+    fgL + step >= 0 && fgL + step <= 100
+  ) {
+    fgL += step;
+  }
+
+  const bg = `hsl(${hue}, ${bgS}%, ${bgL}%)`;
+  const fg = `hsl(${altHue}, ${fgS}%, ${fgL}%)`;
+
+  function applyPalette(background, foreground) {
+    document.body.style.backgroundColor = background;
+    document.body.style.color = foreground;
+  }
+  applyPalette(bg, fg);
+
+  let showingAlt = false;
+
+  // Speaker button: reads the current phrase aloud via the device's TTS.
+  // Corner is randomized per phrase using the same seeded RNG, so position
+  // is stable for a given (year, idx) pair but changes when you toggle.
+  const speakerEl = document.getElementById("speaker");
+  const hasSpeech = "speechSynthesis" in window;
+  if (!hasSpeech) speakerEl.hidden = true;
+  const corners = ["tl", "tr", "bl", "br"];
+  const cornerRng = mulberry32(year * 1000 + idx);
+  const cornerA = corners[Math.floor(cornerRng() * 4)];
+  const cornerB = corners[Math.floor(cornerRng() * 4)];
+
+  function placeSpeaker(corner) {
+    speakerEl.classList.remove("tl", "tr", "bl", "br");
+    speakerEl.classList.add(corner);
+  }
+  placeSpeaker(cornerA);
+
+  function speak(text) {
+    if (!hasSpeech) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.95;
+    u.pitch = 1.0;
+    speakerEl.classList.add("speaking");
+    u.onend = () => speakerEl.classList.remove("speaking");
+    u.onerror = () => speakerEl.classList.remove("speaking");
+    speechSynthesis.speak(u);
+  }
+
+  speakerEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    speak(showingAlt ? altPhrase : phrase);
+  });
+
+  // Easter egg: tap the phrase to crossfade between today's phrase and its
+  // pair at (idx + 366) % phrases.length. The pair inverts the palette — fg and
+  // bg swap — so each phrase visually claims the opposite half of the day's
+  // color scheme. The speaker also hops to its alternate corner.
+  phraseEl.addEventListener("click", () => {
+    if (hasSpeech) speechSynthesis.cancel();
+    speakerEl.classList.remove("speaking");
+    phraseEl.classList.add("fading");
+    setTimeout(() => {
+      showingAlt = !showingAlt;
+      phraseEl.textContent = showingAlt ? altPhrase : phrase;
+      footerEl.textContent = showingAlt
+        ? `№ ${altIdx + 1} of ${totalCount}`
+        : `№ ${idx + 1} of ${totalCount}`;
+      applyPalette(showingAlt ? fg : bg, showingAlt ? bg : fg);
+      placeSpeaker(showingAlt ? cornerB : cornerA);
+      phraseEl.classList.remove("fading");
+    }, 600);
+  });
+
+  // React to OS theme changes mid-session by reloading so the palette recomputes.
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    location.reload();
+  });
+}
+
+init();
+</script>
+</body>
+</html>
