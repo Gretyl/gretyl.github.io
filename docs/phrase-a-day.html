@@ -163,7 +163,7 @@
 // AA-large is 3.0 and AAA-large is 4.5 — we use ~7.0 as a comfortable floor.
 const MIN_CONTRAST = 6.969;
 
-// Seedable PRNG (mulberry32) so the year shuffle is deterministic.
+// Seedable PRNG (mulberry32) — used for hash-based ordering and corner RNG.
 function mulberry32(seed) {
   return function() {
     let t = seed += 0x6D2B79F5;
@@ -173,19 +173,19 @@ function mulberry32(seed) {
   };
 }
 
-function shuffle(array, rng) {
-  const a = array.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+// Hash-based ordering: each phrase gets a deterministic score from its own
+// number, independent of how many phrases exist. Adding phrases inserts them
+// at their hash-determined position without disturbing the existing order.
+const SEED = 696969;
+function stableOrder(phrases) {
+  return phrases.slice().sort((a, b) => {
+    return mulberry32(SEED + a.num)() - mulberry32(SEED + b.num)();
+  });
 }
 
-function dayOfYear(date) {
-  const start = new Date(date.getFullYear(), 0, 0);
-  const diff = date - start;
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
+const EPOCH = new Date(2026, 3, 9);  // April 9, 2026 — first commit
+function daysSinceEpoch(date) {
+  return Math.floor((date - EPOCH) / 86400000);
 }
 
 // --- WCAG contrast helpers ---
@@ -244,18 +244,16 @@ async function init() {
   }
 
   const now = new Date();
-  const year = now.getFullYear();
-  const rng = mulberry32(year+367);
-  const shuffled = shuffle(phrases, rng);
+  const ordered = stableOrder(phrases);
   // Compute all per-day state from a date: phrase, palette, speaker corners.
-  // Closes over shuffled so rollover can recompute without re-fetching.
+  // Closes over ordered so rollover can recompute without re-fetching.
   function computeDay(date) {
-    const yr = date.getFullYear();
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const idx = (dayOfYear(date) - 1) % shuffled.length;
-    const altIdx = (idx + 366) % shuffled.length;
+    const dayNum = daysSinceEpoch(date);
+    const idx = dayNum % ordered.length;
+    const altIdx = (idx + Math.floor(ordered.length / 2)) % ordered.length;
 
-    const hue = ((idx * 47) + (yr * 31)) % 360;
+    const hue = ((idx * 47) + (dayNum * 31)) % 360;
     const altHue = (hue + 180 + (idx * 13) % 60 - 30) % 360;
     const jitter = (idx * 7) % 8;
 
@@ -281,15 +279,15 @@ async function init() {
     }
 
     const corners = ["tl", "tr", "bl", "br"];
-    const cornerRng = mulberry32(yr * 1000 + idx);
+    const cornerRng = mulberry32(idx * 1000 + dayNum);
 
     return {
       idx,
-      phrase: shuffled[idx].text,
-      phraseNum: shuffled[idx].num,
+      phrase: ordered[idx].text,
+      phraseNum: ordered[idx].num,
       altIdx,
-      altPhrase: shuffled[altIdx].text,
-      altPhraseNum: shuffled[altIdx].num,
+      altPhrase: ordered[altIdx].text,
+      altPhraseNum: ordered[altIdx].num,
       dateStr: date.toLocaleDateString(undefined, {
         weekday: "long", month: "long", day: "numeric", year: "numeric"
       }),
@@ -368,11 +366,10 @@ async function init() {
     }, 600);
   });
 
-  // Soft rollover: crossfade to the next day's phrase at midnight without
-  // reloading. Year boundaries trigger a full reload (new seed, new shuffle).
+  // Soft rollover: crossfade to the next day's phrase at midnight.
+  // The permutation is fixed, so no year-boundary reload is needed.
   function rollover() {
     const rollNow = new Date();
-    if (rollNow.getFullYear() !== year) { location.reload(); return; }
     const next = computeDay(rollNow);
     if (next.idx === day.idx) return;
     showingAlt = false;
