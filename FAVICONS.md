@@ -48,3 +48,7 @@ favicon_emoji: 🎯
 The `_includes/head-custom.html` override handles the rest — it reads the front matter variable and emits the SVG favicon `<link>` in the layout's `<head>`. No changes to the page content are needed.
 
 If `favicon_emoji` is omitted, no favicon is rendered.
+
+## Going further — Home Screen apps
+
+The SVG emoji favicon covers browser tabs, but iOS requires a separate **180×180 PNG** for the Home Screen icon. If you're making a page installable as a standalone app, see [PWA.md](PWA.md) for the full checklist — icon, manifest, service worker, and offline support.
