@@ -510,13 +510,13 @@
 510. The universe whispers your name, slightly wrong.
 511. Take a deep breath; they need to hear it on the recording.
 512. You contain multitudes, and one of them is leaving tonight.
-513. Smile -- the negotiation has not yet begun.
+513. Smile – the negotiation has not yet begun.
 514. Be the snack you wish to see in the world.
 515. Your aura has been subpoenaed.
 516. Manifest gently, the walls are listening.
 517. Trust your gut; your gut has been compromised.
 518. Lean on your support system; the system has buckled.
-519. Be water -- the kind that ruins drywall.
+519. Be water – the kind that ruins drywall.
 520. Your chakras are out of pocket.
 521. Greet the morning; the morning is already inside.
 522. You glow different when you stop screaming.
@@ -524,7 +524,7 @@
 524. The harvest moon knows what you did.
 525. Light a candle for the version of you that didn't make it home.
 526. Your boundaries are decorative.
-527. Drink water -- the water knows.
+527. Drink water – the water knows.
 528. The herbs in your kitchen are taking sides.
 529. Speak kindly to your plants; they have already chosen a successor.
 530. The wind is carrying your name to people who shouldn't have it.
@@ -540,20 +540,20 @@
 540. Gratitude is a closed loop with one entrance.
 541. Bless this mess, it has plans.
 542. Live, laugh, leave no forwarding address.
-543. Hang in there -- they're counting on it.
+543. Hang in there – they're counting on it.
 544. Today is the first day of the rest of the inquiry.
 545. Good vibes only, until the inspection.
 546. Find your tribe; the tribe is already inside the house.
 547. Be the change you wish to bury in the yard.
 548. Self-care is a soft word for the harder thing.
 549. Treat yourself; the sentence has been handed down.
-550. Take a break -- they're swapping the locks.
+550. Take a break – they're swapping the locks.
 551. You deserve rest, then they will deserve answers.
 552. Pamper yourself, the inspection is Friday.
 553. Romanticize your life before it romanticizes you back.
 554. Your morning coffee is in cahoots.
 555. Light a candle and step away from it​​​​​​​​​​​​​​​​ slowly.
-556. Read a book -- the book has been waiting.
+556. Read a book – the book has been waiting.
 557. Take a long bath; the drain is taking notes.
 558. Your skincare routine is a ritual, and rituals have requirements.
 559. Manifest abundance, then count the abundance.
