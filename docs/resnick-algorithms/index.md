@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Resnick Algorithms
+favicon_emoji: 🧪
 ---
 
 {% include analytics.html %}
