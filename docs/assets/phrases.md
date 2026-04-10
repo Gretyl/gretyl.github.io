@@ -567,3 +567,4 @@
 567. Karma works in mysterious envelopes.
 568. The energy you put out is the energy that finds your address.
 569. You attract what you fear; please update your fears.
+570. Don't let them stop twirling, make them start twirling.
