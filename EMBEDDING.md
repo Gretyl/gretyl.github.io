@@ -2,6 +2,8 @@
 
 How to add OpenGraph meta tags to standalone HTML pages so they render rich previews on Mastodon, Discord, Slack, etc.
 
+See also [FAVICONS.md](FAVICONS.md) — both docs govern `<head>` content and should be applied together when adding new pages.
+
 ## When to use this
 
 Standalone HTML files (no Jekyll front matter) that you want to show a preview card when shared. Jekyll-rendered pages handle metadata differently — this guide is **not** for those.
@@ -64,12 +66,13 @@ The tool shows a live Mastodon-style card preview. Once you're happy with the la
 
 ### 3. Embed in the HTML file
 
-Paste the tags immediately after the opening `<head>` tag, **before** `<meta charset="UTF-8">`. Leave a blank line above and below the block:
+Paste the tags after the favicon `<link>` (see [FAVICONS.md](FAVICONS.md)), **before** the GA4 script and `<meta charset="UTF-8">`. The standard `<head>` ordering is favicon → OG → GA4 → rest:
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" href="data:image/svg+xml,...">
 
 <meta property="og:title" content="The Artemis Trail">
 <meta property="og:description" content="Lunar mission simulator, in the style of Oregon Trail.">
@@ -77,6 +80,9 @@ Paste the tags immediately after the opening `<head>` tag, **before** `<meta cha
 <meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/artemis-trail.png">
 <meta property="og:site_name" content="Gretyl">
 <meta property="og:type" content="website">
+
+<script async src="...gtag..."></script>
+<script>...</script>
 
 <meta charset="UTF-8">
 ```
@@ -116,6 +122,7 @@ When including video, provide all four `og:video` properties. Store video files 
  <!DOCTYPE html>
  <html lang="en">
  <head>
++<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
 +
 +<meta property="og:title" content="GREED -- A Classic Dice Game of Risk &amp; Reward">
 +<meta property="og:description" content="Score points and get greedy -- want to push your luck? 🎲">

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Purely Functional Data Structures
+favicon_emoji: 🗿
 ---
 
 {% include analytics.html %}
