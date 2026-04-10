@@ -222,7 +222,7 @@ function parsePhrases(markdown) {
     const n = parseInt(m[1], 10);
     const text = m[2].trim();
     if (!text) continue;
-    phrases.push(text);
+    phrases.push({ text, num: n });
     if (n > totalCount) totalCount = n;
   }
   return { phrases, totalCount };
@@ -248,9 +248,11 @@ async function init() {
   const rng = mulberry32(year+367);
   const shuffled = shuffle(phrases, rng);
   const idx = (dayOfYear(now) - 1) % shuffled.length;
-  const phrase = shuffled[idx];
+  const phrase = shuffled[idx].text;
+  const phraseNum = shuffled[idx].num;
   const altIdx = (idx + 366) % shuffled.length;
-  const altPhrase = shuffled[altIdx];
+  const altPhrase = shuffled[altIdx].text;
+  const altPhraseNum = shuffled[altIdx].num;
 
   const dateStr = now.toLocaleDateString(undefined, {
     weekday: "long", month: "long", day: "numeric", year: "numeric"
@@ -263,7 +265,7 @@ async function init() {
   const phraseEl = document.getElementById("phrase");
   const footerEl = document.getElementById("footer");
   phraseEl.textContent = phrase;
-  footerEl.textContent = `№ ${idx + 1} of ${totalCount}`;
+  footerEl.textContent = `№ ${phraseNum} of ${totalCount}`;
 
   // Deterministic color pair from the day's index within this year's permutation.
   // Hue rotates around the wheel; foreground hue is offset so the two never blend.
@@ -354,8 +356,8 @@ async function init() {
       showingAlt = !showingAlt;
       phraseEl.textContent = showingAlt ? altPhrase : phrase;
       footerEl.textContent = showingAlt
-        ? `№ ${altIdx + 1} of ${totalCount}`
-        : `№ ${idx + 1} of ${totalCount}`;
+        ? `№ ${altPhraseNum} of ${totalCount}`
+        : `№ ${phraseNum} of ${totalCount}`;
       applyPalette(showingAlt ? fg : bg, showingAlt ? bg : fg);
       placeSpeaker(showingAlt ? cornerB : cornerA);
       phraseEl.classList.remove("fading");
