@@ -1,0 +1,15 @@
+{
+  "name": "Shadertoy Harness",
+  "short_name": "Shadertoy",
+  "start_url": "/tools/shadertoy.html",
+  "display": "standalone",
+  "theme_color": "#1a1a2e",
+  "background_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "/assets/icons/shadertoy-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

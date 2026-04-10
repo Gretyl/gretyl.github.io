@@ -10,6 +10,13 @@
 <meta property="og:site_name" content="Gretyl">
 <meta property="og:type" content="website">
 
+<link rel="apple-touch-icon" href="/assets/icons/opengraph-preview-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="OG Preview">
+<link rel="manifest" href="/assets/manifest/opengraph-preview.json">
+
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-05N3959YM1"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -19,7 +26,7 @@
 </script>
 
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>OpenGraph Tag Generator</title>
   <style>
     :root {
@@ -67,6 +74,7 @@
     body {
       margin: 0;
       padding: 2rem 1.5rem;
+      padding: max(2rem, env(safe-area-inset-top)) max(1.5rem, env(safe-area-inset-right)) max(2rem, env(safe-area-inset-bottom)) max(1.5rem, env(safe-area-inset-left));
       background: var(--bg);
       color: var(--text);
       font-family: system-ui, -apple-system, sans-serif;
@@ -314,7 +322,7 @@
     }
 
     @media (max-width: 768px) {
-      body { padding: 1rem; }
+      body { padding: 1rem; padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); }
       .layout {
         grid-template-columns: 1fr;
       }

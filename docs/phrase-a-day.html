@@ -10,6 +10,13 @@
 <meta property="og:site_name" content="Gretyl">
 <meta property="og:type" content="website">
 
+<link rel="apple-touch-icon" href="/assets/icons/phrase-a-day-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Phrase a Day">
+<link rel="manifest" href="/assets/manifest/phrase-a-day.json">
+
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-05N3959YM1"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -19,7 +26,7 @@
 </script>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Phrase a Day</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,6 +47,7 @@
     justify-content: center;
     min-height: 100vh;
     padding: 5vh 6vw;
+    padding: max(5vh, env(safe-area-inset-top)) max(6vw, env(safe-area-inset-right)) max(5vh, env(safe-area-inset-bottom)) max(6vw, env(safe-area-inset-left));
     box-sizing: border-box;
     text-align: center;
   }
