@@ -1238,6 +1238,10 @@ function loop(time=0){
   if(state==='playing'||state==='imploding'||state==='crushing'){update(dt);draw()}
   if(state==='playing'||state==='imploding'||state==='crushing')requestAnimationFrame(loop);
 }
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw-implode.js');
+}
 </script>
 </body>
 </html>

@@ -566,6 +566,10 @@ window.startGame=startGame;window.advance=advance;window.showLog=showLog;
 window.endGame=endGame;window.showTitle=showTitle;
 
 init();showTitle();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw-artemis-trail.js');
+}
 </script>
 </body>
 </html>

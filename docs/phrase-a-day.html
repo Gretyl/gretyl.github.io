@@ -359,6 +359,10 @@ async function init() {
 }
 
 init();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw-phrase-a-day.js');
+}
 </script>
 </body>
 </html>

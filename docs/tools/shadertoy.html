@@ -817,6 +817,10 @@ canvas.addEventListener('webglcontextrestored', () => {
 // ── Init ───────────────────────────────────────────────────────────────────
 loadPreset(DEFAULT_PRESET);
 requestAnimationFrame(frame);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw-shadertoy.js');
+}
 </script>
 </body>
 </html>

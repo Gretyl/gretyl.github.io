@@ -608,6 +608,10 @@
 
     // Reflect default field values (e.g. default image) on initial load
     updateOutput();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw-opengraph-preview.js');
+    }
   </script>
 </body>
 </html>
