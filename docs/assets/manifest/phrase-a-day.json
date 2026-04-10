@@ -1,6 +1,6 @@
 {
   "name": "Phrase a Day",
-  "short_name": "Phrase",
+  "short_name": "PhraseADay",
   "start_url": "/phrase-a-day.html",
   "display": "standalone",
   "theme_color": "#1a1a2e",
