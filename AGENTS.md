@@ -49,6 +49,7 @@ Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, 
 ## Debugging
 
 - **Local HTTP server for `fetch()`-dependent pages.** Standalone HTML pages that use `fetch()` for local assets (e.g., `phrase-a-day.html` loading `assets/phrases.md`) will fail under `file://` URLs due to browser security restrictions. Serve them via a local HTTP server instead: `cd docs && python3 -m http.server 8765`, then open `http://localhost:8765/<page>.html` in the browser or with `uvx rodney open`.
+- **Service worker cache versioning.** When modifying HTML or assets cached by a service worker, bump the `CACHE_NAME` version string in the corresponding `sw-{app}.js` file so stale offline copies are evicted. See the cache versioning section in [PWA.md](PWA.md) for details.
 
 ## Before pushing
 
