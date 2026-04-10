@@ -11,9 +11,9 @@
     {% include header-title.html %}
 {% endif %}
 
-<p><a href="/phrase-a-day.html">🗓️ Motivate me!</a></p>
-
 <p>{{ site.description | default: site.github.project_tagline }}</p>
+
+<p><a href="/phrase-a-day.html">🗓️ Motivate me!</a></p>
 
 {% unless site.hide_project_page %}
     {% if site.github.is_project_page %}
@@ -21,7 +21,7 @@
     {% endif %}
 
     {% if site.github.is_user_page %}
-    <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
+    <p class="view"><a href="{{ site.github.owner_url }}">📊 GitHub Profile</a></p>
     {% endif %}
 {% endunless %}
 
