@@ -549,10 +549,10 @@
 549. Treat yourself; the sentence has been handed down.
 550. Take a break -- they're swapping the locks.
 551. You deserve rest, then they will deserve answers.
-552. Pamper yourself, the inspection is friday.
+552. Pamper yourself, the inspection is Friday.
 553. Romanticize your life before it romanticizes you back.
 554. Your morning coffee is in cahoots.
-555. Light a candle and step away from it​​​​​​​​​​​​​​​​
+555. Light a candle and step away from it​​​​​​​​​​​​​​​​ slowly.
 556. Read a book -- the book has been waiting.
 557. Take a long bath; the drain is taking notes.
 558. Your skincare routine is a ritual, and rituals have requirements.
