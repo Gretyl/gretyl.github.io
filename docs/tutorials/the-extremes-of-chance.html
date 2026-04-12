@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Extremes of Chance</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0a09;
+    --surface: #1c1917;
+    --surface2: #292524;
+    --border: #3f3a36;
+    --text: #e7e5e4;
+    --text-dim: #a8a29e;
+    --text-muted: #78716c;
+    --accent-min: #f97316;
+    --accent-min-dim: #9a3412;
+    --accent-max: #06b6d4;
+    --accent-max-dim: #0e7490;
+    --accent-gold: #fbbf24;
+    --accent-green: #4ade80;
+    --radius: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 60px 24px 120px;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: clamp(2.4rem, 5vw, 3.4rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  h1 .sub {
+    display: block;
+    font-size: 0.42em;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .intro {
+    font-size: 1.15rem;
+    color: var(--text-dim);
+    margin-bottom: 56px;
+    max-width: 640px;
+  }
+
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin-top: 72px;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.15rem;
+    margin-top: 40px;
+    margin-bottom: 10px;
+    color: var(--text-dim);
+  }
+
+  p { margin-bottom: 18px; }
+
+  .math {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88em;
+    background: var(--surface);
+    padding: 2px 7px;
+    border-radius: 3px;
+    color: var(--accent-gold);
+    white-space: nowrap;
+  }
+
+  .callout {
+    background: var(--surface);
+    border-left: 3px solid var(--accent-gold);
+    padding: 16px 20px;
+    margin: 28px 0;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.95rem;
+    color: var(--text-dim);
+  }
+  .callout strong {
+    color: var(--accent-gold);
+    font-weight: 500;
+  }
+
+  .skeptic {
+    background: var(--surface);
+    border-left: 3px solid var(--accent-min);
+    padding: 16px 20px;
+    margin: 28px 0;
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .skeptic .q {
+    font-style: italic;
+    color: var(--accent-min);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+  }
+  .skeptic .a {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+
+  /* --- Simulation Panels --- */
+  .sim-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 24px 0;
+  }
+
+  .sim-panel .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  button {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  button:hover {
+    background: var(--border);
+    border-color: var(--text-muted);
+  }
+  button.active {
+    background: var(--accent-min-dim);
+    border-color: var(--accent-min);
+    color: #fff;
+  }
+
+  .btn-max.active {
+    background: var(--accent-max-dim) !important;
+    border-color: var(--accent-max) !important;
+  }
+
+  label.slider-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  label.slider-label span.val {
+    color: var(--accent-gold);
+    min-width: 24px;
+    text-align: right;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    background: var(--border);
+    height: 4px;
+    border-radius: 2px;
+    width: 100px;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent-gold);
+    cursor: pointer;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    border-radius: 4px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+  }
+  .stat {
+    color: var(--text-muted);
+  }
+  .stat .sv {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .stat .sv.min-c { color: var(--accent-min); }
+  .stat .sv.max-c { color: var(--accent-max); }
+
+  /* side-by-side */
+  .side-by-side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  @media (max-width: 600px) {
+    .side-by-side { grid-template-columns: 1fr; }
+  }
+  .side-by-side .col {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .side-by-side .col h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .side-by-side .col h4.min-c { color: var(--accent-min); }
+  .side-by-side .col h4.max-c { color: var(--accent-max); }
+
+  /* dice animation area */
+  .dice-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    min-height: 80px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .die-val {
+    font-size: 2rem;
+    font-weight: 700;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: transform 0.2s, border-color 0.3s;
+  }
+  .die-val.picked {
+    border-color: var(--accent-green);
+    transform: scale(1.1);
+  }
+  .die-op {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+  .die-result {
+    font-size: 1.1rem;
+    color: var(--accent-green);
+    font-weight: 500;
+  }
+
+  .sep {
+    width: 100%;
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 56px 0;
+  }
+
+  a { color: var(--accent-max); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1><span class="sub">An interactive exploration of</span>The Extremes of Chance</h1>
+  <p class="intro">
+    Roll two dice. Keep the lower one — or the higher one. How does that simple choice reshape the entire distribution? This page builds the answer from scratch: one concept at a time, each demonstrated before it's named.
+  </p>
+
+  <!-- ============================================ -->
+  <!-- SECTION 1: One roll -->
+  <!-- ============================================ -->
+  <h2>Start with one roll</h2>
+  <p>
+    A single uniform random number on [0, 1) is the simplest possible distribution. Every value is equally likely. Click to sample — watch how the histogram fills in flat.
+  </p>
+
+  <div class="sim-panel" id="sec1">
+    <div class="controls">
+      <button onclick="sampleSingle(1)">Roll once</button>
+      <button onclick="sampleSingle(50)">+50 rolls</button>
+      <button onclick="sampleSingle(500)">+500 rolls</button>
+      <button onclick="resetSingle()">Reset</button>
+    </div>
+    <canvas id="canvas-single" height="200"></canvas>
+    <div class="stats-row">
+      <div class="stat">Rolls: <span class="sv" id="s1-n">0</span></div>
+      <div class="stat">Mean: <span class="sv" id="s1-mean">—</span></div>
+      <div class="stat">Expected: <span class="sv">0.500</span></div>
+    </div>
+  </div>
+
+  <p>
+    The expected value is <span class="math">E[X] = 1/2</span>. Nothing surprising. But what happens when you roll <em>two</em> numbers and pick one?
+  </p>
+
+  <!-- ============================================ -->
+  <!-- SECTION 2: The intuition-builder -->
+  <!-- ============================================ -->
+  <h2>Two rolls, one choice</h2>
+  <p>
+    Click "Roll" to generate two uniform values. The interface picks the minimum for you. Before looking at the histogram — just watch the pairs. Notice anything about where the chosen value tends to land?
+  </p>
+
+  <div class="sim-panel" id="sec2">
+    <div class="controls">
+      <button onclick="rollPair()">Roll pair</button>
+      <button onclick="rollPairBatch(50)">+50 pairs</button>
+      <button onclick="rollPairBatch(500)">+500 pairs</button>
+      <button onclick="resetPair()">Reset</button>
+      <div style="flex-grow:1"></div>
+      <button id="btn-pair-min" class="active" onclick="setPairMode('min')">min</button>
+      <button id="btn-pair-max" class="btn-max" onclick="setPairMode('max')">max</button>
+    </div>
+    <div class="dice-area" id="dice-area">
+      <div class="die-val" id="die-a">—</div>
+      <div class="die-op">&amp;</div>
+      <div class="die-val" id="die-b">—</div>
+      <div class="die-op">→</div>
+      <div class="die-result" id="die-result">—</div>
+    </div>
+    <canvas id="canvas-pair" height="200"></canvas>
+    <div class="stats-row">
+      <div class="stat">Pairs: <span class="sv" id="s2-n">0</span></div>
+      <div class="stat">Mean: <span class="sv" id="s2-mean">—</span></div>
+      <div class="stat">Expected: <span class="sv" id="s2-exp">0.333</span></div>
+    </div>
+  </div>
+
+  <div class="skeptic">
+    <div class="q">"Wait — why isn't the expected minimum just 0.25? Each die averages 0.5, and the minimum should be about half of that?"</div>
+    <div class="a">Good instinct, but the minimum of two values isn't "half of one value." It's the <em>probability-weighted</em> outcome of always picking the lower. Low values are likely to be chosen because <em>either</em> die landing low is enough. The exact answer comes from the CDF — keep going.</div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 3: Side-by-side reveal -->
+  <!-- ============================================ -->
+  <h2>The shape of min vs. max</h2>
+  <p>
+    Now let's see both distributions simultaneously, with the theoretical curves overlaid. The min distribution follows <span class="math">f(t) = n(1−t)^(n−1)</span> and the max follows <span class="math">f(t) = nt^(n−1)</span>. Watch how they mirror each other.
+  </p>
+
+  <div class="side-by-side" id="sec3">
+    <div class="col">
+      <h4 class="min-c">min(X₁ … Xₙ) — Disadvantage</h4>
+      <canvas id="canvas-min" height="180"></canvas>
+      <div class="stats-row">
+        <div class="stat">E: <span class="sv min-c" id="s3-min-e">—</span></div>
+        <div class="stat">Med: <span class="sv min-c" id="s3-min-med">—</span></div>
+      </div>
+    </div>
+    <div class="col">
+      <h4 class="max-c">max(X₁ … Xₙ) — Advantage</h4>
+      <canvas id="canvas-max" height="180"></canvas>
+      <div class="stats-row">
+        <div class="stat">E: <span class="sv max-c" id="s3-max-e">—</span></div>
+        <div class="stat">Med: <span class="sv max-c" id="s3-max-med">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sim-panel">
+    <div class="controls">
+      <button onclick="runSideBySide(500)">+500 samples</button>
+      <button onclick="runSideBySide(2000)">+2000 samples</button>
+      <button onclick="resetSideBySide()">Reset</button>
+      <div style="flex-grow:1"></div>
+      <label class="slider-label">
+        n = <span class="val" id="n-val">2</span>
+        <input type="range" id="n-slider" min="2" max="10" value="2" oninput="changeN(this.value)">
+      </label>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>The identities:</strong> For n independent uniform [0,1) variables — E[min] = 1/(n+1) and E[max] = n/(n+1). They always sum to 1. Drag n above and watch the means converge toward the extremes.
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 4: Mean vs Median -->
+  <!-- ============================================ -->
+  <h2>Mean vs. Median — which matters?</h2>
+  <p>
+    The mean and median of these distributions differ because the shapes are skewed. For min(X,Y): the mean is <span class="math">1/3 ≈ 0.333</span> but the median is <span class="math">1 − 1/√2 ≈ 0.293</span>. Which one should you care about?
+  </p>
+
+  <p>
+    For <strong>threshold checks</strong> (D&amp;D attack rolls, skill checks), you're asking "do I beat the DC?" — the full CDF matters, and the median tells you your 50/50 breakpoint. For <strong>accumulated outcomes</strong> (damage over many rounds), the mean governs your long-run total. Click through to see the CDF with both marked.
+  </p>
+
+  <div class="sim-panel" id="sec4">
+    <div class="controls">
+      <label class="slider-label">
+        n = <span class="val" id="n-val-cdf">2</span>
+        <input type="range" id="n-slider-cdf" min="2" max="10" value="2" oninput="changeCdfN(this.value)">
+      </label>
+      <div style="flex-grow:1"></div>
+      <button id="btn-cdf-min" class="active" onclick="setCdfMode('min')">min CDF</button>
+      <button id="btn-cdf-max" class="btn-max" onclick="setCdfMode('max')">max CDF</button>
+    </div>
+    <canvas id="canvas-cdf" height="240"></canvas>
+    <div class="stats-row">
+      <div class="stat">Mean: <span class="sv" id="s4-mean">—</span></div>
+      <div class="stat">Median: <span class="sv" id="s4-med">—</span></div>
+      <div class="stat">Δ: <span class="sv" id="s4-delta">—</span></div>
+    </div>
+  </div>
+
+  <div class="skeptic">
+    <div class="q">"So for a d% roll with advantage, my median outcome is about 71 — but my average outcome is about 67. Why are those different?"</div>
+    <div class="a">Because the max distribution is left-skewed: the long tail of low outcomes drags the mean below the median. You'll beat 67 more than half the time, but those occasional low rolls pull your average down. For pass/fail checks, the median is the more useful number. For damage accumulation, trust the mean.</div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 5: The parameter explorer -->
+  <!-- ============================================ -->
+  <h2>The full picture</h2>
+  <p>
+    One last experiment. Vary n from 2 to 10 and watch how the distributions, means, and medians shift. With more dice, the extremes get more extreme — min clusters near 0, max clusters near 1 — but the <em>rate</em> at which they converge follows the elegant <span class="math">1/(n+1)</span> and <span class="math">n/(n+1)</span> formulas.
+  </p>
+
+  <div class="sim-panel" id="sec5">
+    <div class="controls">
+      <label class="slider-label">
+        n = <span class="val" id="n-val-final">2</span>
+        <input type="range" id="n-slider-final" min="1" max="10" value="2" oninput="drawFinalChart(+this.value)">
+      </label>
+    </div>
+    <canvas id="canvas-final" height="260"></canvas>
+    <div class="stats-row" id="final-stats"></div>
+  </div>
+
+  <hr class="sep">
+  <p style="color: var(--text-muted); font-size: 0.9rem;">
+    Built to demonstrate: bottom-up scaffolding, clickable simulations as primary explanation, side-by-side comparison, skeptical interlocutor, metric reveal after intuition, and controlled parameter variation.
+  </p>
+
+</div>
+
+<script>
+// ============================
+// Utility
+// ============================
+const $ = id => document.getElementById(id);
+const DPR = window.devicePixelRatio || 1;
+
+function setupCanvas(id) {
+  const c = $(id);
+  const rect = c.getBoundingClientRect();
+  c.width = rect.width * DPR;
+  c.height = rect.height * DPR;
+  const ctx = c.getContext('2d');
+  ctx.scale(DPR, DPR);
+  return { c, ctx, w: rect.width, h: rect.height };
+}
+
+const BINS = 40;
+function makeBins() { return new Float64Array(BINS); }
+
+function drawHist(canvasId, bins, total, opts = {}) {
+  const { c, ctx, w, h } = setupCanvas(canvasId);
+  const pad = { l: 36, r: 12, t: 8, b: 24 };
+  const pw = w - pad.l - pad.r;
+  const ph = h - pad.t - pad.b;
+  const barW = pw / BINS;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // axes
+  ctx.strokeStyle = '#3f3a36';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t);
+  ctx.lineTo(pad.l, pad.t + ph);
+  ctx.lineTo(pad.l + pw, pad.t + ph);
+  ctx.stroke();
+
+  // axis labels
+  ctx.fillStyle = '#78716c';
+  ctx.font = '11px JetBrains Mono, monospace';
+  ctx.textAlign = 'center';
+  for (let i = 0; i <= 4; i++) {
+    const v = i / 4;
+    ctx.fillText(v.toFixed(1), pad.l + v * pw, pad.t + ph + 16);
+  }
+
+  if (total === 0) return;
+
+  // normalize to density
+  const binWidth = 1 / BINS;
+  let maxDensity = 0;
+  for (let i = 0; i < BINS; i++) {
+    const d = (bins[i] / total) / binWidth;
+    if (d > maxDensity) maxDensity = d;
+  }
+  // ensure reasonable scale
+  const yMax = Math.max(maxDensity * 1.15, 2.5);
+
+  // y-axis ticks
+  ctx.textAlign = 'right';
+  for (let v = 0; v <= yMax; v += Math.ceil(yMax / 4)) {
+    const y = pad.t + ph - (v / yMax) * ph;
+    ctx.fillText(v.toFixed(0), pad.l - 6, y + 4);
+  }
+
+  const color = opts.color || '#f97316';
+  const colorDim = opts.colorDim || '#9a3412';
+
+  // bars
+  for (let i = 0; i < BINS; i++) {
+    const d = (bins[i] / total) / binWidth;
+    const bh = (d / yMax) * ph;
+    const x = pad.l + i * barW;
+    const y = pad.t + ph - bh;
+    ctx.fillStyle = colorDim;
+    ctx.fillRect(x + 0.5, y, barW - 1, bh);
+    ctx.fillStyle = color;
+    ctx.fillRect(x + 0.5, y, barW - 1, Math.min(2, bh));
+  }
+
+  // theoretical curve
+  if (opts.theoryCurve) {
+    ctx.strokeStyle = opts.color || '#f97316';
+    ctx.lineWidth = 2;
+    ctx.globalAlpha = 0.9;
+    ctx.beginPath();
+    for (let px = 0; px <= pw; px++) {
+      const t = px / pw;
+      const d = opts.theoryCurve(t);
+      const y = pad.t + ph - (d / yMax) * ph;
+      px === 0 ? ctx.moveTo(pad.l + px, y) : ctx.lineTo(pad.l + px, y);
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = 1;
+  }
+
+  // mean / median lines
+  if (opts.meanLine != null) {
+    const x = pad.l + opts.meanLine * pw;
+    ctx.setLineDash([6, 4]);
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ph); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+// ============================
+// Section 1: Single roll
+// ============================
+let s1Bins = makeBins(), s1N = 0, s1Sum = 0;
+
+function sampleSingle(count) {
+  for (let i = 0; i < count; i++) {
+    const v = Math.random();
+    s1Sum += v; s1N++;
+    const bin = Math.min(Math.floor(v * BINS), BINS - 1);
+    s1Bins[bin]++;
+  }
+  drawHist('canvas-single', s1Bins, s1N, { color: '#a8a29e', colorDim: '#57534e' });
+  $('s1-n').textContent = s1N;
+  $('s1-mean').textContent = (s1Sum / s1N).toFixed(3);
+}
+
+function resetSingle() {
+  s1Bins = makeBins(); s1N = 0; s1Sum = 0;
+  drawHist('canvas-single', s1Bins, 0, {});
+  $('s1-n').textContent = '0'; $('s1-mean').textContent = '—';
+}
+
+// ============================
+// Section 2: Pair rolls
+// ============================
+let s2Bins = makeBins(), s2N = 0, s2Sum = 0, pairMode = 'min';
+
+function setPairMode(m) {
+  pairMode = m;
+  $('btn-pair-min').classList.toggle('active', m === 'min');
+  $('btn-pair-max').classList.toggle('active', m === 'max');
+  $('btn-pair-max').classList.toggle('btn-max', true);
+  $('s2-exp').textContent = m === 'min' ? '0.333' : '0.667';
+  resetPair();
+}
+
+function rollPair() {
+  const a = Math.random(), b = Math.random();
+  const result = pairMode === 'min' ? Math.min(a, b) : Math.max(a, b);
+  s2Sum += result; s2N++;
+  const bin = Math.min(Math.floor(result * BINS), BINS - 1);
+  s2Bins[bin]++;
+
+  // animate dice
+  $('die-a').textContent = a.toFixed(2);
+  $('die-b').textContent = b.toFixed(2);
+  $('die-result').textContent = result.toFixed(2);
+
+  $('die-a').classList.toggle('picked', (pairMode === 'min' ? a <= b : a >= b));
+  $('die-b').classList.toggle('picked', (pairMode === 'min' ? b <= a : b >= a));
+
+  const col = pairMode === 'min' ? { color: '#f97316', colorDim: '#9a3412' } : { color: '#06b6d4', colorDim: '#0e7490' };
+  drawHist('canvas-pair', s2Bins, s2N, col);
+  $('s2-n').textContent = s2N;
+  $('s2-mean').textContent = (s2Sum / s2N).toFixed(3);
+}
+
+function rollPairBatch(count) {
+  for (let i = 0; i < count; i++) {
+    const a = Math.random(), b = Math.random();
+    const result = pairMode === 'min' ? Math.min(a, b) : Math.max(a, b);
+    s2Sum += result; s2N++;
+    const bin = Math.min(Math.floor(result * BINS), BINS - 1);
+    s2Bins[bin]++;
+  }
+  const col = pairMode === 'min' ? { color: '#f97316', colorDim: '#9a3412' } : { color: '#06b6d4', colorDim: '#0e7490' };
+  drawHist('canvas-pair', s2Bins, s2N, col);
+  $('s2-n').textContent = s2N;
+  $('s2-mean').textContent = (s2Sum / s2N).toFixed(3);
+}
+
+function resetPair() {
+  s2Bins = makeBins(); s2N = 0; s2Sum = 0;
+  const col = pairMode === 'min' ? { color: '#f97316', colorDim: '#9a3412' } : { color: '#06b6d4', colorDim: '#0e7490' };
+  drawHist('canvas-pair', s2Bins, 0, col);
+  $('s2-n').textContent = '0'; $('s2-mean').textContent = '—';
+  $('die-a').textContent = '—'; $('die-b').textContent = '—'; $('die-result').textContent = '—';
+  $('die-a').classList.remove('picked'); $('die-b').classList.remove('picked');
+}
+
+// ============================
+// Section 3: Side-by-side
+// ============================
+let s3MinBins = makeBins(), s3MaxBins = makeBins(), s3N2 = 0, currentN = 2;
+
+function changeN(v) {
+  currentN = +v;
+  $('n-val').textContent = v;
+  resetSideBySide();
+}
+
+function runSideBySide(count) {
+  for (let i = 0; i < count; i++) {
+    let mn = 1, mx = 0;
+    for (let j = 0; j < currentN; j++) {
+      const v = Math.random();
+      if (v < mn) mn = v;
+      if (v > mx) mx = v;
+    }
+    s3MinBins[Math.min(Math.floor(mn * BINS), BINS - 1)]++;
+    s3MaxBins[Math.min(Math.floor(mx * BINS), BINS - 1)]++;
+    s3N2++;
+  }
+  const n = currentN;
+  drawHist('canvas-min', s3MinBins, s3N2, {
+    color: '#f97316', colorDim: '#9a3412',
+    theoryCurve: t => n * Math.pow(1 - t, n - 1),
+    meanLine: 1 / (n + 1)
+  });
+  drawHist('canvas-max', s3MaxBins, s3N2, {
+    color: '#06b6d4', colorDim: '#0e7490',
+    theoryCurve: t => n * Math.pow(t, n - 1),
+    meanLine: n / (n + 1)
+  });
+  $('s3-min-e').textContent = (1 / (n + 1)).toFixed(3);
+  $('s3-max-e').textContent = (n / (n + 1)).toFixed(3);
+  // median of min: solve 1-(1-t)^n = 0.5 → t = 1 - 0.5^(1/n)
+  $('s3-min-med').textContent = (1 - Math.pow(0.5, 1 / n)).toFixed(3);
+  // median of max: solve t^n = 0.5 → t = 0.5^(1/n)
+  $('s3-max-med').textContent = Math.pow(0.5, 1 / n).toFixed(3);
+}
+
+function resetSideBySide() {
+  s3MinBins = makeBins(); s3MaxBins = makeBins(); s3N2 = 0;
+  drawHist('canvas-min', s3MinBins, 0, { color: '#f97316', colorDim: '#9a3412' });
+  drawHist('canvas-max', s3MaxBins, 0, { color: '#06b6d4', colorDim: '#0e7490' });
+  $('s3-min-e').textContent = '—'; $('s3-max-e').textContent = '—';
+  $('s3-min-med').textContent = '—'; $('s3-max-med').textContent = '—';
+}
+
+// ============================
+// Section 4: CDF
+// ============================
+let cdfN = 2, cdfMode = 'min';
+
+function changeCdfN(v) { cdfN = +v; $('n-val-cdf').textContent = v; drawCDF(); }
+function setCdfMode(m) {
+  cdfMode = m;
+  $('btn-cdf-min').classList.toggle('active', m === 'min');
+  $('btn-cdf-max').classList.toggle('active', m === 'max');
+  $('btn-cdf-max').classList.toggle('btn-max', true);
+  drawCDF();
+}
+
+function drawCDF() {
+  const { c, ctx, w, h } = setupCanvas('canvas-cdf');
+  const pad = { l: 44, r: 16, t: 12, b: 28 };
+  const pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+  ctx.clearRect(0, 0, w, h);
+
+  // axes
+  ctx.strokeStyle = '#3f3a36'; ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + ph); ctx.lineTo(pad.l + pw, pad.t + ph);
+  ctx.stroke();
+
+  ctx.fillStyle = '#78716c'; ctx.font = '11px JetBrains Mono, monospace';
+  ctx.textAlign = 'center';
+  for (let i = 0; i <= 4; i++) { ctx.fillText((i/4).toFixed(1), pad.l + (i/4)*pw, pad.t+ph+16); }
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) { ctx.fillText((i/4).toFixed(1), pad.l - 6, pad.t + ph - (i/4)*ph + 4); }
+
+  const n = cdfN;
+  const cdf = cdfMode === 'min'
+    ? (t => 1 - Math.pow(1 - t, n))
+    : (t => Math.pow(t, n));
+
+  // fill area under CDF
+  const fillColor = cdfMode === 'min' ? 'rgba(249,115,22,0.12)' : 'rgba(6,182,212,0.12)';
+  ctx.fillStyle = fillColor;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t + ph);
+  for (let px = 0; px <= pw; px++) {
+    const t = px / pw;
+    ctx.lineTo(pad.l + px, pad.t + ph - cdf(t) * ph);
+  }
+  ctx.lineTo(pad.l + pw, pad.t + ph);
+  ctx.fill();
+
+  // CDF curve
+  const lineColor = cdfMode === 'min' ? '#f97316' : '#06b6d4';
+  ctx.strokeStyle = lineColor; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let px = 0; px <= pw; px++) {
+    const t = px / pw;
+    const y = pad.t + ph - cdf(t) * ph;
+    px === 0 ? ctx.moveTo(pad.l + px, y) : ctx.lineTo(pad.l + px, y);
+  }
+  ctx.stroke();
+
+  // Mean & Median markers
+  const mean = cdfMode === 'min' ? 1/(n+1) : n/(n+1);
+  const median = cdfMode === 'min' ? 1 - Math.pow(0.5, 1/n) : Math.pow(0.5, 1/n);
+
+  // mean line (vertical, dashed, gold)
+  const mx = pad.l + mean * pw;
+  const my = pad.t + ph - cdf(mean) * ph;
+  ctx.setLineDash([6,4]); ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(mx, pad.t + ph); ctx.lineTo(mx, my); ctx.stroke();
+  ctx.setLineDash([]);
+  // label
+  ctx.fillStyle = '#fbbf24'; ctx.font = 'bold 11px JetBrains Mono, monospace'; ctx.textAlign = 'center';
+  ctx.fillText('mean', mx, my - 8);
+
+  // median line (horizontal at 0.5, then down)
+  const medX = pad.l + median * pw;
+  const halfY = pad.t + ph - 0.5 * ph;
+  ctx.setLineDash([4,4]); ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(pad.l, halfY); ctx.lineTo(medX, halfY); ctx.lineTo(medX, pad.t + ph); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#4ade80';
+  ctx.fillText('median', medX, pad.t + ph - 0.5 * ph - 8);
+
+  // 0.5 label on y-axis
+  ctx.fillStyle = '#4ade80'; ctx.textAlign = 'right';
+  ctx.fillText('0.5', pad.l - 6, halfY + 4);
+
+  $('s4-mean').textContent = mean.toFixed(3);
+  $('s4-med').textContent = median.toFixed(3);
+  $('s4-delta').textContent = Math.abs(mean - median).toFixed(3);
+  $('s4-mean').style.color = lineColor;
+  $('s4-med').style.color = lineColor;
+  $('s4-delta').style.color = lineColor;
+}
+
+// ============================
+// Section 5: Final chart (both PDFs overlaid)
+// ============================
+function drawFinalChart(n) {
+  $('n-val-final').textContent = n;
+  const { c, ctx, w, h } = setupCanvas('canvas-final');
+  const pad = { l: 40, r: 16, t: 12, b: 28 };
+  const pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+  ctx.clearRect(0, 0, w, h);
+
+  // axes
+  ctx.strokeStyle = '#3f3a36'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t+ph); ctx.lineTo(pad.l+pw, pad.t+ph); ctx.stroke();
+  ctx.fillStyle = '#78716c'; ctx.font = '11px JetBrains Mono, monospace'; ctx.textAlign = 'center';
+  for (let i = 0; i <= 4; i++) ctx.fillText((i/4).toFixed(1), pad.l+(i/4)*pw, pad.t+ph+16);
+
+  const yMax = Math.max(n * 1.15, 2.5);
+  ctx.textAlign = 'right';
+  for (let v = 0; v <= yMax; v += Math.max(1, Math.round(yMax/4))) {
+    ctx.fillText(v.toFixed(0), pad.l-6, pad.t+ph-(v/yMax)*ph+4);
+  }
+
+  function plotPDF(fn, color, alpha) {
+    // fill
+    ctx.fillStyle = color.replace('1)', alpha + ')');
+    ctx.beginPath(); ctx.moveTo(pad.l, pad.t+ph);
+    for (let px = 0; px <= pw; px++) {
+      const t = px/pw;
+      ctx.lineTo(pad.l+px, pad.t+ph - (fn(t)/yMax)*ph);
+    }
+    ctx.lineTo(pad.l+pw, pad.t+ph); ctx.fill();
+    // stroke
+    ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    for (let px = 0; px <= pw; px++) {
+      const t = px/pw;
+      const y = pad.t+ph - (fn(t)/yMax)*ph;
+      px===0 ? ctx.moveTo(pad.l+px,y) : ctx.lineTo(pad.l+px,y);
+    }
+    ctx.stroke();
+  }
+
+  plotPDF(t => n * Math.pow(1-t, n-1), 'rgba(249,115,22,1)', 0.15);
+  plotPDF(t => n * Math.pow(t, n-1), 'rgba(6,182,212,1)', 0.15);
+
+  // mean markers
+  const minMean = 1/(n+1), maxMean = n/(n+1);
+  [
+    { v: minMean, col: '#f97316', label: `E[min]=${minMean.toFixed(2)}` },
+    { v: maxMean, col: '#06b6d4', label: `E[max]=${maxMean.toFixed(2)}` }
+  ].forEach(({ v, col, label }) => {
+    const x = pad.l + v * pw;
+    ctx.setLineDash([5,3]); ctx.strokeStyle = col; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t+ph); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = col; ctx.font = 'bold 11px JetBrains Mono, monospace'; ctx.textAlign = 'center';
+    ctx.fillText(label, x, pad.t + ph + 26);
+  });
+
+  // stats
+  const stats = $('final-stats');
+  const medMin = (1 - Math.pow(0.5, 1/n)).toFixed(3);
+  const medMax = Math.pow(0.5, 1/n).toFixed(3);
+  stats.innerHTML = `
+    <div class="stat" style="color:var(--accent-min)">E[min] = <span class="sv">${minMean.toFixed(3)}</span></div>
+    <div class="stat" style="color:var(--accent-min)">Med[min] = <span class="sv">${medMin}</span></div>
+    <div class="stat" style="color:var(--accent-max)">E[max] = <span class="sv">${maxMean.toFixed(3)}</span></div>
+    <div class="stat" style="color:var(--accent-max)">Med[max] = <span class="sv">${medMax}</span></div>
+    <div class="stat" style="color:var(--accent-gold)">Sum = <span class="sv">${(minMean+maxMean).toFixed(3)}</span></div>
+  `;
+}
+
+// ============================
+// Init
+// ============================
+window.addEventListener('load', () => {
+  // draw empty canvases
+  drawHist('canvas-single', makeBins(), 0, {});
+  drawHist('canvas-pair', makeBins(), 0, {});
+  drawHist('canvas-min', makeBins(), 0, { color: '#f97316', colorDim: '#9a3412' });
+  drawHist('canvas-max', makeBins(), 0, { color: '#06b6d4', colorDim: '#0e7490' });
+  drawCDF();
+  drawFinalChart(2);
+});
+
+window.addEventListener('resize', () => {
+  // redraw everything on resize
+  drawHist('canvas-single', s1Bins, s1N, { color: '#a8a29e', colorDim: '#57534e' });
+  const col = pairMode === 'min' ? { color: '#f97316', colorDim: '#9a3412' } : { color: '#06b6d4', colorDim: '#0e7490' };
+  drawHist('canvas-pair', s2Bins, s2N, col);
+  const n = currentN;
+  if (s3N2 > 0) {
+    drawHist('canvas-min', s3MinBins, s3N2, { color: '#f97316', colorDim: '#9a3412', theoryCurve: t => n*Math.pow(1-t,n-1), meanLine: 1/(n+1) });
+    drawHist('canvas-max', s3MaxBins, s3N2, { color: '#06b6d4', colorDim: '#0e7490', theoryCurve: t => n*Math.pow(t,n-1), meanLine: n/(n+1) });
+  } else {
+    drawHist('canvas-min', s3MinBins, 0, { color: '#f97316', colorDim: '#9a3412' });
+    drawHist('canvas-max', s3MaxBins, 0, { color: '#06b6d4', colorDim: '#0e7490' });
+  }
+  drawCDF();
+  drawFinalChart(+$('n-slider-final').value);
+});
+</script>
+</body>
+</html>

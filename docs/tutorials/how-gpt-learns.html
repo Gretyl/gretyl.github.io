@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How a GPT Learns</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1c1917;
+  --paper: #faf9f6;
+  --paper-warm: #f3f0ea;
+  --accent: #b45309;
+  --accent-light: #fef3c7;
+  --accent-muted: #d4a574;
+  --green: #15803d;
+  --green-light: #dcfce7;
+  --red: #dc2626;
+  --red-light: #fee2e2;
+  --blue: #1d4ed8;
+  --blue-light: #dbeafe;
+  --muted: #78716c;
+  --rule: #d6d3d1;
+  --code-bg: #292524;
+  --code-fg: #fafaf9;
+  --shadow: rgba(28,25,23,0.06);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:17px; scroll-behavior:smooth; }
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.72;
+  -webkit-font-smoothing: antialiased;
+}
+
+header {
+  padding: 4.5rem 2rem 2.5rem;
+  text-align: center;
+  border-bottom: 1px solid var(--rule);
+}
+
+header .kicker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+}
+
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 400;
+  line-height: 1.15;
+  max-width: 640px;
+  margin: 0 auto 0.8rem;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  color: var(--muted);
+  max-width: 500px;
+  margin: 0 auto;
+  font-weight: 300;
+}
+
+.container { max-width: 720px; margin: 0 auto; padding: 0 1.5rem; }
+
+section {
+  padding: 3rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+section:last-of-type { border-bottom: none; }
+
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.7rem;
+  font-weight: 400;
+  margin-bottom: 0.3rem;
+  letter-spacing: -0.01em;
+}
+
+.section-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+p { margin-bottom: 1rem; }
+strong { font-weight: 600; }
+
+.lead {
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+/* Widget chrome */
+.widget {
+  margin: 1.5rem 0;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 16px var(--shadow);
+}
+
+.widget-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--paper-warm);
+  border-bottom: 1px solid var(--rule);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.widget-body { padding: 1.4rem; }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 1rem;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+.btn.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.btn.primary:hover { background: var(--accent); border-color: var(--accent); }
+
+/* Debrief callout */
+.debrief {
+  margin-top: 1.2rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--accent-light);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 7px 7px 0;
+  font-size: 0.9rem;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all 0.5s ease;
+}
+.debrief.visible { opacity:1; transform:translateY(0); }
+
+/* Mono label */
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+/* Skeptic dialogue */
+.skeptic-box {
+  margin: 1.5rem 0;
+  border: 1px dashed var(--accent-muted);
+  border-radius: 10px;
+  padding: 1.1rem 1.2rem;
+  background: var(--accent-light);
+}
+.skeptic-q {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.92rem;
+}
+.skeptic-q::before { content: '🤔 '; }
+.skeptic-a {
+  font-size: 0.9rem;
+  color: var(--ink);
+  line-height: 1.65;
+}
+
+/* Token display */
+.token-row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin: 0.8rem 0;
+}
+.token {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 34px;
+  padding: 0 8px;
+  border-radius: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border: 1px solid var(--rule);
+  background: #fff;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.token.bos { background: var(--paper-warm); color: var(--muted); font-size: 0.68rem; }
+.token.active { border-color: var(--accent); background: var(--accent-light); }
+.token.correct { border-color: var(--green); background: var(--green-light); }
+.token.wrong { border-color: var(--red); background: var(--red-light); }
+.token.predicted {
+  border-style: dashed;
+  border-color: var(--blue);
+  background: var(--blue-light);
+}
+.token.ghost { opacity: 0.35; border-style: dashed; }
+
+/* Probability bars */
+.prob-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 3px;
+}
+.prob-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  width: 22px;
+  text-align: center;
+}
+.prob-track {
+  flex: 1;
+  height: 18px;
+  background: var(--paper-warm);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.prob-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+.prob-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  width: 36px;
+  text-align: right;
+}
+
+/* Training chart */
+.chart-area {
+  position: relative;
+  height: 160px;
+  background: var(--paper-warm);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 0.8rem 0;
+}
+.chart-canvas { width: 100%; height: 100%; }
+.chart-label {
+  position: absolute;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+/* Comparison grid */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--rule);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+.compare-panel {
+  background: #fff;
+  padding: 1rem;
+}
+.compare-panel h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.7rem;
+  color: var(--muted);
+}
+.compare-panel h4 .tag {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  margin-left: 0.3rem;
+  vertical-align: middle;
+}
+.tag.before { background: var(--red-light); color: var(--red); }
+.tag.after { background: var(--green-light); color: var(--green); }
+
+/* Generation output */
+.gen-output {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  padding: 0.8rem;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border-radius: 6px;
+  min-height: 44px;
+  word-break: break-all;
+}
+
+/* Slider controls */
+.param-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.7rem;
+}
+.param-row label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  min-width: 110px;
+}
+.param-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+}
+.param-row .pval {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: 600;
+  min-width: 30px;
+  text-align: right;
+}
+
+/* Attention heatmap */
+.attn-grid {
+  display: inline-grid;
+  gap: 2px;
+  margin: 0.8rem 0;
+}
+.attn-cell {
+  width: 36px;
+  height: 36px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.85);
+  transition: background 0.3s ease;
+}
+.attn-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+}
+
+/* Scaffold steps */
+.build-steps { display: flex; flex-direction: column; gap: 0; }
+.build-step {
+  display: flex;
+  align-items: stretch;
+  min-height: 48px;
+}
+.build-line {
+  width: 3px;
+  background: var(--rule);
+  margin-left: 12px;
+  flex-shrink: 0;
+  position: relative;
+  transition: background 0.4s ease;
+}
+.build-step.on .build-line { background: var(--accent); }
+.build-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--rule);
+  position: absolute;
+  left: -3.5px;
+  top: 14px;
+  transition: all 0.3s ease;
+}
+.build-step.on .build-dot {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+.build-body {
+  flex: 1;
+  padding: 0.4rem 0 1rem 1.2rem;
+  opacity: 0.28;
+  transform: translateX(-3px);
+  transition: all 0.35s ease;
+}
+.build-step.on .build-body { opacity: 1; transform: translateX(0); }
+.build-body h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 0.2rem;
+}
+.build-body p { font-size: 0.88rem; margin-bottom: 0; line-height: 1.55; }
+
+footer {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--rule);
+}
+
+@media (max-width: 600px) {
+  .compare-grid { grid-template-columns: 1fr; }
+  .attn-cell { width: 28px; height: 28px; font-size: 0.5rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">An interactive explanation</div>
+  <h1>How a GPT Learns</h1>
+  <p class="subtitle">Predict the next token. Measure how wrong you were. Adjust. That's the whole algorithm — this page lets you feel each step.</p>
+</header>
+
+<div class="container">
+
+<!-- ===================== 1. THE TASK ===================== -->
+<section id="s-task">
+  <span class="section-num">01</span>
+  <h2>The Task: Predict What Comes Next</h2>
+  <p class="lead">Before architecture, before math — the learning signal is just one question repeated billions of times.</p>
+
+  <p>A GPT sees a sequence of tokens and tries to predict the next one. That's the entire training objective. Below is a name from the training set. Try to guess each next character yourself — you're doing exactly what the model does.</p>
+
+  <div class="widget">
+    <div class="widget-bar"><span>You are the model</span><span>Guess the next letter</span></div>
+    <div class="widget-body">
+      <div class="token-row" id="predict-tokens"></div>
+      <div id="predict-choices" style="margin:0.8rem 0;display:flex;gap:4px;flex-wrap:wrap;"></div>
+      <div id="predict-status" class="mono" style="color:var(--muted);min-height:1.4rem;"></div>
+    </div>
+  </div>
+
+  <div class="debrief" id="d-task">
+    You just did one forward pass — looked at context, made a prediction. You probably got better as more letters appeared, because context reduces uncertainty. A GPT does the same thing: more context, sharper predictions. The difference is it does this across millions of names and adjusts its weights after every mistake.
+  </div>
+</section>
+
+<!-- ===================== 2. PROBABILITY ===================== -->
+<section id="s-prob">
+  <span class="section-num">02</span>
+  <h2>Not One Guess — A Distribution</h2>
+  <p class="lead">The model doesn't pick one letter. It assigns probability to every possible letter.</p>
+
+  <p>When you guessed above, you committed to a single answer. A GPT is more nuanced — it outputs a probability for each character in its vocabulary. Click "Predict" to see what an untrained model thinks comes after each prefix, then watch how a trained model's distribution differs.</p>
+
+  <div class="widget">
+    <div class="widget-bar"><span>Probability distributions</span><span>Before vs. after training</span></div>
+    <div class="widget-body">
+      <div class="compare-grid">
+        <div class="compare-panel">
+          <h4>Untrained <span class="tag before">random</span></h4>
+          <div id="probs-before"></div>
+        </div>
+        <div class="compare-panel">
+          <h4>Trained <span class="tag after">learned</span></h4>
+          <div id="probs-after"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.6rem;">
+        <button class="btn primary" id="probs-run">Show predictions after "ch"</button>
+        <button class="btn" id="probs-cycle">Try another prefix</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="debrief" id="d-prob">
+    The untrained model spreads probability almost uniformly — it has no idea what follows "ch". The trained model concentrates mass on letters like <strong>a</strong>, <strong>r</strong>, <strong>e</strong>, <strong>i</strong> — because it's seen thousands of names and learned which continuations actually occur. Training is the process of reshaping these flat distributions into peaked, accurate ones.
+  </div>
+</section>
+
+<!-- ===================== 3. LOSS ===================== -->
+<section id="s-loss">
+  <span class="section-num">03</span>
+  <h2>Measuring Mistakes: The Loss</h2>
+  <p class="lead">If the correct letter got 2% probability, that's a big mistake. If it got 90%, barely a mistake at all.</p>
+
+  <p>The <strong>loss</strong> is the negative log of the probability the model assigned to the correct next token. Drag the slider to change how much probability the model placed on the right answer, and watch the loss respond.</p>
+
+  <div class="widget">
+    <div class="widget-bar"><span>Cross-entropy loss</span><span>−log(p)</span></div>
+    <div class="widget-body">
+      <div class="param-row">
+        <label>P(correct token)</label>
+        <input type="range" id="loss-slider" min="1" max="99" value="10">
+        <span class="pval" id="loss-pval">10%</span>
+      </div>
+      <div class="chart-area" id="loss-viz">
+        <canvas class="chart-canvas" id="loss-canvas"></canvas>
+        <div class="chart-label" style="left:8px;top:6px;">loss</div>
+        <div class="chart-label" style="right:8px;bottom:6px;">P(correct)</div>
+      </div>
+      <div id="loss-readout" class="mono" style="color:var(--muted);margin-top:0.4rem;text-align:center;"></div>
+    </div>
+  </div>
+
+  <div class="debrief" id="d-loss">
+    Notice the shape: loss drops steeply as probability rises from near-zero, then flattens as it approaches 100%. This means the model gets heavily penalized for being confidently wrong, but gets diminishing returns for going from "pretty sure" to "very sure." This asymmetry drives the model to eliminate its worst mistakes first.
+  </div>
+</section>
+
+<!-- ===================== 4. BACKPROP ===================== -->
+<section id="s-backprop">
+  <span class="section-num">04</span>
+  <h2>Learning by Blame: Backpropagation</h2>
+  <p class="lead">The loss says how wrong the prediction was. Backprop says who's responsible.</p>
+
+  <p>Every prediction flows through layers of computation — embeddings, attention, MLPs. Backpropagation walks backward through this chain, computing a <strong>gradient</strong> for every weight: "if I nudge you up, does the loss go up or down, and by how much?"</p>
+
+  <div class="widget">
+    <div class="widget-bar"><span>Gradient flow — simplified 4-layer network</span><span>Click to backpropagate</span></div>
+    <div class="widget-body">
+      <div id="backprop-viz" style="position:relative;height:200px;"></div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.8rem;">
+        <button class="btn primary" id="bp-forward">Forward pass →</button>
+        <button class="btn" id="bp-backward" disabled>← Backward pass</button>
+        <button class="btn" id="bp-reset" style="opacity:0.6;">Reset</button>
+      </div>
+      <div id="bp-status" class="mono" style="color:var(--muted);margin-top:0.5rem;min-height:1.4rem;"></div>
+    </div>
+  </div>
+
+  <div class="skeptic-box">
+    <div class="skeptic-q">Wait — every single weight gets its own gradient? In a real model that's billions of numbers!</div>
+    <div class="skeptic-a">Yes. In microgpt, every scalar is a <code>Value</code> object that tracks its parents in the computation graph. The backward pass walks this graph in reverse topological order. In production, PyTorch does the same thing but with GPU-accelerated tensor operations instead of one scalar at a time. The math is identical — the scale is different.</div>
+  </div>
+
+  <div class="debrief" id="d-backprop">
+    Each weight now has a direction to move that would reduce the loss. The optimizer (Adam) uses these gradients — plus momentum and adaptive scaling — to make the actual update. Then the whole cycle repeats: predict, measure loss, backpropagate, update.
+  </div>
+</section>
+
+<!-- ===================== 5. ATTENTION ===================== -->
+<section id="s-attn">
+  <span class="section-num">05</span>
+  <h2>Attention: Which Context Matters?</h2>
+  <p class="lead">Not every previous token is equally useful. Attention learns to look at the right ones.</p>
+
+  <p>When predicting the last letter of a name, should the model focus on the first letter? The previous letter? Every position has a different relevance. Below is a heatmap of attention weights — each row shows where that position is "looking." Click different tokens to see the pattern shift.</p>
+
+  <div class="widget">
+    <div class="widget-bar"><span>Attention heatmap — "charlotte"</span><span>Brighter = more attention</span></div>
+    <div class="widget-body">
+      <div id="attn-container" style="overflow-x:auto;"></div>
+      <div id="attn-note" class="mono" style="color:var(--muted);margin-top:0.6rem;min-height:1.4rem;"></div>
+    </div>
+  </div>
+
+  <div class="debrief" id="d-attn">
+    Early tokens attend mostly to themselves and the start-of-sequence marker (they have little context). Later tokens spread attention across the sequence — especially to letters that help resolve ambiguity. The <strong>"e"</strong> at the end attends heavily to <strong>"tt"</strong> because in English names, "tte" is a strong signal that the name is ending. None of this is programmed — it emerges from gradient updates.
+  </div>
+</section>
+
+<!-- ===================== 6. TRAINING ===================== -->
+<section id="s-train">
+  <span class="section-num">06</span>
+  <h2>Training: Watching the Model Improve</h2>
+  <p class="lead">Thousands of predict-measure-update cycles, compressed into one chart.</p>
+
+  <p>Press "Train" to simulate a training run. Watch the loss curve fall — fast at first (eliminating obvious mistakes like predicting 'z' after 'q'), then slowly (fine-tuning subtle patterns). The generated names below go from gibberish to plausible.</p>
+
+  <div class="widget">
+    <div class="widget-bar"><span>Training simulation</span><span>Loss over time</span></div>
+    <div class="widget-body">
+      <div class="chart-area">
+        <canvas class="chart-canvas" id="train-canvas"></canvas>
+        <div class="chart-label" style="left:8px;top:6px;">loss</div>
+        <div class="chart-label" style="right:8px;bottom:6px;">steps →</div>
+      </div>
+      <div style="margin-top:0.8rem;">
+        <div class="mono" style="color:var(--muted);font-size:0.75rem;margin-bottom:0.3rem;">Sample outputs at current step:</div>
+        <div class="gen-output" id="train-samples">Press "Train" to begin...</div>
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.8rem;align-items:center;">
+        <button class="btn primary" id="train-go">Train</button>
+        <button class="btn" id="train-reset" style="opacity:0.6;">Reset</button>
+        <span id="train-step-label" class="mono" style="color:var(--muted);margin-left:auto;"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="debrief" id="d-train">
+    Early on, the model can barely string two consonants together. By the end, it produces names that <em>feel</em> right — "Marlina," "Jorah," "Elissa" — even though they might not exist. It learned the statistical texture of names: common openings, vowel-consonant rhythms, typical lengths. That texture is encoded in the weights, shaped entirely by the predict-and-correct loop.
+  </div>
+</section>
+
+<!-- ===================== 7. SCALING ===================== -->
+<section id="s-scale">
+  <span class="section-num">07</span>
+  <h2>Scaling Up: Same Algorithm, More Everything</h2>
+  <p class="lead">The gap between microgpt and ChatGPT is scale, not mechanism.</p>
+
+  <p>Adjust the model's capacity below and see how generation quality changes. More embedding dimensions let the model represent subtler patterns. More layers let it compose those patterns. The core loop never changes.</p>
+
+  <div class="widget">
+    <div class="widget-bar"><span>Parameter variation</span><span>Adjust and regenerate</span></div>
+    <div class="widget-body">
+      <div class="param-row">
+        <label>Embedding dim</label>
+        <input type="range" id="scale-dim" min="1" max="5" value="1">
+        <span class="pval" id="scale-dim-val">4</span>
+      </div>
+      <div class="param-row">
+        <label>Layers</label>
+        <input type="range" id="scale-layers" min="1" max="5" value="1">
+        <span class="pval" id="scale-layers-val">1</span>
+      </div>
+      <div class="param-row">
+        <label>Training data</label>
+        <input type="range" id="scale-data" min="1" max="5" value="1">
+        <span class="pval" id="scale-data-val">100</span>
+      </div>
+      <div style="margin-top:0.8rem;">
+        <div class="mono" style="color:var(--muted);font-size:0.75rem;margin-bottom:0.3rem;">Generated names at this scale:</div>
+        <div class="gen-output" id="scale-output"></div>
+      </div>
+      <div id="scale-note" class="mono" style="color:var(--muted);margin-top:0.5rem;font-size:0.78rem;"></div>
+    </div>
+  </div>
+
+  <div class="skeptic-box">
+    <div class="skeptic-q">If it's the same algorithm, why does GPT-4 seem qualitatively different from a tiny model?</div>
+    <div class="skeptic-a">Because scale enables emergence. A model with 4 dimensions can learn "vowels follow consonants." One with 12,288 dimensions can represent concepts like sarcasm, logic, and code structure — not because the algorithm told it to, but because the data contained those patterns and the model had enough capacity to capture them. More data, more parameters, more computation — same gradient descent loop.</div>
+  </div>
+</section>
+
+<!-- ===================== 8. FULL PICTURE ===================== -->
+<section id="s-full">
+  <span class="section-num">08</span>
+  <h2>The Full Picture, Built Up</h2>
+  <p class="lead">Every piece you've seen, assembled into the complete training loop.</p>
+
+  <p>Step through the components below. Each one is something you've already interacted with — now see how they compose into the single cycle that runs trillions of times to produce a language model.</p>
+
+  <div class="widget">
+    <div class="widget-bar"><span>The training loop</span><span>Click through</span></div>
+    <div class="widget-body">
+      <div class="build-steps" id="full-steps">
+        <div class="build-step on" data-i="0">
+          <div class="build-line"><div class="build-dot"></div></div>
+          <div class="build-body">
+            <h4>1 · Tokenize</h4>
+            <p>Convert a document into a sequence of integer token IDs. In microgpt: one character = one token.</p>
+          </div>
+        </div>
+        <div class="build-step" data-i="1">
+          <div class="build-line"><div class="build-dot"></div></div>
+          <div class="build-body">
+            <h4>2 · Embed</h4>
+            <p>Look up learned vectors for each token and its position. These are the model's raw inputs.</p>
+          </div>
+        </div>
+        <div class="build-step" data-i="2">
+          <div class="build-line"><div class="build-dot"></div></div>
+          <div class="build-body">
+            <h4>3 · Attend</h4>
+            <p>Each position queries the others: "which context is relevant to me?" Attention weights are computed via Q·K dot products, masked so the model can't see the future.</p>
+          </div>
+        </div>
+        <div class="build-step" data-i="3">
+          <div class="build-line"><div class="build-dot"></div></div>
+          <div class="build-body">
+            <h4>4 · Transform</h4>
+            <p>The MLP processes each position's blended representation through an expand → nonlinearity → project-back-down pathway. Residual connections preserve earlier information.</p>
+          </div>
+        </div>
+        <div class="build-step" data-i="4">
+          <div class="build-line"><div class="build-dot"></div></div>
+          <div class="build-body">
+            <h4>5 · Predict</h4>
+            <p>Project to vocabulary size. Apply softmax to get a probability distribution over next tokens.</p>
+          </div>
+        </div>
+        <div class="build-step" data-i="5">
+          <div class="build-line"><div class="build-dot"></div></div>
+          <div class="build-body">
+            <h4>6 · Measure loss</h4>
+            <p>Cross-entropy: −log(probability of the correct token). High when wrong, low when right.</p>
+          </div>
+        </div>
+        <div class="build-step" data-i="6">
+          <div class="build-line"><div class="build-dot"></div></div>
+          <div class="build-body">
+            <h4>7 · Backpropagate</h4>
+            <p>Walk the computation graph backward. Every weight gets a gradient: its share of the blame.</p>
+          </div>
+        </div>
+        <div class="build-step" data-i="7">
+          <div class="build-line"><div class="build-dot"></div></div>
+          <div class="build-body">
+            <h4>8 · Update weights</h4>
+            <p>Adam optimizer nudges each weight in the direction that reduces loss. Then repeat from step 1 with the next document. Forever.</p>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.5rem;justify-content:center;margin-top:0.8rem;">
+        <button class="btn" id="full-back" disabled>← Back</button>
+        <button class="btn primary" id="full-next">Next →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  An interactive explanation of how GPT models learn, inspired by Karpathy's microgpt.
+</footer>
+
+<script>
+// ============ 1. PREDICT THE NEXT TOKEN ============
+(function(){
+  const name = 'charlotte';
+  const container = document.getElementById('predict-tokens');
+  const choices = document.getElementById('predict-choices');
+  const status = document.getElementById('predict-status');
+  const debrief = document.getElementById('d-task');
+  let pos = 0;
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+
+  function render() {
+    container.innerHTML = '';
+    // BOS
+    const bos = document.createElement('span');
+    bos.className = 'token bos';
+    bos.textContent = 'BOS';
+    container.appendChild(bos);
+    // Revealed letters
+    for (let i = 0; i < pos; i++) {
+      const t = document.createElement('span');
+      t.className = 'token';
+      t.textContent = name[i];
+      container.appendChild(t);
+    }
+    // Current target (ghost)
+    if (pos < name.length) {
+      const g = document.createElement('span');
+      g.className = 'token ghost';
+      g.textContent = '?';
+      container.appendChild(g);
+    }
+
+    // Choices
+    choices.innerHTML = '';
+    if (pos < name.length) {
+      // Offer 6 plausible letters including the correct one
+      const correct = name[pos];
+      const pool = new Set([correct]);
+      while (pool.size < 6) {
+        const c = alphabet[Math.floor(Math.random()*26)];
+        pool.add(c);
+      }
+      const arr = [...pool].sort(() => Math.random()-0.5);
+      arr.forEach(ch => {
+        const b = document.createElement('button');
+        b.className = 'btn';
+        b.textContent = ch;
+        b.style.minWidth = '38px';
+        b.style.justifyContent = 'center';
+        b.addEventListener('click', () => {
+          if (ch === correct) {
+            status.innerHTML = `<span style="color:var(--green);">✓ Correct!</span> "${name.slice(0,pos+1)}" — the model would get low loss here.`;
+          } else {
+            status.innerHTML = `<span style="color:var(--red);">✗ It was "${correct}".</span> The model would get high loss and adjust its weights.`;
+          }
+          pos++;
+          if (pos >= name.length) {
+            debrief.classList.add('visible');
+            setTimeout(() => {
+              choices.innerHTML = '';
+              render();
+              status.innerHTML += ' You predicted the whole name!';
+            }, 300);
+          } else {
+            setTimeout(render, 400);
+          }
+        });
+        choices.appendChild(b);
+      });
+    }
+  }
+  render();
+})();
+
+// ============ 2. PROBABILITY DISTRIBUTIONS ============
+(function(){
+  const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
+  const prefixes = ['ch','ma','el','jo','sa','ri','an'];
+  // Simulated learned distributions (top letters after common prefixes)
+  const learned = {
+    'ch': {a:0.22,r:0.18,e:0.15,i:0.12,l:0.08,o:0.07,u:0.05},
+    'ma': {r:0.20,d:0.15,x:0.10,t:0.10,l:0.10,k:0.08,c:0.06},
+    'el': {l:0.25,i:0.20,e:0.12,a:0.10,s:0.06,o:0.05},
+    'jo': {h:0.20,s:0.18,r:0.12,n:0.12,a:0.08,e:0.06},
+    'sa': {m:0.18,r:0.16,n:0.14,l:0.10,d:0.08,v:0.06},
+    'ri': {c:0.18,l:0.14,a:0.12,e:0.10,n:0.10,t:0.08},
+    'an': {n:0.18,d:0.15,a:0.12,t:0.10,g:0.08,i:0.08},
+  };
+  let pIdx = 0;
+  const debrief = document.getElementById('d-prob');
+
+  function drawBars(containerId, probs, limit) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    // Sort by prob descending, show top 8
+    const sorted = Object.entries(probs).sort((a,b) => b[1]-a[1]).slice(0, limit || 8);
+    const maxP = Math.max(...sorted.map(s=>s[1]));
+    sorted.forEach(([ch,p]) => {
+      const row = document.createElement('div');
+      row.className = 'prob-row';
+      const lbl = document.createElement('span');
+      lbl.className = 'prob-label';
+      lbl.textContent = ch;
+      const track = document.createElement('div');
+      track.className = 'prob-track';
+      const fill = document.createElement('div');
+      fill.className = 'prob-fill';
+      fill.style.width = '0%';
+      fill.style.background = containerId.includes('before') ? 'var(--rule)' : 'var(--accent)';
+      track.appendChild(fill);
+      const val = document.createElement('span');
+      val.className = 'prob-val';
+      val.textContent = (p*100).toFixed(1)+'%';
+      row.append(lbl, track, val);
+      el.appendChild(row);
+      requestAnimationFrame(() => { fill.style.width = (p/maxP*100)+'%'; });
+    });
+  }
+
+  function showPrefix(prefix) {
+    // Untrained: roughly uniform
+    const untrained = {};
+    letters.forEach(l => untrained[l] = 1/26 + (Math.random()-0.5)*0.01);
+    // Trained: from our learned map, fill remaining with small values
+    const trained = {};
+    const base = learned[prefix] || {};
+    let remaining = 1;
+    Object.values(base).forEach(v => remaining -= v);
+    letters.forEach(l => {
+      trained[l] = base[l] || (remaining / (26 - Object.keys(base).length)) * (0.5 + Math.random());
+    });
+    // Normalize
+    const sum = Object.values(trained).reduce((s,v)=>s+v,0);
+    letters.forEach(l => trained[l] /= sum);
+
+    document.querySelector('#probs-run').textContent = `Show predictions after "${prefix}"`;
+    drawBars('probs-before', untrained, 8);
+    drawBars('probs-after', trained, 8);
+    debrief.classList.add('visible');
+  }
+
+  document.getElementById('probs-run').addEventListener('click', () => showPrefix(prefixes[pIdx]));
+  document.getElementById('probs-cycle').addEventListener('click', () => {
+    pIdx = (pIdx + 1) % prefixes.length;
+    showPrefix(prefixes[pIdx]);
+  });
+})();
+
+// ============ 3. LOSS CURVE ============
+(function(){
+  const slider = document.getElementById('loss-slider');
+  const pval = document.getElementById('loss-pval');
+  const readout = document.getElementById('loss-readout');
+  const canvas = document.getElementById('loss-canvas');
+  const debrief = document.getElementById('d-loss');
+  const ctx = canvas.getContext('2d');
+
+  function draw() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * 2;
+    canvas.height = rect.height * 2;
+    ctx.scale(2, 2);
+    const W = rect.width, H = rect.height;
+    const pad = {l:35, r:15, t:15, b:25};
+
+    ctx.clearRect(0,0,W,H);
+
+    // Draw curve: -log(p) for p from 0.01 to 1
+    ctx.beginPath();
+    ctx.strokeStyle = '#d6d3d1';
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i <= 200; i++) {
+      const p = 0.01 + (i/200)*0.99;
+      const loss = -Math.log(p);
+      const x = pad.l + (p) * (W - pad.l - pad.r);
+      const y = pad.t + (1 - loss/4.6) * (H - pad.t - pad.b);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Current point
+    const pCur = +slider.value / 100;
+    const lossCur = -Math.log(pCur);
+    const cx = pad.l + pCur * (W - pad.l - pad.r);
+    const cy = pad.t + (1 - lossCur/4.6) * (H - pad.t - pad.b);
+
+    // Dashed lines
+    ctx.setLineDash([3,3]);
+    ctx.strokeStyle = 'var(--accent)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx, H - pad.b); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pad.l, cy); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Dot
+    ctx.beginPath();
+    ctx.arc(cx, cy, 5, 0, Math.PI*2);
+    ctx.fillStyle = 'var(--accent)';
+    ctx.fill();
+
+    // Axes
+    ctx.strokeStyle = '#d6d3d1';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H-pad.b); ctx.lineTo(W-pad.r, H-pad.b);
+    ctx.stroke();
+
+    pval.textContent = Math.round(pCur*100) + '%';
+    readout.textContent = `P = ${pCur.toFixed(2)} → loss = −log(${pCur.toFixed(2)}) = ${lossCur.toFixed(2)}`;
+    if (+slider.value > 15) debrief.classList.add('visible');
+  }
+
+  slider.addEventListener('input', draw);
+  window.addEventListener('resize', draw);
+  setTimeout(draw, 100);
+})();
+
+// ============ 4. BACKPROPAGATION ============
+(function(){
+  const viz = document.getElementById('backprop-viz');
+  const fwdBtn = document.getElementById('bp-forward');
+  const bwdBtn = document.getElementById('bp-backward');
+  const resetBtn = document.getElementById('bp-reset');
+  const statusEl = document.getElementById('bp-status');
+  const debrief = document.getElementById('d-backprop');
+
+  const layers = ['Input\n(tokens)','Embed\n+ Attend','MLP\n(transform)','Output\n(logits)','Loss'];
+  let state = 'idle'; // idle, forward, done-fwd, backward, done-bwd
+
+  function draw(activeIdx, direction) {
+    viz.innerHTML = '';
+    const W = viz.offsetWidth;
+    const H = viz.offsetHeight;
+    const n = layers.length;
+    const gap = W / (n + 1);
+
+    layers.forEach((name, i) => {
+      const x = gap * (i + 1);
+      const node = document.createElement('div');
+      node.style.cssText = `position:absolute;left:${x-32}px;top:${H/2-28}px;width:64px;height:56px;
+        border-radius:8px;display:flex;align-items:center;justify-content:center;text-align:center;
+        font-family:'JetBrains Mono',monospace;font-size:0.62rem;font-weight:500;line-height:1.3;
+        transition:all 0.3s ease;border:2px solid var(--rule);background:#fff;color:var(--ink);`;
+
+      if (direction === 'fwd' && i <= activeIdx) {
+        node.style.borderColor = 'var(--accent)';
+        node.style.background = i === activeIdx ? 'var(--accent-light)' : '#fff';
+      } else if (direction === 'bwd' && i >= activeIdx) {
+        node.style.borderColor = 'var(--blue)';
+        node.style.background = i === activeIdx ? 'var(--blue-light)' : '#fff';
+      }
+      node.textContent = name.replace('\n',' ');
+      viz.appendChild(node);
+
+      // Arrow
+      if (i < n - 1) {
+        const arrow = document.createElement('div');
+        const ax = x + 34;
+        const aw = gap - 68;
+        arrow.style.cssText = `position:absolute;left:${ax}px;top:${H/2-1}px;width:${aw}px;height:2px;
+          background:var(--rule);transition:background 0.3s ease;`;
+        if (direction === 'fwd' && i < activeIdx) arrow.style.background = 'var(--accent)';
+        else if (direction === 'bwd' && i >= activeIdx) arrow.style.background = 'var(--blue)';
+        viz.appendChild(arrow);
+
+        // Direction indicator
+        const tri = document.createElement('div');
+        if (direction === 'fwd') {
+          tri.style.cssText = `position:absolute;left:${ax+aw-4}px;top:${H/2-4}px;width:0;height:0;
+            border-top:4px solid transparent;border-bottom:4px solid transparent;
+            border-left:6px solid ${i<activeIdx?'var(--accent)':'var(--rule)'};transition:all 0.3s;`;
+        } else if (direction === 'bwd') {
+          tri.style.cssText = `position:absolute;left:${ax}px;top:${H/2-4}px;width:0;height:0;
+            border-top:4px solid transparent;border-bottom:4px solid transparent;
+            border-right:6px solid ${i>=activeIdx?'var(--blue)':'var(--rule)'};transition:all 0.3s;`;
+        } else {
+          tri.style.cssText = `position:absolute;left:${ax+aw-4}px;top:${H/2-4}px;width:0;height:0;
+            border-top:4px solid transparent;border-bottom:4px solid transparent;
+            border-left:6px solid var(--rule);`;
+        }
+        viz.appendChild(tri);
+      }
+    });
+  }
+
+  function animateForward() {
+    fwdBtn.disabled = true;
+    let i = 0;
+    const msgs = ['Tokens enter...','Embedding + Attention...','MLP transforms...','Logits computed...','Loss = 2.31'];
+    function step() {
+      statusEl.textContent = msgs[i];
+      draw(i, 'fwd');
+      i++;
+      if (i < layers.length) setTimeout(step, 500);
+      else {
+        bwdBtn.disabled = false;
+        state = 'done-fwd';
+      }
+    }
+    step();
+  }
+
+  function animateBackward() {
+    bwdBtn.disabled = true;
+    let i = layers.length - 1;
+    const msgs = ['Loss gradient = 1','Output gradients computed','MLP gradients flow back','Attention + embed gradients','All weights have gradients ✓'];
+    function step() {
+      statusEl.textContent = msgs[layers.length - 1 - i];
+      draw(i, 'bwd');
+      i--;
+      if (i >= 0) setTimeout(step, 500);
+      else {
+        state = 'done-bwd';
+        debrief.classList.add('visible');
+      }
+    }
+    step();
+  }
+
+  fwdBtn.addEventListener('click', animateForward);
+  bwdBtn.addEventListener('click', animateBackward);
+  resetBtn.addEventListener('click', () => {
+    state = 'idle'; fwdBtn.disabled = false; bwdBtn.disabled = true;
+    statusEl.textContent = '';
+    draw(-1, null);
+  });
+  draw(-1, null);
+})();
+
+// ============ 5. ATTENTION HEATMAP ============
+(function(){
+  const name = 'charlotte';
+  const tokens = ['BOS', ...name.split('')];
+  const n = tokens.length;
+  const container = document.getElementById('attn-container');
+  const note = document.getElementById('attn-note');
+  const debrief = document.getElementById('d-attn');
+
+  // Simulate plausible attention weights (causal: can only attend to self and earlier)
+  function genWeights() {
+    const W = [];
+    for (let i = 0; i < n; i++) {
+      const row = new Array(n).fill(0);
+      // Can attend to positions 0..i
+      let total = 0;
+      for (let j = 0; j <= i; j++) {
+        // Bias: attend more to BOS and nearby tokens; some affinity for repeated chars
+        let w = 0.1 + Math.random() * 0.3;
+        if (j === 0) w += 0.3; // BOS gets attention
+        if (Math.abs(i - j) <= 1) w += 0.4; // nearby
+        if (j > 0 && tokens[j] === tokens[i]) w += 0.5; // same char
+        if (i > 3 && j > 0 && j < i) w += 0.1; // spread for later positions
+        row[j] = w;
+        total += w;
+      }
+      // Normalize
+      for (let j = 0; j <= i; j++) row[j] /= total;
+      W.push(row);
+    }
+    return W;
+  }
+
+  const weights = genWeights();
+
+  function render(highlightRow) {
+    container.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = 'attn-grid';
+    grid.style.gridTemplateColumns = `40px repeat(${n}, 1fr)`;
+
+    // Header row: "from ↓ / to →"
+    const corner = document.createElement('div');
+    corner.className = 'attn-header';
+    corner.style.fontSize = '0.55rem';
+    corner.textContent = '→ to';
+    grid.appendChild(corner);
+    tokens.forEach(t => {
+      const h = document.createElement('div');
+      h.className = 'attn-header';
+      h.textContent = t === 'BOS' ? '⟨s⟩' : t;
+      grid.appendChild(h);
+    });
+
+    // Data rows
+    for (let i = 0; i < n; i++) {
+      const rowLabel = document.createElement('div');
+      rowLabel.className = 'attn-header';
+      rowLabel.textContent = tokens[i] === 'BOS' ? '⟨s⟩' : tokens[i];
+      rowLabel.style.cursor = 'pointer';
+      rowLabel.style.fontWeight = i === highlightRow ? '700' : '500';
+      rowLabel.style.color = i === highlightRow ? 'var(--accent)' : 'var(--muted)';
+      rowLabel.addEventListener('click', () => render(i));
+      grid.appendChild(rowLabel);
+
+      for (let j = 0; j < n; j++) {
+        const cell = document.createElement('div');
+        cell.className = 'attn-cell';
+        const w = weights[i][j];
+        if (j > i) {
+          // Future: masked
+          cell.style.background = '#f5f5f4';
+          cell.textContent = '—';
+          cell.style.color = '#d6d3d1';
+        } else {
+          const intensity = Math.min(w * 2.5, 1);
+          const isHighlighted = i === highlightRow;
+          const r = isHighlighted ? 180 : 120;
+          const g = isHighlighted ? 73 : 100;
+          const b = isHighlighted ? 9 : 90;
+          cell.style.background = `rgba(${r},${g},${b},${0.08 + intensity * 0.85})`;
+          cell.textContent = (w * 100).toFixed(0);
+          cell.style.color = intensity > 0.4 ? '#fff' : 'rgba(0,0,0,0.5)';
+        }
+        grid.appendChild(cell);
+      }
+    }
+    container.appendChild(grid);
+
+    if (highlightRow !== undefined) {
+      const tok = tokens[highlightRow];
+      const maxJ = weights[highlightRow].indexOf(Math.max(...weights[highlightRow].slice(0, highlightRow+1)));
+      note.textContent = `"${tok === 'BOS' ? '⟨s⟩' : tok}" at position ${highlightRow} attends most to "${tokens[maxJ] === 'BOS' ? '⟨s⟩' : tokens[maxJ]}" at position ${maxJ}`;
+      debrief.classList.add('visible');
+    }
+  }
+
+  render(undefined);
+})();
+
+// ============ 6. TRAINING SIMULATION ============
+(function(){
+  const canvas = document.getElementById('train-canvas');
+  const ctx = canvas.getContext('2d');
+  const samples = document.getElementById('train-samples');
+  const stepLabel = document.getElementById('train-step-label');
+  const debrief = document.getElementById('d-train');
+  let losses = [];
+  let animFrame = null;
+
+  const samplesByStage = [
+    ['xqzwp','bml','yyutkr','zb','gcxo'],
+    ['thar','blim','kessa','mron','aja'],
+    ['maren','josia','talin','breka','elsi'],
+    ['charlotte','marlina','jorah','elissa','kaden'],
+  ];
+
+  function drawChart() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * 2;
+    canvas.height = rect.height * 2;
+    ctx.scale(2, 2);
+    const W = rect.width, H = rect.height;
+    const pad = {l:35,r:10,t:12,b:20};
+
+    ctx.clearRect(0,0,W,H);
+
+    if (losses.length < 2) return;
+
+    ctx.beginPath();
+    ctx.strokeStyle = 'var(--accent)';
+    ctx.lineWidth = 2;
+    const maxL = losses[0];
+    const minL = Math.min(...losses);
+    losses.forEach((l, i) => {
+      const x = pad.l + (i / (losses.length - 1)) * (W - pad.l - pad.r);
+      const y = pad.t + ((l - minL) / (maxL - minL + 0.01)) * (H - pad.t - pad.b);
+      const yFlip = pad.t + (H - pad.t - pad.b) - (y - pad.t);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Axes
+    ctx.strokeStyle = '#d6d3d1';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H-pad.b); ctx.lineTo(W-pad.r, H-pad.b);
+    ctx.stroke();
+  }
+
+  function train() {
+    if (animFrame) cancelAnimationFrame(animFrame);
+    losses = [];
+    let step = 0;
+    const totalSteps = 150;
+    let loss = 3.3;
+
+    function tick() {
+      // Simulated loss curve: fast drop then slow
+      const decay = step < 30 ? 0.06 : step < 80 ? 0.015 : 0.004;
+      loss -= decay * (0.7 + Math.random() * 0.6);
+      loss = Math.max(loss, 0.8 + Math.random() * 0.15);
+      losses.push(loss);
+
+      // Update samples
+      const stage = step < 20 ? 0 : step < 60 ? 1 : step < 110 ? 2 : 3;
+      samples.textContent = samplesByStage[stage].join('  ·  ');
+
+      stepLabel.textContent = `step ${step}/${totalSteps}`;
+      drawChart();
+      step++;
+      if (step <= totalSteps) animFrame = requestAnimationFrame(tick);
+      else {
+        debrief.classList.add('visible');
+      }
+    }
+    tick();
+  }
+
+  document.getElementById('train-go').addEventListener('click', train);
+  document.getElementById('train-reset').addEventListener('click', () => {
+    if (animFrame) cancelAnimationFrame(animFrame);
+    losses = [];
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * 2;
+    canvas.height = rect.height * 2;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    samples.textContent = 'Press "Train" to begin...';
+    stepLabel.textContent = '';
+  });
+})();
+
+// ============ 7. SCALING ============
+(function(){
+  const dimSlider = document.getElementById('scale-dim');
+  const layerSlider = document.getElementById('scale-layers');
+  const dataSlider = document.getElementById('scale-data');
+  const dimVal = document.getElementById('scale-dim-val');
+  const layerVal = document.getElementById('scale-layers-val');
+  const dataVal = document.getElementById('scale-data-val');
+  const output = document.getElementById('scale-output');
+  const noteEl = document.getElementById('scale-note');
+
+  const dimMap = [4, 16, 48, 128, 768];
+  const layerMap = [1, 2, 4, 8, 24];
+  const dataMap = ['100', '1K', '32K', '1M', '1T'];
+
+  const qualityMap = {
+    // score 3-15 based on sum of slider values
+    3: { names: ['xb','q','yyy','mmz','t'], note: 'Tiny model, tiny data → pure noise.' },
+    4: { names: ['thq','bam','lke','roz','xi'], note: 'Slightly better, but no real structure yet.' },
+    5: { names: ['marn','joli','tess','brak','el'], note: 'Starting to look name-like. Consonant-vowel patterns emerging.' },
+    6: { names: ['maren','jolian','tessa','braka','elis'], note: 'Recognizable as names. Common endings appearing.' },
+    7: { names: ['marlena','joliana','tessara','brayden','elissa'], note: 'Good structure. Length and rhythm feel right.' },
+    8: { names: ['charlotte','marlina','joliana','brayden','elissa'], note: 'Strong name quality. Model has learned most patterns.' },
+    9: { names: ['charlotte','alexandrine','josephina','theodora','evangeline'], note: 'Rich, complex names. The model handles long-range dependencies.' },
+    10: { names: ['charlotte','evangeline','seraphina','theodora','isadora'], note: 'Excellent quality. Rare patterns and elegant structure.' },
+  };
+
+  function update() {
+    const d = +dimSlider.value;
+    const l = +layerSlider.value;
+    const dt = +dataSlider.value;
+    dimVal.textContent = dimMap[d-1];
+    layerVal.textContent = layerMap[l-1];
+    dataVal.textContent = dataMap[dt-1];
+
+    const score = Math.min(10, Math.max(3, d + l + dt));
+    const q = qualityMap[score] || qualityMap[10];
+    output.textContent = q.names.join('  ·  ');
+    noteEl.textContent = q.note;
+  }
+
+  [dimSlider, layerSlider, dataSlider].forEach(s => s.addEventListener('input', update));
+  update();
+})();
+
+// ============ 8. FULL PICTURE ============
+(function(){
+  const steps = document.querySelectorAll('#full-steps .build-step');
+  const backBtn = document.getElementById('full-back');
+  const nextBtn = document.getElementById('full-next');
+  let idx = 0;
+
+  function update() {
+    steps.forEach((s, i) => s.classList.toggle('on', i <= idx));
+    backBtn.disabled = idx === 0;
+    nextBtn.disabled = idx === steps.length - 1;
+  }
+
+  nextBtn.addEventListener('click', () => { idx = Math.min(idx+1, steps.length-1); update(); });
+  backBtn.addEventListener('click', () => { idx = Math.max(idx-1, 0); update(); });
+  update();
+})();
+</script>
+</body>
+</html>
