@@ -69,27 +69,76 @@ Display: Vertical bar gauges (10 cells = 10% each), color-banded red (0–30%), 
 | 15 | 4-2 | 5 | Apr 5 | CHARLIE | R+C | Random event. Choice possible. |
 | 16 | 5-0 | 6 | Apr 6 | ALPHA | S | **Lunar approach.** Moon fills windows. Koch excitement quote. Glover on first woman's eyes at the Moon. |
 | 17 | 5-1 | 6 | Apr 6 | BRAVO | S | **Comms blackout.** 30 min behind Moon. Crew utterly alone. Radio crackles back. Closest approach ~4,100 mi. |
-| 18 | 5-2 | 6 | Apr 6 | CHARLIE | S | Far side photography. Low-angle sunlight. Individual craters at 6,600 km. |
+| 18 | 5-2 | 6 | Apr 6 | CHARLIE | S | **Solar eclipse.** Sun disappears behind Moon, photographed by solar array wing camera. Glover highlight quote. Far side less illuminated than hoped due to April 1 launch. |
 | 19 | 6-0 | 7 | Apr 7 | ALPHA | S | **Off-duty day.** Rest, personal time, Moon gazing. Only such day in the mission. |
 | 20 | 6-1 | 7 | Apr 7 | BRAVO | R+C | Random event. Choice possible. |
-| 21 | 6-2 | 7 | Apr 7 | CHARLIE | R+C | Random event. Choice possible. |
+| 21 | 6-2 | 7 | Apr 7 | CHARLIE | S | **Presidential downlink.** Live call with President Trump from White Flight Control Room at JSC. |
 | 22 | 7-0 | 8 | Apr 8 | ALPHA | R+C | Random event. Choice possible. |
 | 23 | 7-1 | 8 | Apr 8 | BRAVO | S | **Green Bank + amateur radio.** 100m telescope bounces radar off Orion hull. 14-country amateur tracking network. |
 | 24 | 7-2 | 8 | Apr 8 | CHARLIE | R+C | Random event. Choice possible. |
 | 25 | 8-0 | 9 | Apr 9 | ALPHA | R+C | Random event. Choice possible. |
 | 26 | 8-1 | 9 | Apr 9 | BRAVO | R+C | Random event. Choice possible. |
 | 27 | 8-2 | 9 | Apr 9 | CHARLIE | R+C | Random event. Choice possible. |
-| 28 | 9-0 | 10 | Apr 10 | ALPHA | R+C | Random event. Choice possible. |
-| 29 | 9-1 | 10 | Apr 10 | BRAVO | S | **Re-entry.** Service module jettisoned. Skip re-entry. AVCOAT heat shield. G-forces. |
+| 28 | 9-0 | 10 | Apr 10 | ALPHA | S | **Final return burn.** 8 seconds, 4.2 ft/s delta-v. Wake-up songs: "Run to the Water" (Live), "Free" (Zac Brown Band). |
+| 29 | 9-1 | 10 | Apr 10 | BRAVO | S | **Re-entry.** Service module jettisoned. Steeper single-entry (not skip). 24,661 mph. 6-min plasma blackout. |
 | 30 | 9-2 | 10 | Apr 10 | CHARLIE | S/end | **Splashdown.** Triggers endGame(true). |
 
-**Totals:** 14 scripted slots (including skip + splashdown), 16 random slots (each with 22% choice chance).
+**Totals:** 17 scripted slots (including skip + splashdown), 13 random slots (each with 22% choice chance).
+
+### 3.1 Launch Screen
+
+Shown once after difficulty selection (shift 0-0 is auto-advanced). Displays:
+
+1. **EARTH** ASCII art (green, centered)
+2. **T-ZERO heading** — "T-ZERO — 6:35 PM EDT — APRIL 1, 2026" (amber, large)
+3. **Launch site** — Kennedy Space Center, LC-39B, SLS Block 1, 8.8 million lbs thrust
+4. **Launch sequence** — Booster sep T+2:00, Core MECO T+8:00, ICPS fires, Orion separates, arrays deploy. Wiseman quote: "That was an amazing ride."
+5. **Crew roster with firsts:**
+   - Commander Reid Wiseman (CDR) — oldest beyond LEO
+   - Pilot Victor Glover (PLT) — first person of color beyond LEO
+   - MS Christina Koch (MS1) — first woman beyond LEO
+   - MS Jeremy Hansen, CSA (MS2) — first non-US citizen beyond LEO
+6. **Mission Control** — 3 capcom shifts/day (8 hrs each)
+7. **DSN architecture** — Goldstone · Canberra · Madrid — 120° apart for 24/7 coverage. Note: Goldstone 70m DSS-14 is offline.
+8. **Begin button** — "Begin Day 1 — Charlie Shift →" (amber)
+
+### 3.2 Shift Screen Layout
+
+Every shift screen follows this layout, top to bottom:
+
+1. **Progress bar** — green fill bar showing `totalShifts / 30` as a percentage
+2. **Shift label** — "Day N/10 — Apr N — Day Name" + "Shift: ☽/☀/☆ Name (N/30 shifts elapsed)"
+3. **Day description** — italic dim-green narrative from `DAY_DESCS[day]`, one per day (10 total)
+4. **Resource gauges** — 7 vertical bar gauges (O₂, H₂O, Food, Pwr, Fuel, Sys, MRL)
+5. **Crew roster** — "Crew: CDR ✓  PLT ✓  MS1 ✓  MS2 ✓" (decorative; no per-crew health tracking)
+6. **Telemetry panel** — MET, range, velocity, signal delay, DSN, space weather (see Section 6)
+7. **Event text** — the shift's event narrative, colored by flavor (see Section 8.9)
+8. **Action buttons** — dynamic labels:
+   - After Alpha/Bravo: next shift name ("Bravo Shift →", "Charlie Shift →")
+   - After Charlie (Days 1–9): "Day N Alpha →"
+   - After Charlie (Day 10): "Begin Re-entry →"
+   - "Log" button (amber) to view mission log
+
+Day descriptions provide one-sentence mission context per day (e.g., "SLS launches from LC-39B at 6:35 PM EDT. Orion enters high elliptical orbit."). They are shown on every shift of that day.
+
+Shift icons: ☽ (Alpha/night), ☀ (Bravo/day), ☆ (Charlie/evening).
+
+### 3.3 Mission Log
+
+Accessible via the "Log" button on shift screens and choice result screens.
+
+- **Header:** "═══ MISSION LOG — ORION 'INTEGRITY' ═══" (amber)
+- **Status panel:** Full shift screen status (progress bar, gauges, telemetry) shown above the log
+- **Log entries:** Chronological list, one per event/decision: "Day N SHIFT: event text"
+- **Navigation:** "← Back" button returns to the current shift view with continue/log buttons
+
+Events and choice outcomes are appended to the log as they occur. The log persists for the entire mission.
 
 ---
 
 ## 4. Random Event Pools
 
-### 4.1 Good Events (10)
+### 4.1 Good Events (12)
 
 | # | Summary | Effects | Source |
 |---|---------|---------|--------|
@@ -103,6 +152,8 @@ Display: Vertical bar gauges (10 cells = 10% each), color-banded red (0–30%), 
 | 8 | Madrid DSS-56 lock, max data rate | Systems +5, Morale +5 | DSN newest antenna |
 | 9 | Ka-band HD video test at 20 Mbps | Morale +8 | Real capability |
 | 10 | Wake-up song, audio cut mid-lyric | Morale +10 | Real event from mission |
+| 11 | Propellant efficiency — ESM used less than half its fuel | Fuel +5, Morale +8 | Post-mission engineering data |
+| 12 | Recovery armada on station (RB-57F, Cessna, 7 Black Hawks, Murtha) | Morale +5 | NASA recovery ops |
 
 ### 4.2 Bad Events (11)
 
@@ -130,6 +181,18 @@ Display: Vertical bar gauges (10 cells = 10% each), color-banded red (0–30%), 
 | 4 | Quiet coast, family email via DSN | Morale +5 | Crew welfare |
 | 5 | Sports scores, Hansen hockey | Morale +5 | Real crew personality |
 | 6 | Canberra routine pass at 2.1 Mbps | None | Standard DSN ops |
+
+### 4.4 Event Probability by Difficulty
+
+On each random shift, a single roll determines the event type. Good event chance is fixed at 35%; difficulty scales the bad event chance, and neutral fills the remainder:
+
+| Difficulty | Bad | Good | Neutral |
+|------------|-----|------|---------|
+| Easy (Astronaut Candidate) | 20% | 35% | 45% |
+| Normal (Mission Specialist) | 30% | 35% | 35% |
+| Hard (Flight Commander) | 40% | 35% | 25% |
+
+After the event fires, the choice trigger rolls separately (22% chance, from unused pool).
 
 ---
 
@@ -234,7 +297,7 @@ Each string is prefixed with a severity word used for UI coloring:
 | `EARTH` | 9 | Launch screen | Stylized globe with continents |
 | `MOON` | 9 | Day 6 lunar flyby shifts | Stylized Moon with craters |
 | `TOILET` | 11 | Day 1 Bravo toilet event | Hygiene bay with warning indicator |
-| `SPLASH` | 38 | Successful splashdown | Parachute + Orion + ocean waves + USS Portland (LPD-27) + Pacific Ocean label |
+| `SPLASH` | 38 | Successful splashdown | Parachute + Orion + ocean waves + USS John P. Murtha (LPD-26) + Pacific Ocean label |
 
 ### 7.1 Art Color Rules
 
@@ -364,6 +427,26 @@ Single breakpoint at `max-width: 600px`:
 | Gauge gap | 2px | 1px |
 | Telemetry grid | 2 columns | 1 column |
 
+### 8.9 Event Rendering (Flavor System)
+
+Each event is assigned a "flavor" string that controls its text color and optional ASCII art on the shift screen:
+
+| Flavor | Text Class | Color | ASCII Art | Used By |
+|--------|-----------|-------|-----------|---------|
+| `good` | `.tb .ta` | Amber | None | Good random events, positive scripted events |
+| `bad` | `.tb .tr` | Red | None | Bad random events |
+| `neutral` | `.tb` | Green | None | Neutral events, untyped scripted events |
+| `lunar` | `.tb .ta` | Amber | MOON (amber) | Day 6 flyby shifts |
+| `record` | `.tb .ta` | Amber | None + record box | Distance record (Day 5 Bravo) |
+| `reentry` | `.tb .tr` | Red | None | Re-entry (Day 10 Bravo) |
+| `sleep` | `.tb` | Green | None | Sleep events (treated as neutral) |
+
+**Record box:** On the distance record event, a bordered amber box appears with a trophy (&#127942;) showing "NEW RECORD: 252,021 mi from Earth" and the Apollo 13 comparison.
+
+**Choice presentation:** When a choice event fires, an amber-bordered box appears with a ⚠ icon, the choice title in amber, the situation description in green, and option buttons below.
+
+**Critical failure screen:** When any resource or morale hits 0%, the shift screen shows "⚠ CRITICAL FAILURE ⚠" in large red text with a red "Mission Abort →" button. All other buttons (continue, choice options) are suppressed.
+
 ---
 
 ## 9. Scoring
@@ -376,9 +459,20 @@ score = round((morale + average(all_resources)) / 2)
 |-------|--------|
 | 86–100 | FLAWLESS — Worthy of the Golden Age |
 | 66–85 | SUCCESSFUL — Integrity lived up to her name |
-| 41–65 | ROUGH — USS Portland fished you out |
+| 41–65 | ROUGH — USS John P. Murtha fished you out |
 | 1–40 | BARELY SURVIVED — Houston relieved |
 | 0 | MISSION LOST (failure only) |
+
+### 9.1 Loss Handling
+
+On mission failure (`endGame(false)`), score is always 0 regardless of remaining resources — there is no partial credit for a failed mission.
+
+Failure message varies by cause:
+
+| Cause | Message |
+|-------|---------|
+| Morale ≤ 0 | "Crew coordination collapsed." |
+| Any resource ≤ 0 | "Life support could not sustain the crew." |
 
 ---
 
@@ -400,8 +494,8 @@ score = round((morale + average(all_resources)) / 2)
 | Distance record: 252,021 mi (Apollo 13: 248,655 mi) | Scripted 4-1 | CNN, NASA |
 | Closest approach: ~4,100 mi / 6,600 km above far side | Scripted 5-1, 5-2 | NASA daily agenda |
 | 30-50 min comms blackout behind Moon | Scripted 5-1 | NASA daily agenda |
-| Splashdown: Pacific off San Diego, USS Portland (LPD-27) | Endgame | CBS, NASA |
-| Skip re-entry maneuver | Scripted 9-1 | NASA |
+| Splashdown: Pacific off San Diego, USS John P. Murtha (LPD-26) | Endgame | CBS, NASA |
+| Steeper single-entry profile (not skip re-entry) | Scripted 9-1 | NASA |
 | AVCOAT heat shield concerns from Artemis I | Scripted 9-1 | Wikipedia, NASA |
 | DSS-14 Goldstone 70m damaged Sep 2025 | Telemetry panel, launch screen | SpaceNews, Gizmodo |
 | DSN 120° spacing: Goldstone/Canberra/Madrid | Telemetry panel | NASA DSN |
@@ -521,11 +615,18 @@ Post-splashdown update. Mission concluded successfully on April 10, 2026 at 8:07
   - Day 7: Off-duty day
   - Day 10: Service module jettison / re-entry, splashdown
 - **Random event pools** — 8 good, 8 bad, 4 neutral events with resource effects
-- **6 choice events** — Power allocation, course correction, crew rest vs repairs, radiation shelter, urine dump timing, flywheel exercise issue
+- **Event probability scaling** — difficulty controls bad-event chance: Easy 20%, Normal 30%, Hard 40%. Good chance fixed at 35%, neutral fills the remainder
+- **Event flavor rendering** — events color-coded by type: good/amber, bad/red, neutral/green, lunar/amber+Moon art, record/amber+trophy box, reentry/red. Flavor determines text class and optional ASCII art overlay
+- **6 choice events** — Power allocation, course correction, crew rest vs repairs, radiation shelter, urine dump timing, flywheel exercise issue. Presented in amber-bordered box with ⚠ icon, option buttons below
 - **Toilet malfunction** — guaranteed Day 1 Bravo event based on real mission, with HYGIENE BAY ASCII art and 3 repair options
 - **5 ASCII art assets** — SLS rocket (33 lines), Earth (9), Moon (9), Toilet (11), Splashdown scene (38 lines with parachute, Orion, waves, USS Portland)
-- **Mission log** — chronological record of all events and decisions, viewable mid-mission
-- **Scoring system** — composite of morale + average resources, 5 rating tiers
+- **Record box** — distance record event (Day 5 Bravo) displays bordered amber box with trophy emoji (&#127942;), new record vs Apollo 13 comparison
+- **Critical failure screen** — when any resource or morale hits 0%, displays "⚠ CRITICAL FAILURE ⚠" in large red text with red "Mission Abort →" button; all other buttons suppressed
+- **Launch screen** — Earth ASCII art, T-ZERO countdown, SLS specs (8.8M lbs thrust), launch sequence timeline (booster sep, MECO, ICPS, arrays), Wiseman quote, crew roster with firsts, Mission Control shift structure, DSN architecture note with DSS-14 offline status
+- **Shift screen layout** — progress bar (% complete), shift label with date/name/icon (☽☀☆), day description (10 italic narratives), 7 resource gauges, crew roster (CDR/PLT/MS1/MS2 ✓), dynamic navigation button labels ("Bravo Shift →", "Day N Alpha →", "Begin Re-entry →")
+- **Mission log** — chronological record of all events and decisions, viewable mid-mission via "Log" button on shift screens; "← Back" returns to current shift
+- **Scoring system** — composite of morale + average resources, 5 rating tiers. Score = 0 on mission failure regardless of remaining resources
+- **Failure message variation** — morale failure ("Crew coordination collapsed.") vs resource failure ("Life support could not sustain the crew.")
 - **Real mission facts** — 35+ verified details from NASA, news coverage, and live mission trackers
 - **Accurate April 1, 2026 launch date** — all 10 days mapped to real calendar dates (Apr 1–10)
 - **Crew firsts** documented on launch screen (first woman, person of color, non-US citizen, oldest beyond LEO)
