@@ -1,25 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+
+<meta property="og:title" content="The Artemis Trail — A Lunar Odyssey">
+<meta property="og:description" content="Command Orion 'Integrity' on humanity's first crewed moonshot in 53 years. An interactive game based on the real Artemis II mission — April 1, 2026.">
+<meta property="og:url" content="https://gretyl.maplecrew.org/artemis-trail.html">
+<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/artemis-trail.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ASCII art of the SLS rocket and Orion spacecraft on a CRT-green terminal, with the title 'The Artemis Trail' below">
+<meta property="og:site_name" content="Gretyl">
+<meta property="og:type" content="website">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Artemis Trail — A Lunar Odyssey">
+<meta name="twitter:description" content="Command Orion 'Integrity' on humanity's first crewed moonshot in 53 years. Fix the toilet. Break the distance record. Come home alive.">
+<meta name="twitter:image" content="https://gretyl.maplecrew.org/assets/og/artemis-trail.png">
+<meta name="twitter:image:alt" content="ASCII art of the SLS rocket and Orion spacecraft on a retro CRT terminal">
+
+<link rel="apple-touch-icon" href="/assets/icons/artemis-trail-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Artemis Trail">
+<link rel="manifest" href="/assets/manifest/artemis-trail.json">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-05N3959YM1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-05N3959YM1');
+</script>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>The Artemis Trail</title>
 <meta name="title" content="The Artemis Trail — A Lunar Odyssey">
 <meta name="description" content="An interactive Oregon Trail-style game based on NASA's real Artemis II mission. Command Orion 'Integrity' on humanity's first crewed moonshot in 53 years. Fix the toilet. Break the distance record. Come home alive.">
 <meta name="author" content="Built with Claude">
-<meta property="og:type" content="website">
-<meta property="og:url" content="">
-<meta property="og:title" content="The Artemis Trail — A Lunar Odyssey">
-<meta property="og:description" content="Command Orion 'Integrity' on humanity's first crewed moonshot in 53 years. An interactive game based on the real Artemis II mission — April 1, 2026.">
-<meta property="og:image" content="og-artemis-trail.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="ASCII art of the SLS rocket and Orion spacecraft on a CRT-green terminal, with the title 'The Artemis Trail' below">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="The Artemis Trail — A Lunar Odyssey">
-<meta name="twitter:description" content="Command Orion 'Integrity' on humanity's first crewed moonshot in 53 years. Fix the toilet. Break the distance record. Come home alive.">
-<meta name="twitter:image" content="og-artemis-trail.png">
-<meta name="twitter:image:alt" content="ASCII art of the SLS rocket and Orion spacecraft on a retro CRT terminal">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap');
 :root{--green:#33ff33;--green-dim:#1a9a1a;--green-glow:#33ff3366;--amber:#ffb000;--red:#ff3333;--bg:#0a0a0a;--scanline:rgba(0,0,0,0.15)}
@@ -28,7 +48,7 @@ html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'VT
 #crt{width:100%;height:100%;background:var(--bg);color:var(--green);position:relative;overflow:hidden}
 #crt::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,var(--scanline) 0px,var(--scanline) 1px,transparent 1px,transparent 3px);pointer-events:none;z-index:10}
 #crt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,0.6) 100%);pointer-events:none;z-index:11}
-#screen{position:relative;z-index:5;width:100%;height:100%;display:flex;flex-direction:column;padding:20px;overflow-y:auto}
+#screen{position:relative;z-index:5;width:100%;height:100%;display:flex;flex-direction:column;padding:20px;padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));overflow-y:auto}
 #screen::-webkit-scrollbar{width:0}
 .subtitle{text-align:center;font-size:28px;color:var(--amber);text-shadow:0 0 15px rgba(255,176,0,0.4);margin-bottom:4px;letter-spacing:6px}
 .credits{text-align:center;font-size:18px;color:var(--green-dim);margin-bottom:20px}
@@ -184,7 +204,7 @@ const SHIFT_LABELS=['ALPHA','BRAVO','CHARLIE'];
 const SHIFT_ICONS=['☽','☀','☆'];
 const DATES=['Apr 1','Apr 2','Apr 3','Apr 4','Apr 5','Apr 6','Apr 7','Apr 8','Apr 9','Apr 10'];
 const DAY_NAMES=['Launch & High Earth Orbit','TLI Burn — Moon Bound','Outbound Coast','Deep Space Transit','Lunar Sphere of Influence','Lunar Flyby — Far Side','Return Trajectory','Homeward Coast','Earth Approach','Re-entry & Splashdown'];
-const DAY_DESCS=['SLS launches from LC-39B at 6:35 PM EDT. Orion enters high elliptical orbit. Prox ops demo with ICPS.','Translunar injection: 5 min 55 sec burn. Orion leaves Earth orbit — first crew beyond LEO since 1972.','First trajectory correction burn. CPR demo in zero-g. Medical kit checkout. DSN emergency comms test.','Second outbound correction burn. AVATAR organ-chip experiment. Crew reviews lunar surface targets.','Moon becomes primary gravity. Final outbound correction burn. Camera prep for flyby.','Closest approach: ~4,100 mi above far side. Record: 252,021 mi from Earth. 30-50 min blackout.','Off-duty day. Lunar gravity slingshot bends trajectory home. Free-return path confirmed.','First return correction burn. Earth grows in windows. Science data downlink.','Final return corrections. Crew dons Orion Crew Survival System suits. Service module sep prep.','Service module jettisoned. Skip re-entry. Splashdown in Pacific off San Diego. USS Portland recovery.'];
+const DAY_DESCS=['SLS launches from LC-39B at 6:35 PM EDT. Orion enters high elliptical orbit. Prox ops demo with ICPS.','Translunar injection: 5 min 55 sec burn. Orion leaves Earth orbit — first crew beyond LEO since 1972.','First trajectory correction burn. CPR demo in zero-g. Medical kit checkout. DSN emergency comms test.','Second outbound correction burn. AVATAR organ-chip experiment. Crew reviews lunar surface targets.','Moon becomes primary gravity. Final outbound correction burn. Camera prep for flyby.','Closest approach: ~4,100 mi above far side. Record: 252,021 mi from Earth. 30-50 min blackout.','Off-duty day. Lunar gravity slingshot bends trajectory home. Free-return path confirmed.','First return correction burn. Earth grows in windows. Science data downlink.','Final return corrections. Crew dons Orion Crew Survival System suits. Service module sep prep.','Service module jettisoned. Steeper single-entry (not skip). Splashdown 8:07 PM EDT off San Diego. USS John P. Murtha recovery.'];
 
 // ─── DSN GROUND STATIONS — rotate with shifts (120° apart) ───
 const DSN_STATIONS=[
@@ -368,6 +388,7 @@ function showTitle(){
     <div class="ascii" style="text-align:center;color:var(--amber);text-shadow:0 0 8px rgba(255,176,0,0.3)">${SHIP}</div>
     <div class="subtitle">THE ARTEMIS TRAIL</div>
     <div class="credits">A Lunar Odyssey — Based on the Real Artemis II Mission</div>
+    <div class="credits" style="font-size:14px;margin-bottom:10px">v1.2</div>
     <div class="tb" style="text-align:center">April 1, 2026. Kennedy Space Center, LC-39B.<br>You command Orion "Integrity" — humanity's<br>first crewed moonshot in 53 years.</div>
     <div class="tb td" style="text-align:center">Four crew. Ten days. Thirty shifts. 685,000 miles.<br>Mission Control runs three 8-hour rotations per day.<br>Fix the toilet. Break the distance record. Come home.</div>
     <div class="br" style="justify-content:center">
@@ -540,7 +561,7 @@ window.returnLog=function(){
 
 function endGame(win){
   const sc=win?Math.round((S.morale+Object.values(S.res).reduce((a,b)=>a+b,0)/6)/2):0;
-  const rk=sc>85?'FLAWLESS — Worthy of the Golden Age':sc>65?'SUCCESSFUL — Integrity lived up to her name':sc>40?'ROUGH — USS Portland fished you out':win?'BARELY SURVIVED — Houston relieved':'MISSION LOST';
+  const rk=sc>85?'FLAWLESS — Worthy of the Golden Age':sc>65?'SUCCESSFUL — Integrity lived up to her name':sc>40?'ROUGH — USS John P. Murtha fished you out':win?'BARELY SURVIVED — Houston relieved':'MISSION LOST';
   render(`
     <div class="ascii" style="text-align:center;color:${win?'var(--amber)':'var(--red)'}">${win?SPLASH:SHIP}</div>
     <div class="tb ${win?'ta':'tr'}" style="font-size:26px;text-align:center">${win?'═══ SPLASHDOWN — APRIL 10, 2026 ═══':'═══ MISSION FAILED ═══'}</div>
@@ -563,6 +584,10 @@ function endGame(win){
 window.startGame=startGame;window.advance=advance;window.showLog=showLog;
 window.endGame=endGame;window.showTitle=showTitle;
 init();showTitle();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw-artemis-trail.js');
+}
 </script>
 </body>
 </html>
