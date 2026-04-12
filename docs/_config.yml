@@ -34,3 +34,7 @@ navigation:
     sublist:
       - name: Greed
         link: /tutorials/greed.html
+      - name: How a GPT Learns
+        link: /tutorials/how-gpt-learns.html
+      - name: The Extremes of Chance
+        link: /tutorials/the-extremes-of-chance.html
