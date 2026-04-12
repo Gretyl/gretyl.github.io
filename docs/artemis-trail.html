@@ -1,45 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
-
-<meta property="og:title" content="The Artemis Trail">
-<meta property="og:description" content="Lunar mission simulator, in the style of Oregon Trail.">
-<meta property="og:url" content="https://gretyl.maplecrew.org/artemis-trail.html">
-<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/artemis-trail.png">
-<meta property="og:site_name" content="Gretyl">
-<meta property="og:type" content="website">
-
-<link rel="apple-touch-icon" href="/assets/icons/artemis-trail-180.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Artemis Trail">
-<link rel="manifest" href="/assets/manifest/artemis-trail.json">
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-05N3959YM1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-05N3959YM1');
-</script>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Artemis Trail</title>
+<meta name="title" content="The Artemis Trail — A Lunar Odyssey">
+<meta name="description" content="An interactive Oregon Trail-style game based on NASA's real Artemis II mission. Command Orion 'Integrity' on humanity's first crewed moonshot in 53 years. Fix the toilet. Break the distance record. Come home alive.">
+<meta name="author" content="Built with Claude">
+<meta property="og:type" content="website">
+<meta property="og:url" content="">
+<meta property="og:title" content="The Artemis Trail — A Lunar Odyssey">
+<meta property="og:description" content="Command Orion 'Integrity' on humanity's first crewed moonshot in 53 years. An interactive game based on the real Artemis II mission — April 1, 2026.">
+<meta property="og:image" content="og-artemis-trail.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ASCII art of the SLS rocket and Orion spacecraft on a CRT-green terminal, with the title 'The Artemis Trail' below">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Artemis Trail — A Lunar Odyssey">
+<meta name="twitter:description" content="Command Orion 'Integrity' on humanity's first crewed moonshot in 53 years. Fix the toilet. Break the distance record. Come home alive.">
+<meta name="twitter:image" content="og-artemis-trail.png">
+<meta name="twitter:image:alt" content="ASCII art of the SLS rocket and Orion spacecraft on a retro CRT terminal">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap');
-:root {
-  --green:#33ff33; --green-dim:#1a9a1a; --green-glow:#33ff3366;
-  --amber:#ffb000; --red:#ff3333; --bg:#0a0a0a; --scanline:rgba(0,0,0,0.15);
-}
+:root{--green:#33ff33;--green-dim:#1a9a1a;--green-glow:#33ff3366;--amber:#ffb000;--red:#ff3333;--bg:#0a0a0a;--scanline:rgba(0,0,0,0.15)}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'VT323',monospace}
 #crt{width:100%;height:100%;background:var(--bg);color:var(--green);position:relative;overflow:hidden}
 #crt::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,var(--scanline) 0px,var(--scanline) 1px,transparent 1px,transparent 3px);pointer-events:none;z-index:10}
 #crt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,0.6) 100%);pointer-events:none;z-index:11}
-#screen{position:relative;z-index:5;width:100%;height:100%;display:flex;flex-direction:column;padding:20px;padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));overflow-y:auto}
+#screen{position:relative;z-index:5;width:100%;height:100%;display:flex;flex-direction:column;padding:20px;overflow-y:auto}
 #screen::-webkit-scrollbar{width:0}
 .subtitle{text-align:center;font-size:28px;color:var(--amber);text-shadow:0 0 15px rgba(255,176,0,0.4);margin-bottom:4px;letter-spacing:6px}
 .credits{text-align:center;font-size:18px;color:var(--green-dim);margin-bottom:20px}
@@ -53,6 +42,13 @@ html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'VT
 .btn.r{color:var(--red);border-color:var(--red)}.btn.r:hover{background:var(--red);color:var(--bg)}
 .sbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;border:1px solid var(--green-dim);padding:8px;margin:8px 0;font-size:19px}
 .sbar .l{color:var(--green-dim)}.sbar .v{color:var(--green)}.sbar .v.w{color:var(--amber)}.sbar .v.d{color:var(--red)}
+.pbar{width:100%;height:16px;border:1px solid var(--green-dim);margin:6px 0;position:relative}
+.pfill{height:100%;background:var(--green);transition:width 0.5s;box-shadow:0 0 8px var(--green-glow)}
+.ascii{font-size:14px;line-height:1.2;white-space:pre;color:var(--green);text-shadow:0 0 4px var(--green-glow);margin:8px 0}
+.blink{animation:bl 1s step-end infinite}@keyframes bl{50%{opacity:0}}
+.fin{animation:fi 0.5s ease-out}@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.br{margin:8px 0;display:flex;flex-wrap:wrap;gap:4px}
+.shift-label{font-size:16px;color:var(--green-dim);border-bottom:1px solid var(--green-dim);padding-bottom:4px;margin-bottom:6px}
 .gauges{display:flex;justify-content:center;gap:2px;margin:8px 0;padding:8px 4px;border:1px solid var(--green-dim)}
 .gauge{display:flex;flex-direction:column;align-items:center;width:clamp(36px,12vw,56px)}
 .gauge .g-label{font-size:clamp(11px,2.5vw,14px);color:var(--green-dim);margin-bottom:2px;white-space:nowrap}
@@ -67,14 +63,10 @@ html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'VT
 .g-glow-green{color:var(--green);text-shadow:0 0 6px var(--green-glow)}
 .g-glow-amber{color:var(--amber);text-shadow:0 0 6px rgba(255,176,0,0.4)}
 .g-glow-red{color:var(--red);text-shadow:0 0 6px rgba(255,50,50,0.4)}
-.pbar{width:100%;height:16px;border:1px solid var(--green-dim);margin:6px 0;position:relative}
-.pfill{height:100%;background:var(--green);transition:width 0.5s;box-shadow:0 0 8px var(--green-glow)}
-.ascii{font-size:14px;line-height:1.2;white-space:pre;color:var(--green);text-shadow:0 0 4px var(--green-glow);margin:8px 0}
-.blink{animation:bl 1s step-end infinite}@keyframes bl{50%{opacity:0}}
-.fin{animation:fi 0.5s ease-out}@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.br{margin:8px 0;display:flex;flex-wrap:wrap;gap:4px}
-.shift-label{font-size:16px;color:var(--green-dim);border-bottom:1px solid var(--green-dim);padding-bottom:4px;margin-bottom:6px}
-@media(max-width:600px){.subtitle{font-size:20px;letter-spacing:3px}.tb,.btn{font-size:18px}.ascii{font-size:10px}#screen{padding:12px}.gauges{gap:1px;padding:6px 2px}.gauge{width:clamp(30px,13vw,44px)}.gauge .g-cell{height:5px}}
+.telem{border:1px solid var(--green-dim);padding:6px 10px;margin:8px 0;font-size:15px;color:var(--green-dim);display:grid;grid-template-columns:1fr 1fr;gap:2px 12px}
+.telem .tl{color:var(--green-dim)}.telem .tv{color:var(--green)}
+.telem .tv.tw{color:var(--amber)}.telem .tv.td{color:var(--red)}
+@media(max-width:600px){.subtitle{font-size:20px;letter-spacing:3px}.tb,.btn{font-size:18px}.ascii{font-size:10px}#screen{padding:12px}.gauges{gap:1px;padding:6px 2px}.gauge{width:clamp(30px,13vw,44px)}.gauge .g-cell{height:5px}.telem{font-size:13px;grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -144,7 +136,6 @@ const TOILET=`   _______
   | \\___/ |
   |_______|
  HYGIENE BAY`;
-
 const SPLASH=`
             .  *    .   *        .    *   .
       *         .        .   *        .
@@ -179,8 +170,8 @@ const SPLASH=`
   ~  ~~~  ~~~~~  ~~  ~~~~  ~~~~~  ~~~  ~
      ~~   ~~~~  ~~~  ~~  ~~~~  ~~~~  ~~
                                       __/
-       USS PORTLAND           __..--''
-         (LPD-27)    __..--''
+     USS J.P. MURTHA           __..--''
+         (LPD-26)    __..--''
      _____..---==='''   __|____|___
     |__________________________|___\\
     \\_____|_____|_____|_____|_____/
@@ -188,59 +179,69 @@ const SPLASH=`
     ~~~~   ~~~~~  ~~~~~  ~~~~   ~~~~~
   ~ PACIFIC OCEAN — OFF SAN DIEGO ~`;
 
-const SHIFT_NAMES = ['Alpha (00:00–08:00)','Bravo (08:00–16:00)','Charlie (16:00–00:00)'];
-const SHIFT_LABELS = ['ALPHA','BRAVO','CHARLIE'];
-const SHIFT_ICONS = ['☽','☀','☆'];
-
-// 10 days × 3 shifts = 30 shifts. Each day has a date string.
+const SHIFT_NAMES=['Alpha (00:00–08:00)','Bravo (08:00–16:00)','Charlie (16:00–00:00)'];
+const SHIFT_LABELS=['ALPHA','BRAVO','CHARLIE'];
+const SHIFT_ICONS=['☽','☀','☆'];
 const DATES=['Apr 1','Apr 2','Apr 3','Apr 4','Apr 5','Apr 6','Apr 7','Apr 8','Apr 9','Apr 10'];
-const DAY_NAMES=[
-  'Launch & High Earth Orbit','TLI Burn — Moon Bound','Outbound Coast','Deep Space Transit',
-  'Lunar Sphere of Influence','Lunar Flyby — Far Side','Return Trajectory','Homeward Coast',
-  'Earth Approach','Re-entry & Splashdown'
-];
-const DAY_DESCS=[
-  'SLS launches from LC-39B at 6:35 PM EDT. Orion enters high elliptical orbit. Prox ops demo with ICPS.',
-  'Translunar injection: 5 min 55 sec burn. Orion leaves Earth orbit — first crew beyond LEO since 1972.',
-  'First trajectory correction burn. CPR demo in zero-g. Medical kit checkout. DSN emergency comms test.',
-  'Second outbound correction burn. AVATAR organ-chip experiment. Crew reviews lunar surface targets.',
-  'Moon becomes primary gravity. Final outbound correction burn. Camera prep for flyby.',
-  'Closest approach: ~4,100 mi above far side. Record: 252,021 mi from Earth. 30-50 min blackout.',
-  'Off-duty day. Lunar gravity slingshot bends trajectory home. Free-return path confirmed.',
-  'First return correction burn. Earth grows in windows. Science data downlink.',
-  'Final return corrections. Crew dons Orion Crew Survival System suits. Service module sep prep.',
-  'Service module jettisoned. Skip re-entry. Splashdown in Pacific off San Diego. USS Portland recovery.'
-];
+const DAY_NAMES=['Launch & High Earth Orbit','TLI Burn — Moon Bound','Outbound Coast','Deep Space Transit','Lunar Sphere of Influence','Lunar Flyby — Far Side','Return Trajectory','Homeward Coast','Earth Approach','Re-entry & Splashdown'];
+const DAY_DESCS=['SLS launches from LC-39B at 6:35 PM EDT. Orion enters high elliptical orbit. Prox ops demo with ICPS.','Translunar injection: 5 min 55 sec burn. Orion leaves Earth orbit — first crew beyond LEO since 1972.','First trajectory correction burn. CPR demo in zero-g. Medical kit checkout. DSN emergency comms test.','Second outbound correction burn. AVATAR organ-chip experiment. Crew reviews lunar surface targets.','Moon becomes primary gravity. Final outbound correction burn. Camera prep for flyby.','Closest approach: ~4,100 mi above far side. Record: 252,021 mi from Earth. 30-50 min blackout.','Off-duty day. Lunar gravity slingshot bends trajectory home. Free-return path confirmed.','First return correction burn. Earth grows in windows. Science data downlink.','Final return corrections. Crew dons Orion Crew Survival System suits. Service module sep prep.','Service module jettisoned. Skip re-entry. Splashdown in Pacific off San Diego. USS Portland recovery.'];
 
-// Scripted events for specific shift slots (day 0-indexed, shift 0-2)
+// ─── DSN GROUND STATIONS — rotate with shifts (120° apart) ───
+const DSN_STATIONS=[
+  {name:'Goldstone, CA',dish:'DSS-24/25/26 (34m array)',note:'70m DSS-14 offline since Sep 2025 — damaged by over-rotation'},
+  {name:'Canberra, AUS',dish:'DSS-43 (70m) + DSS-35/36 (34m)',note:'Primary deep-space link for Southern Hemisphere passes'},
+  {name:'Madrid, ESP',dish:'DSS-63 (70m) + DSS-56 (34m)',note:'DSS-56 is the newest "all-in-one" antenna in the network'},
+];
+// Simulated mission telemetry per shift
+const TELEM_DIST=[0,0,0,6000,40000,100000,160000,200000,250000,300000,340000,370000,395000,406841,400000,380000,350000,300000,250000,200000,150000,100000,60000,30000,10000,2000,500,200,80,0];
+const TELEM_SPEED=[0,28000,27500,39000,15000,7200,5500,4200,3500,2800,2200,1800,1500,1200,1500,2000,2800,3500,4200,5500,7200,9500,12000,16000,22000,28000,32000,36000,39800,0];
+const SPACE_WX=['Quiet — no significant activity','Quiet — background flux nominal','Minor B-class flare detected on far side of Sun','Quiet — solar wind 380 km/s','Elevated — C2.3 flare, proton flux rising','Moderate — solar wind gust 520 km/s, monitoring','Quiet — CME observed but Earth-directed unlikely','Minor — small coronal hole high-speed stream','Quiet — Kp index 2, geomagnetically calm','Active — M1.1 flare, SWPC watching for CME','Quiet — all clear from NOAA SWPC','Elevated — proton event warning, crew advised','Quiet — beautiful aurora reported from ISS altitude','Minor — brief radio blackout R1 on daylit hemisphere','Quiet — nominal conditions for deep space ops'];
+
+function dsnForShift(){return DSN_STATIONS[S.shift]||DSN_STATIONS[0]}
+function metStr(){const h=S.totalShifts*8;const d=Math.floor(h/24);const hr=h%24;return`T+${d}d ${String(hr).padStart(2,'0')}:00`}
+function signalDelay(){const d=TELEM_DIST[S.totalShifts]||0;if(d<1000)return'<0.01s';const lt=d*1.609/299792;return lt.toFixed(1)+'s one-way'}
+function telemetryHTML(){
+  const dsn=dsnForShift();
+  const dist=TELEM_DIST[Math.min(S.totalShifts,29)]||0;
+  const spd=TELEM_SPEED[Math.min(S.totalShifts,29)]||0;
+  const wx=SPACE_WX[(S.totalShifts*7+S.day*3)%SPACE_WX.length];
+  const wxCls=wx.startsWith('Active')||wx.startsWith('Elevated')?'tv tw':wx.startsWith('Moderate')?'tv tw':'tv';
+  const distStr=dist>1000?(dist/1.609).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')+' mi':dist+' km';
+  const spdStr=spd>0?(spd*0.621371).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')+' mph':'—';
+  return`<div class="telem">
+    <div><span class="tl">MET:</span> <span class="tv">${metStr()}</span></div>
+    <div><span class="tl">Range:</span> <span class="tv">${distStr}</span></div>
+    <div><span class="tl">Velocity:</span> <span class="tv">${spdStr}</span></div>
+    <div><span class="tl">Signal:</span> <span class="tv">${signalDelay()} (S+Ka band)</span></div>
+    <div><span class="tl">DSN:</span> <span class="tv">${dsn.name}</span></div>
+    <div><span class="tl">Antenna:</span> <span class="tv">${dsn.dish}</span></div>
+    <div style="grid-column:1/-1"><span class="tl">Space Wx:</span> <span class="${wxCls}">${wx}</span></div>
+    <div style="grid-column:1/-1"><span class="tl">DSN Note:</span> <span class="tv" style="color:var(--green-dim)">${dsn.note}</span></div>
+  </div>`;
+}
+
+// ─── SCRIPTED EVENTS ───
 const SCRIPTED={};
-// Day 1 shift 0: Launch
 SCRIPTED['0-0']={type:'launch'};
-// Day 1 shift 1: Toilet malfunction (real event — hours after launch)
 SCRIPTED['0-1']={type:'toilet'};
-// Day 1 shift 2: Short sleep, perigee raise burn, more sleep
-SCRIPTED['0-2']={text:'Crew sleeps in two 4-hour blocks — interrupted by the perigee raise burn. Koch sleeps heads-down in the docking tunnel "like a bat." Wiseman dozes under the displays. Glover wishes for warmer sleeping bags.', effect:{morale:-5}, flavor:'sleep'};
-// Day 2 shift 0: Exercise + TLI prep
-SCRIPTED['1-0']={text:'Wake-up song: "Green Light" by John Legend. Wiseman is first to use the flywheel exercise device. Koch preps systems for the TLI burn. The crew has had only two short naps in 30 hours.', effect:{morale:10}, flavor:'good'};
-// Day 2 shift 1: TLI BURN
-SCRIPTED['1-1']={text:'TLI BURN! 5 min 55 sec. The European Service Module engine fires, accelerating Orion by 900 mph. Capcom Birch: "Integrity, looks like a good burn." Orion breaks free of Earth orbit. Hansen: "Humanity has once again shown what we are capable of."', effect:{morale:15,systems:5,fuel:-10}, flavor:'good'};
-// Day 2 shift 2: First meal together
-SCRIPTED['1-2']={text:'The crew gathers for their first real meal together in space — rehydrated food heated in the suitcase-style warmer. Wiseman describes watching the sunset behind Earth: "You could see the entire globe, pole to pole. Africa, Europe... the northern lights."', effect:{morale:10}, flavor:'good'};
-// Day 5 shift 1: Distance record
-SCRIPTED['4-1']={text:'DISTANCE RECORD BROKEN! Orion passes 248,655 miles — the Apollo 13 record set in 1970 falls after 56 years. New record: 252,021 statute miles from Earth. The crew is farther from home than any human in history.', effect:{morale:25}, flavor:'record'};
-// Day 6 shift 0: Lunar far side approach
-SCRIPTED['5-0']={text:'The Moon fills every window like a basketball at arm\'s length. Koch: "Knowing we\'re about to see the far side... I\'m really excited." Glover: "We\'re sending the first woman\'s eyes to the Moon — she may see colors we can\'t."', effect:{morale:15}, flavor:'lunar'};
-// Day 6 shift 1: Comms blackout
-SCRIPTED['5-1']={text:'COMMS BLACKOUT — 30 minutes of silence as Orion passes behind the Moon. The crew is utterly alone. Then the radio crackles back: "Integrity, Houston, welcome back." Closest approach: ~4,100 miles above the far side surface.', effect:{morale:10}, flavor:'lunar'};
-// Day 6 shift 2: Far side photography
-SCRIPTED['5-2']={text:'The crew photographs the far side under dramatic low-angle sunlight. Long shadows reveal ridges, crater rims, and slopes never seen by human eyes before. Every minute of far-side viewing is maximized.', effect:{morale:10}, flavor:'good'};
-// Day 7: Off-duty day
-SCRIPTED['6-0']={text:'OFF-DUTY DAY. The crew rests, takes personal time, and gazes at the receding Moon. No major burns or tests scheduled — the only such day in the mission.', effect:{morale:15}, flavor:'good'};
-// Day 10 shift 1: Re-entry
-SCRIPTED['9-1']={text:'SERVICE MODULE JETTISONED. Orion\'s heat shield faces forward. Skip re-entry begins — the capsule dips into atmosphere, skips back up, then plunges down for final descent. G-forces build. The AVCOAT heat shield glows.', effect:{morale:5,systems:-5}, flavor:'reentry'};
-// Day 10 shift 2: Splashdown
+SCRIPTED['0-2']={text:'Crew sleeps in two 4-hour blocks — interrupted by the perigee raise burn. Koch sleeps heads-down in the docking tunnel "like a bat." Wiseman dozes under the displays. Glover wishes for warmer sleeping bags.',effect:{morale:-5},flavor:'sleep'};
+SCRIPTED['1-0']={text:'Wake-up song: "Green Light" by John Legend. Wiseman is first to use the flywheel exercise device. Koch preps systems for the TLI burn. The crew has had only two short naps in 30 hours.',effect:{morale:10},flavor:'good'};
+SCRIPTED['1-1']={text:'TLI BURN! 5 min 55 sec. The European Service Module engine fires, accelerating Orion by 900 mph. Capcom Birch: "Integrity, looks like a good burn." Orion breaks free of Earth orbit. Hansen: "Humanity has once again shown what we are capable of."',effect:{morale:15,systems:5,fuel:-10},flavor:'good'};
+SCRIPTED['1-2']={text:'The crew gathers for their first real meal together — rehydrated food heated in the suitcase-style warmer. Wiseman: "You could see the entire globe, pole to pole. Africa, Europe... the northern lights."',effect:{morale:10},flavor:'good'};
+SCRIPTED['2-1']={text:'DSN HANDOFF: Orion\'s link passes from Goldstone to Canberra as Earth rotates. Two 34m dishes in Australia lock on — receiving 6 Mbps of S-band telemetry at 160,000 km. Signal: nominal.',effect:{systems:5},flavor:'good'};
+SCRIPTED['4-1']={text:'DISTANCE RECORD BROKEN! Orion passes 248,655 miles — the Apollo 13 record set in 1970 falls after 56 years. New record: 252,021 statute miles from Earth.',effect:{morale:25},flavor:'record'};
+SCRIPTED['5-0']={text:'The Moon fills every window like a basketball at arm\'s length. Koch: "Knowing we\'re about to see the far side... I\'m really excited." Glover: "We\'re sending the first woman\'s eyes to the Moon — she may see colors we can\'t."',effect:{morale:15},flavor:'lunar'};
+SCRIPTED['5-1']={text:'COMMS BLACKOUT — 30 minutes of silence as Orion passes behind the Moon. The crew is utterly alone — farther from any other human than anyone in history. Then the radio crackles back: "Integrity, Houston, welcome back."',effect:{morale:10},flavor:'lunar'};
+SCRIPTED['5-2']={text:'SOLAR ECLIPSE! The Sun disappears behind the Moon — photographed by a camera on the solar array wing. Glover: "We saw great sim, but when it actually happened, it just blew us all away." Far side wasn\'t as illuminated as hoped due to the April 1 launch — this eclipse is the consolation prize.',effect:{morale:20},flavor:'lunar'};
+SCRIPTED['5-2b_unused']=1;// marker
+SCRIPTED['6-2']={text:'Live downlink with President Trump from the White Flight Control Room. Crew waves from screens after their historic lunar flyby. A moment for the history books.',effect:{morale:12},flavor:'good'};
+SCRIPTED['9-0']={text:'Final return burn: 8 seconds, 4.2 ft/s delta-v. Wake-up songs: "Run to the Water" by Live and "Free" by Zac Brown Band — crew-selected. Wiseman and Glover pose with a photo of Earth taken just after the burn.',effect:{morale:10,fuel:-3},flavor:'good'};
+SCRIPTED['6-0']={text:'OFF-DUTY DAY. The crew rests, takes personal time, and gazes at the receding Moon. No major burns or tests scheduled — the only such day in the mission.',effect:{morale:15},flavor:'good'};
+SCRIPTED['7-1']={text:'Amateur radio operators across 14 countries report successfully tracking Orion\'s S-band signal. The Green Bank 100m telescope in West Virginia bounces radar off Orion\'s hull for independent tracking data.',effect:{morale:8,systems:5},flavor:'good'};
+SCRIPTED['9-1']={text:'SERVICE MODULE JETTISONED. Crew module thrusters fire 19s to separate. Steeper entry profile (not skip re-entry — changed after Artemis I heat shield erosion). Max velocity 24,661 mph, 35× speed of sound. 6-min plasma blackout.',effect:{morale:5,systems:-5},flavor:'reentry'};
 SCRIPTED['9-2']={type:'splashdown'};
 
+// ─── RANDOM EVENTS ───
 const RANDOM_GOOD=[
   {text:'Solar array wings performing 12% above predicted output. Power budget looks excellent.',effect:{power:10}},
   {text:'Orion switches from TDRS to Deep Space Network — first crewed spacecraft to need DSN in 50 years. Signal crystal clear.',effect:{systems:8}},
@@ -248,26 +249,36 @@ const RANDOM_GOOD=[
   {text:'Hansen calibrates far-side cameras. He\'s practiced this sequence hundreds of times in the sim. Confident and smooth.',effect:{morale:5,systems:5}},
   {text:'AVATAR organ-chip experiment returning nominal data. Miniature organ analogs responding well to deep-space radiation.',effect:{morale:5}},
   {text:'Crew performs emergency egress drill — everyone hits their marks faster than training. Hansen: "Smoother than the sim."',effect:{systems:8}},
-  {text:'Houston sends up sports scores. Hansen is pleased with the hockey results. Glover pretends not to care about basketball.',effect:{morale:8}},
   {text:'Glover completes a flawless manual piloting exercise. Orion handles precisely under direct crew control.',effect:{morale:5,systems:5}},
+  {text:'DSN Madrid locks on with the newest all-in-one antenna DSS-56. Data rate jumps to maximum. Houston downlinks full-res imagery.',effect:{systems:5,morale:5}},
+  {text:'Ka-band high-gain antenna test: HD video downlink at 20 Mbps from lunar distance. Houston receives crisp footage of the crew waving.',effect:{morale:8}},
+  {text:'Wake-up song: classic 90s rock. Mission Control famously cuts the audio mid-lyric. Wiseman quips: "We were all eagerly awaiting the chorus."',effect:{morale:10}},
+  {text:'Propellant status: ESM used less than half its fuel. Engineers celebrating the efficiency — Orion performed better than the models predicted.',effect:{fuel:5,morale:8}},
+  {text:'NASA RB-57F Canberra high-altitude aircraft on station for imaging support. A modified Cessna 208 circles the planned splashdown zone. 7 Navy H-60 Black Hawks staged. The recovery armada is massive.',effect:{morale:5}},
 ];
 const RANDOM_BAD=[
   {text:'Cabin temperature drops well below comfort. Glover: "I wish we\'d brought different sleeping bags." Houston works to warm things up.',effect:{morale:-12}},
-  {text:'Space Weather Center issues a solar proton event warning. Crew shelters behind the thickest shielding for 4 hours.',effect:{morale:-12,systems:-5}},
+  {text:'NOAA SWPC issues a solar proton event warning. Crew shelters behind the thickest shielding for 4 hours. AVATAR logs the radiation spike.',effect:{morale:-12,systems:-5}},
   {text:'Water recycler pump shows intermittent faults. Crew switches to backup filtration loop. Houston analyzes telemetry.',effect:{water:-12,morale:-5}},
-  {text:'45-minute communication dropout with Houston. Crew follows the autonomous ops checklist until signal returns.',effect:{morale:-15}},
+  {text:'DSN DROPOUT — Goldstone\'s 34m array loses lock during antenna handoff. 45 minutes without telemetry. Crew follows autonomous ops checklist.',effect:{morale:-15,systems:-5}},
   {text:'Micrometeorite impact sensor triggers on the European Service Module. Inspection: minor scoring, no breach.',effect:{systems:-12}},
   {text:'Nav computer forces a reboot. Eight minutes of dead reckoning before star trackers re-acquire. Tense silence on the loop.',effect:{systems:-15,morale:-8}},
   {text:'Thermal regulation glitch — cabin overheats to 30°C for 3 hours. Crew strips to T-shirts while Houston patches the code.',effect:{morale:-8,systems:-5}},
   {text:'One solar array wing shows degraded output. Power budget tightens. Houston recommends non-essential shutdowns.',effect:{power:-15,morale:-5}},
+  {text:'CME ALERT! A coronal mass ejection observed on the Sun — traveling at 1,200 km/s, could reach Earth-Moon system in 36 hours. Crew ordered to prepare radiation shelter.',effect:{morale:-15,systems:-5}},
+  {text:'S-band uplink degrades — command signal strength drops 8 dB. Houston switches to backup antenna feed. Voice is scratchy but readable.',effect:{systems:-8,morale:-5}},
+  {text:'DSN scheduling conflict — Artemis II bumps Juno and JWST from antenna time. JPL is not happy. Over 200 hours of science missions displaced.',effect:{morale:-5}},
 ];
 const RANDOM_NEUTRAL=[
   {text:'Routine systems check. Orion performing within all parameters. Wiseman signs off: "Integrity is go across the board."',effect:{}},
   {text:'Crew meal time. Rehydrated shrimp cocktail and tortillas. Everyone agrees the hot sauce makes everything better.',effect:{morale:3}},
   {text:'Exercise session on the flywheel device. Heart rates and O₂ consumption logged for the ARCHAR crew health study.',effect:{morale:3}},
-  {text:'Quiet coast phase. The crew journals observations and checks email from family, relayed through DSN.',effect:{morale:5}},
+  {text:'Quiet coast phase. The crew journals observations and checks email from family, relayed through DSN with 1.3-second delay.',effect:{morale:5}},
+  {text:'Houston sends up sports scores via S-band. Hansen is pleased with the hockey results. Glover pretends not to care about basketball.',effect:{morale:5}},
+  {text:'DSN Canberra reports clean signal lock at 2.1 Mbps. Routine telemetry pass — nothing exciting, which is exactly what everyone wants.',effect:{}},
 ];
 
+// ─── CHOICES ───
 const CHOICES=[
   {title:'Power Allocation Dilemma',desc:'Solar panel output dipped below forecast. Prioritize power for the next shift.',
     opts:[{t:'Prioritize life support',e:{o2:8,water:5,systems:-8}},{t:'Prioritize nav & GNC',e:{systems:8,morale:-5}},{t:'Balanced reduction',e:{power:-8}}]},
@@ -275,12 +286,18 @@ const CHOICES=[
     opts:[{t:'Immediate burn',e:{systems:8,fuel:-12}},{t:'Wait for better tracking',e:{morale:-8}},{t:'Manual star sighting first',e:{morale:3,systems:5}}]},
   {title:'Crew Rest vs. Repairs',desc:'An ECLSS sensor needs attention but the crew hasn\'t slept in 16 hours.',
     opts:[{t:'Repair now, sleep later',e:{systems:12,morale:-12}},{t:'Sleep first, fix next shift',e:{morale:12,systems:-5}},{t:'Split — two sleep, two fix',e:{morale:-3,systems:5}}]},
-  {title:'Radiation Shelter Alert',desc:'Elevated proton flux. Could be false alarm or genuine solar particle event.',
-    opts:[{t:'Full shelter protocol',e:{morale:-8,o2:-5}},{t:'Ignore — AVATAR looks fine',e:{morale:5}},{t:'Partial shielding, monitor',e:{morale:-3}}]},
-  {title:'Urine Dump Timing',desc:'Collection container full. GNC warns dumping overboard now could create thrust that confuses nav sensors.',
+  {title:'Radiation Shelter Alert',desc:'NOAA SWPC reports M1.1 solar flare. Proton flux rising. CME possible within 36 hours.',
+    opts:[{t:'Full shelter protocol now',e:{morale:-8,o2:-5}},{t:'Ignore — AVATAR data nominal',e:{morale:5}},{t:'Partial shielding, monitor SWPC',e:{morale:-3}}]},
+  {title:'Urine Dump Timing',desc:'Collection container full. GNC warns dumping overboard could create thrust that confuses nav sensors.',
     opts:[{t:'Dump now, recalibrate GNC',e:{water:8,systems:-8}},{t:'Wait for approved window',e:{morale:-5}},{t:'Store in backup container',e:{water:-5}}]},
   {title:'Flywheel Exercise Device Issue',desc:'The exercise flywheel is making an unusual grinding noise. Crew fitness data is critical for ARCHAR.',
     opts:[{t:'Full teardown & fix',e:{systems:10,morale:-5}},{t:'Reduce usage, log data',e:{morale:-3}},{t:'Ignore — noise is normal in 0g',e:{morale:3}}]},
+  {title:'DSN Antenna Congestion',desc:'JPL reports DSN is overloaded — Artemis II is consuming hundreds of antenna-hours. Voyager 2 and JWST need time. Reduce your downlink rate?',
+    opts:[{t:'Reduce to 1 Mbps (free up DSN)',e:{morale:5,systems:-5}},{t:'Hold full rate (mission priority)',e:{morale:-5,systems:5}},{t:'Negotiate split windows with JPL',e:{morale:3}}]},
+  {title:'CME Intercept Decision',desc:'DONKI data shows a coronal mass ejection en route — ETA 18 hours. It may miss. Sheltering costs O₂ and time.',
+    opts:[{t:'Full radiation shelter now',e:{morale:-10,o2:-8}},{t:'Wait for updated trajectory',e:{morale:-3}},{t:'Shelter crew, keep systems exposed',e:{morale:-5,systems:-8}}]},
+  {title:'Ka-band Antenna Gimbal Sticking',desc:'The high-gain Ka-band antenna gimbal is intermittent. S-band still works but at much lower data rate — no HD video.',
+    opts:[{t:'EVA prep to inspect (risky)',e:{systems:15,morale:-10,o2:-5}},{t:'Switch to S-band only',e:{systems:-5,morale:-5}},{t:'Cycle gimbal power & hope',e:{systems:5}}]},
 ];
 
 const TOILET_CHOICE={
@@ -309,20 +326,15 @@ function fmtFx(e){if(!e||!Object.keys(e).length)return'No significant impact.';
   return Object.entries(e).map(([k,v])=>{const n={o2:'O₂',water:'H₂O',food:'Food',power:'Power',fuel:'Fuel',systems:'Systems',morale:'Morale'}[k]||k;return n+': '+(v>0?'+':'')+v+'%'}).join(' | ')}
 function isCritical(){return Object.values(S.res).some(v=>v<=0)||S.morale<=0}
 
-function gaugeHTML(label, val) {
-  const ROWS = 10; // 10 cells = 10% each
-  const filled = Math.round(val / 10);
-  const glowCls = val > 60 ? 'g-glow-green' : val > 30 ? 'g-glow-amber' : 'g-glow-red';
-  let cells = '';
-  for (let i = ROWS; i >= 1; i--) {
-    if (i <= filled) {
-      const cellColor = i <= 3 ? 'g-red' : i <= 6 ? 'g-amber' : 'g-green';
-      cells += `<div class="g-cell on ${cellColor}"></div>`;
-    } else {
-      cells += `<div class="g-cell off"></div>`;
-    }
+function gaugeHTML(label,val){
+  const ROWS=10,filled=Math.round(val/10);
+  const gc=val>60?'g-glow-green':val>30?'g-glow-amber':'g-glow-red';
+  let cells='';
+  for(let i=ROWS;i>=1;i--){
+    if(i<=filled){cells+=`<div class="g-cell on ${i<=3?'g-red':i<=6?'g-amber':'g-green'}"></div>`}
+    else{cells+=`<div class="g-cell off"></div>`}
   }
-  return `<div class="gauge"><div class="g-label">${label}</div><div class="g-val ${glowCls}">${pv(val)}</div><div class="g-col">${cells}</div></div>`;
+  return`<div class="gauge"><div class="g-label">${label}</div><div class="g-val ${gc}">${pv(val)}</div><div class="g-col">${cells}</div></div>`;
 }
 
 function statusHTML(){
@@ -337,27 +349,20 @@ function statusHTML(){
     </div>
     <div style="font-size:15px;color:var(--green-dim);margin-bottom:6px;font-style:italic">${DAY_DESCS[d]}</div>
     <div class="gauges">
-      ${gaugeHTML('O₂', r.o2)}
-      ${gaugeHTML('H₂O', r.water)}
-      ${gaugeHTML('Food', r.food)}
-      ${gaugeHTML('Pwr', r.power)}
-      ${gaugeHTML('Fuel', r.fuel)}
-      ${gaugeHTML('Sys', r.systems)}
-      ${gaugeHTML('MRL', S.morale)}
+      ${gaugeHTML('O₂',r.o2)}${gaugeHTML('H₂O',r.water)}${gaugeHTML('Food',r.food)}${gaugeHTML('Pwr',r.power)}${gaugeHTML('Fuel',r.fuel)}${gaugeHTML('Sys',r.systems)}${gaugeHTML('MRL',S.morale)}
     </div>
-    <div style="font-size:15px;color:var(--green-dim)">Crew: ${S.crew.map(c=>c+' ✓').join('  ')}</div>`;
+    <div style="font-size:15px;color:var(--green-dim)">Crew: ${S.crew.map(c=>c+' ✓').join('  ')}</div>
+    ${telemetryHTML()}`;
 }
 
 function nextLabel(){
-  const nd=S.day, ns=(S.shift+1)%3;
   if(S.shift===2){
     if(S.day>=9)return'Begin Re-entry →';
     return`Day ${S.day+2} ${SHIFT_LABELS[0]} →`;
   }
-  return`${SHIFT_LABELS[ns]} Shift →`;
+  return`${SHIFT_LABELS[(S.shift+1)%3]} Shift →`;
 }
 
-// ─── TITLE ───
 function showTitle(){
   render(`
     <div class="ascii" style="text-align:center;color:var(--amber);text-shadow:0 0 8px rgba(255,176,0,0.3)">${SHIP}</div>
@@ -391,20 +396,18 @@ function showLaunch(){
       › Pilot Victor Glover (PLT) — first person of color beyond LEO<br>
       › MS Christina Koch (MS1) — first woman beyond LEO<br>
       › MS Jeremy Hansen, CSA (MS2) — first non-US citizen beyond LEO</div>
-    <div class="tb td" style="font-size:18px">Mission Control runs 3 capcom shifts per day (8 hrs each).<br>Crew sleeps together for ~8.5 hrs/day. 3 meals, 1 shared.</div>
+    <div class="tb td" style="font-size:18px">Mission Control: 3 capcom shifts/day (8 hrs each).<br>DSN: Goldstone · Canberra · Madrid — 120° apart for 24/7 coverage.<br>Note: Goldstone 70m DSS-14 is offline — mission flies without it.</div>
     <div class="br" style="justify-content:center">
       <button class="btn a" onclick="advance()">Begin Day 1 — Charlie Shift →</button>
     </div>`);
 }
 
-// ─── MAIN LOOP ───
 function advance(){
   S.shift++;
-  if(S.shift>2){S.shift=0;S.day++;}
+  if(S.shift>2){S.shift=0;S.day++}
   S.totalShifts++;
   if(S.totalShifts>S.maxShifts){endGame(true);return}
 
-  // Per-shift resource drain (smaller since 3x per day)
   const dr=S.diff==='hard'?2.2:S.diff==='easy'?1:1.5;
   S.res.o2=clamp(S.res.o2-dr);S.res.water=clamp(S.res.water-dr);
   S.res.food=clamp(S.res.food-(dr*0.8));S.res.fuel=clamp(S.res.fuel-0.7);
@@ -413,10 +416,9 @@ function advance(){
   const sc=SCRIPTED[key];
 
   if(sc){
-    if(sc.type==='launch'){advance();return}// skip, already shown
+    if(sc.type==='launch'){advance();return}
     if(sc.type==='toilet'){showToilet();return}
     if(sc.type==='splashdown'){endGame(true);return}
-    // Normal scripted event
     if(sc.effect)fx(sc.effect);
     S.log.push({day:S.day+1,shift:SHIFT_LABELS[S.shift],text:sc.text});
     if(isCritical()){showShift(sc.text,sc.flavor||'neutral',true,null);return}
@@ -424,7 +426,6 @@ function advance(){
     return;
   }
 
-  // Random event
   const roll=Math.random();
   const bc=S.diff==='hard'?0.4:S.diff==='easy'?0.2:0.3;
   const gc=bc+0.35;
@@ -436,9 +437,8 @@ function advance(){
   S.log.push({day:S.day+1,shift:SHIFT_LABELS[S.shift],text:ev.text});
   if(isCritical()){showShift(ev.text,roll<bc?'bad':'good',true,null);return}
 
-  // Choice event chance: ~20% on non-scripted shifts
   const ca=CHOICES.filter((_,i)=>!S.choicesUsed.includes(i));
-  if(ca.length>0&&Math.random()<0.2){
+  if(ca.length>0&&Math.random()<0.22){
     const ci=CHOICES.indexOf(ca[Math.floor(Math.random()*ca.length)]);
     S.choicesUsed.push(ci);
     showShift(ev.text,roll<bc?'bad':'good',false,ci);
@@ -448,8 +448,7 @@ function advance(){
 }
 
 function showToilet(){
-  S.toiletDone=true;
-  fx({morale:-8});
+  S.toiletDone=true;fx({morale:-8});
   S.log.push({day:1,shift:'BRAVO',text:'TOILET MALFUNCTION — fan controller jammed. Urine system down.'});
   const ch=TOILET_CHOICE;
   render(`
@@ -478,8 +477,7 @@ window.toiletFix=function(i){
 };
 
 function showShift(text,flavor,critical,choiceIdx){
-  const isLunar=flavor==='lunar';
-  const isRecord=flavor==='record';
+  const isLunar=flavor==='lunar',isRecord=flavor==='record';
   const art=isLunar?`<div class="ascii" style="text-align:center;color:var(--amber)">${MOON}</div>`:'';
   const cls=flavor==='bad'||flavor==='reentry'?'tb tr':(flavor==='good'||flavor==='lunar'||flavor==='record')?'tb ta':'tb';
 
@@ -546,8 +544,8 @@ function endGame(win){
   render(`
     <div class="ascii" style="text-align:center;color:${win?'var(--amber)':'var(--red)'}">${win?SPLASH:SHIP}</div>
     <div class="tb ${win?'ta':'tr'}" style="font-size:26px;text-align:center">${win?'═══ SPLASHDOWN — APRIL 10, 2026 ═══':'═══ MISSION FAILED ═══'}</div>
-    ${win?`<div class="tb" style="text-align:center">Orion "Integrity" splashes down in the Pacific<br>off San Diego. USS Portland on station.<br>All four crew members safe.</div>
-      <div class="tb td" style="text-align:center">First crewed moonshot in 53 years: complete.<br>Next: Artemis III — lunar surface — 2028.</div>`
+    ${win?`<div class="tb" style="text-align:center">8:07 PM EDT — "A perfect bullseye splashdown" for Integrity.<br>40–50 mi off San Diego. USS John P. Murtha (LPD-26) on station.<br>First Navy crew recovery since Apollo-Soyuz, 1975.<br>All four crew safe. Parachutes to 20 mph impact.</div>
+      <div class="tb td" style="text-align:center">Glover: "Watching the sun eclipse behind the Moon was the greatest gift of this mission."<br>First crewed moonshot in 53 years: complete.<br>Next: Artemis III — lunar surface — 2028.</div>`
     :`<div class="tb tr" style="text-align:center">Critical failure forced abort.<br>${S.morale<=0?'Crew coordination collapsed.':'Life support could not sustain the crew.'}</div>`}
     <div class="sbar" style="border-color:${win?'var(--amber)':'var(--red)'}">
       <div><span class="l">Score</span> <span class="v">${sc}/100</span></div>
@@ -564,12 +562,7 @@ function endGame(win){
 
 window.startGame=startGame;window.advance=advance;window.showLog=showLog;
 window.endGame=endGame;window.showTitle=showTitle;
-
 init();showTitle();
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw-artemis-trail.js');
-}
 </script>
 </body>
 </html>
