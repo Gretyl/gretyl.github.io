@@ -69,27 +69,27 @@ Display: Vertical bar gauges (10 cells = 10% each), color-banded red (0–30%), 
 | 15 | 4-2 | 5 | Apr 5 | CHARLIE | R+C | Random event. Choice possible. |
 | 16 | 5-0 | 6 | Apr 6 | ALPHA | S | **Lunar approach.** Moon fills windows. Koch excitement quote. Glover on first woman's eyes at the Moon. |
 | 17 | 5-1 | 6 | Apr 6 | BRAVO | S | **Comms blackout.** 30 min behind Moon. Crew utterly alone. Radio crackles back. Closest approach ~4,100 mi. |
-| 18 | 5-2 | 6 | Apr 6 | CHARLIE | S | Far side photography. Low-angle sunlight. Individual craters at 6,600 km. |
+| 18 | 5-2 | 6 | Apr 6 | CHARLIE | S | **Solar eclipse.** Sun disappears behind Moon, photographed by solar array wing camera. Glover highlight quote. Far side less illuminated than hoped due to April 1 launch. |
 | 19 | 6-0 | 7 | Apr 7 | ALPHA | S | **Off-duty day.** Rest, personal time, Moon gazing. Only such day in the mission. |
 | 20 | 6-1 | 7 | Apr 7 | BRAVO | R+C | Random event. Choice possible. |
-| 21 | 6-2 | 7 | Apr 7 | CHARLIE | R+C | Random event. Choice possible. |
+| 21 | 6-2 | 7 | Apr 7 | CHARLIE | S | **Presidential downlink.** Live call with President Trump from White Flight Control Room at JSC. |
 | 22 | 7-0 | 8 | Apr 8 | ALPHA | R+C | Random event. Choice possible. |
 | 23 | 7-1 | 8 | Apr 8 | BRAVO | S | **Green Bank + amateur radio.** 100m telescope bounces radar off Orion hull. 14-country amateur tracking network. |
 | 24 | 7-2 | 8 | Apr 8 | CHARLIE | R+C | Random event. Choice possible. |
 | 25 | 8-0 | 9 | Apr 9 | ALPHA | R+C | Random event. Choice possible. |
 | 26 | 8-1 | 9 | Apr 9 | BRAVO | R+C | Random event. Choice possible. |
 | 27 | 8-2 | 9 | Apr 9 | CHARLIE | R+C | Random event. Choice possible. |
-| 28 | 9-0 | 10 | Apr 10 | ALPHA | R+C | Random event. Choice possible. |
-| 29 | 9-1 | 10 | Apr 10 | BRAVO | S | **Re-entry.** Service module jettisoned. Skip re-entry. AVCOAT heat shield. G-forces. |
+| 28 | 9-0 | 10 | Apr 10 | ALPHA | S | **Final return burn.** 8 seconds, 4.2 ft/s delta-v. Wake-up songs: "Run to the Water" (Live), "Free" (Zac Brown Band). |
+| 29 | 9-1 | 10 | Apr 10 | BRAVO | S | **Re-entry.** Service module jettisoned. Steeper single-entry (not skip). 24,661 mph. 6-min plasma blackout. |
 | 30 | 9-2 | 10 | Apr 10 | CHARLIE | S/end | **Splashdown.** Triggers endGame(true). |
 
-**Totals:** 14 scripted slots (including skip + splashdown), 16 random slots (each with 22% choice chance).
+**Totals:** 17 scripted slots (including skip + splashdown), 13 random slots (each with 22% choice chance).
 
 ---
 
 ## 4. Random Event Pools
 
-### 4.1 Good Events (10)
+### 4.1 Good Events (12)
 
 | # | Summary | Effects | Source |
 |---|---------|---------|--------|
@@ -103,6 +103,8 @@ Display: Vertical bar gauges (10 cells = 10% each), color-banded red (0–30%), 
 | 8 | Madrid DSS-56 lock, max data rate | Systems +5, Morale +5 | DSN newest antenna |
 | 9 | Ka-band HD video test at 20 Mbps | Morale +8 | Real capability |
 | 10 | Wake-up song, audio cut mid-lyric | Morale +10 | Real event from mission |
+| 11 | Propellant efficiency — ESM used less than half its fuel | Fuel +5, Morale +8 | Post-mission engineering data |
+| 12 | Recovery armada on station (RB-57F, Cessna, 7 Black Hawks, Murtha) | Morale +5 | NASA recovery ops |
 
 ### 4.2 Bad Events (11)
 
@@ -234,7 +236,7 @@ Each string is prefixed with a severity word used for UI coloring:
 | `EARTH` | 9 | Launch screen | Stylized globe with continents |
 | `MOON` | 9 | Day 6 lunar flyby shifts | Stylized Moon with craters |
 | `TOILET` | 11 | Day 1 Bravo toilet event | Hygiene bay with warning indicator |
-| `SPLASH` | 38 | Successful splashdown | Parachute + Orion + ocean waves + USS Portland (LPD-27) + Pacific Ocean label |
+| `SPLASH` | 38 | Successful splashdown | Parachute + Orion + ocean waves + USS John P. Murtha (LPD-26) + Pacific Ocean label |
 
 ### 7.1 Art Color Rules
 
@@ -376,7 +378,7 @@ score = round((morale + average(all_resources)) / 2)
 |-------|--------|
 | 86–100 | FLAWLESS — Worthy of the Golden Age |
 | 66–85 | SUCCESSFUL — Integrity lived up to her name |
-| 41–65 | ROUGH — USS Portland fished you out |
+| 41–65 | ROUGH — USS John P. Murtha fished you out |
 | 1–40 | BARELY SURVIVED — Houston relieved |
 | 0 | MISSION LOST (failure only) |
 
@@ -400,8 +402,8 @@ score = round((morale + average(all_resources)) / 2)
 | Distance record: 252,021 mi (Apollo 13: 248,655 mi) | Scripted 4-1 | CNN, NASA |
 | Closest approach: ~4,100 mi / 6,600 km above far side | Scripted 5-1, 5-2 | NASA daily agenda |
 | 30-50 min comms blackout behind Moon | Scripted 5-1 | NASA daily agenda |
-| Splashdown: Pacific off San Diego, USS Portland (LPD-27) | Endgame | CBS, NASA |
-| Skip re-entry maneuver | Scripted 9-1 | NASA |
+| Splashdown: Pacific off San Diego, USS John P. Murtha (LPD-26) | Endgame | CBS, NASA |
+| Steeper single-entry profile (not skip re-entry) | Scripted 9-1 | NASA |
 | AVCOAT heat shield concerns from Artemis I | Scripted 9-1 | Wikipedia, NASA |
 | DSS-14 Goldstone 70m damaged Sep 2025 | Telemetry panel, launch screen | SpaceNews, Gizmodo |
 | DSN 120° spacing: Goldstone/Canberra/Madrid | Telemetry panel | NASA DSN |
