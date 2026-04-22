@@ -1,0 +1,3139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git &amp; GitHub — A Playable Rulebook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #efe6d2;
+  --paper-warm: #e9ddc1;
+  --paper-dark: #d8c9a4;
+  --paper-deep: #c9b68a;
+  --ink: #111827;
+  --ink-soft: #3a3f4d;
+  --accent: #b4390a;
+  --accent-soft: #e8a87c;
+  --green: #2f5d47;
+  --green-bright: #558f6f;
+  --red: #8b2e2e;
+  --gold: #a27513;
+  --rule: #b8a988;
+  --rule-faint: #d4c6a5;
+  --shadow: rgba(17, 24, 39, 0.14);
+  --shadow-strong: rgba(17, 24, 39, 0.28);
+  --terminal-bg: #141a23;
+  --terminal-green: #7ec07b;
+  --terminal-yellow: #e0b86f;
+  --terminal-blue: #7aa4d1;
+  --terminal-red: #d97a7a;
+  --terminal-fg: #dfd3b5;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'EB Garamond', Georgia, serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(180,57,10,0.04) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(47,93,71,0.04) 0%, transparent 40%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.07 0 0 0 0 0.05 0 0 0 0 0.03 0 0 0 0.08 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* ====== TYPOGRAPHY ====== */
+h1, h2, h3, h4 {
+  font-family: 'Instrument Serif', serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+
+.display {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+code, pre, .mono {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.88em;
+}
+
+/* ====== LAYOUT ====== */
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+section {
+  padding: 4rem 0;
+  position: relative;
+}
+
+.rule-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 3rem 0;
+  color: var(--rule);
+}
+.rule-divider::before, .rule-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+.rule-divider .ornament {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.8rem;
+  color: var(--accent);
+  opacity: 0.7;
+}
+
+/* ====== HERO ====== */
+.hero {
+  min-height: 96vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6rem 0 4rem;
+  position: relative;
+  border-bottom: 2px solid var(--ink);
+}
+
+.hero-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.hero-eyebrow::after {
+  content: '';
+  flex: 1;
+  max-width: 100px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  line-height: 0.95;
+  margin-bottom: 2rem;
+}
+.hero h1 em {
+  color: var(--accent);
+  font-style: italic;
+  font-family: 'Instrument Serif', serif;
+}
+.hero h1 .amp {
+  font-style: italic;
+  color: var(--accent);
+  font-size: 0.8em;
+  vertical-align: -0.05em;
+  margin: 0 0.1em;
+}
+
+.hero-sub {
+  font-size: 1.35rem;
+  max-width: 640px;
+  color: var(--ink-soft);
+  margin-bottom: 3rem;
+  font-style: italic;
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 2rem;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 1.5rem 0;
+  max-width: 820px;
+}
+.hero-stat .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.3rem;
+}
+.hero-stat .value {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2.1rem;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.hero-ornament {
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 240px;
+  height: 240px;
+  opacity: 0.85;
+  pointer-events: none;
+}
+@media (max-width: 900px) { .hero-ornament { display: none; } }
+
+/* ====== SECTION HEADERS ====== */
+.section-chapter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+  display: inline-block;
+}
+.section-chapter::before {
+  content: '§ ';
+  opacity: 0.6;
+}
+
+.section-title {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  margin-bottom: 1rem;
+  max-width: 780px;
+}
+.section-title em {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.section-lede {
+  font-size: 1.2rem;
+  color: var(--ink-soft);
+  max-width: 640px;
+  margin-bottom: 3rem;
+  font-style: italic;
+}
+
+/* ====== SKEPTICAL INTERLOCUTOR (CVS ENGINEER CALLOUT) ====== */
+.cvs-callout {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 1.5rem;
+  background: linear-gradient(135deg, var(--paper-warm) 0%, var(--paper-dark) 100%);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--accent);
+  padding: 1.5rem 1.8rem;
+  margin: 2.5rem 0;
+  position: relative;
+  box-shadow: 4px 4px 0 var(--shadow);
+  border-radius: 2px;
+}
+.cvs-callout::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px; right: -1px; bottom: -1px;
+  border: 1px dashed var(--rule-faint);
+  pointer-events: none;
+  margin: 4px;
+}
+.cvs-avatar {
+  width: 72px;
+  height: 72px;
+  align-self: center;
+}
+.cvs-quote {
+  align-self: center;
+}
+.cvs-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+.cvs-question {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.4rem;
+  font-style: italic;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.cvs-question::before { content: '"'; color: var(--accent); opacity: 0.5; margin-right: 0.1em; }
+.cvs-question::after { content: '"'; color: var(--accent); opacity: 0.5; margin-left: 0.1em; }
+
+.cvs-response {
+  margin: 0 0 2rem 0;
+  padding: 0 0 0 1.2rem;
+  border-left: 2px solid var(--green);
+  font-size: 1.08rem;
+  color: var(--ink);
+}
+.cvs-response .tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+/* ====== THE FIVE-PHASE LOOP ====== */
+.loop-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  margin: 3rem 0;
+}
+@media (max-width: 900px) { .loop-container { grid-template-columns: 1fr; } }
+
+.loop-svg-wrap {
+  position: relative;
+  aspect-ratio: 1;
+  max-width: 500px;
+  margin: 0 auto;
+  width: 100%;
+}
+.loop-svg { width: 100%; height: 100%; }
+
+.phase-node {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.phase-node circle.phase-ring {
+  fill: var(--paper);
+  stroke: var(--ink);
+  stroke-width: 2;
+  transition: all 0.3s ease;
+}
+.phase-node:hover circle.phase-ring,
+.phase-node.active circle.phase-ring {
+  fill: var(--accent);
+  stroke: var(--accent);
+  r: 44;
+}
+.phase-node text.phase-num {
+  font-family: 'Instrument Serif', serif;
+  font-size: 28px;
+  fill: var(--ink);
+  text-anchor: middle;
+  dominant-baseline: central;
+  transition: fill 0.3s ease;
+}
+.phase-node:hover text.phase-num,
+.phase-node.active text.phase-num {
+  fill: var(--paper);
+}
+.phase-node text.phase-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  fill: var(--ink-soft);
+  text-anchor: middle;
+  dominant-baseline: central;
+  transition: all 0.3s ease;
+}
+.phase-node:hover text.phase-name,
+.phase-node.active text.phase-name {
+  fill: var(--accent);
+  font-weight: 700;
+}
+
+.loop-arrow { stroke: var(--rule); stroke-width: 1.5; fill: none; }
+.loop-arrow-head { fill: var(--rule); }
+
+.loop-info {
+  min-height: 320px;
+}
+.phase-detail { display: none; }
+.phase-detail.active { display: block; animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.phase-detail h3 {
+  font-size: 2.6rem;
+  margin-bottom: 0.5rem;
+}
+.phase-detail h3 em { color: var(--accent); font-style: italic; }
+
+.phase-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.phase-detail p {
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+}
+
+.phase-cmd {
+  background: var(--terminal-bg);
+  color: var(--terminal-fg);
+  padding: 1rem 1.2rem;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  margin-top: 1rem;
+  border-left: 3px solid var(--terminal-green);
+  overflow-x: auto;
+}
+.phase-cmd .prompt { color: var(--terminal-green); user-select: none; }
+.phase-cmd .comment { color: var(--terminal-yellow); opacity: 0.8; }
+
+/* ====== MECHANIC CARDS ====== */
+.mechanics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  margin-top: 2rem;
+}
+
+.mechanic {
+  background: var(--paper-warm);
+  border: 1px solid var(--rule);
+  padding: 2.2rem;
+  position: relative;
+  box-shadow: 6px 6px 0 var(--shadow);
+  border-radius: 2px;
+}
+.mechanic-label {
+  position: absolute;
+  top: -12px;
+  left: 1.5rem;
+  background: var(--accent);
+  color: var(--paper);
+  padding: 0.25rem 0.9rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
+.mechanic h3 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.mechanic h3 em { color: var(--accent); font-style: italic; }
+.mechanic .lede {
+  font-style: italic;
+  color: var(--ink-soft);
+  margin-bottom: 1.5rem;
+  font-size: 1.08rem;
+}
+
+/* ====== LOCAL/REMOTE ANIMATION ====== */
+.local-remote-demo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin: 1.5rem 0;
+  align-items: stretch;
+}
+@media (max-width: 700px) { .local-remote-demo { grid-template-columns: 1fr; } }
+
+.repo-panel {
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  padding: 1.2rem;
+  min-height: 220px;
+  position: relative;
+  border-radius: 2px;
+}
+.repo-panel.remote { background: var(--paper-dark); }
+.repo-panel-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.3rem;
+}
+.repo-panel-name {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: var(--accent);
+}
+.repo-panel.remote .repo-panel-name { color: var(--green); }
+
+.commit-stack {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.5rem;
+  min-height: 120px;
+}
+.commit-node {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.5rem 0.8rem;
+  background: var(--paper-warm);
+  border: 1px solid var(--rule);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  opacity: 0;
+  animation: commitAppear 0.4s ease forwards;
+  border-radius: 2px;
+}
+.repo-panel.remote .commit-node { background: var(--paper); }
+@keyframes commitAppear {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.commit-sha { color: var(--accent); font-weight: 700; }
+.commit-msg { color: var(--ink); flex: 1; }
+.repo-panel.remote .commit-sha { color: var(--green); }
+
+.demo-controls {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+  flex-wrap: wrap;
+}
+.btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+.btn:hover { background: var(--accent); transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--shadow); }
+.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--shadow); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+.btn.ghost:hover { background: var(--ink); color: var(--paper); }
+.btn.push { background: var(--green); }
+.btn.push:hover { background: var(--green-bright); }
+
+/* ====== STAGING DEMO ====== */
+.staging-demo {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+@media (max-width: 800px) { .staging-demo { grid-template-columns: 1fr; } }
+
+.staging-col {
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  padding: 1rem;
+  min-height: 280px;
+  border-radius: 2px;
+}
+.staging-col-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+.hunk {
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.5rem;
+  background: var(--paper-warm);
+  border: 1px solid var(--rule);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 2px;
+}
+.hunk:hover { background: var(--paper-dark); transform: translateX(2px); }
+.hunk-file { color: var(--accent); font-weight: 700; display: block; margin-bottom: 0.3rem; font-size: 0.75rem; }
+.hunk-diff { color: var(--ink-soft); font-size: 0.75rem; line-height: 1.4; }
+.hunk-diff .add { color: var(--green); }
+.hunk-diff .del { color: var(--red); }
+
+.staging-col.staged .hunk { border-color: var(--green); background: rgba(47,93,71,0.08); }
+.staging-col.committed .hunk { border-color: var(--accent); background: rgba(180,57,10,0.06); }
+
+/* ====== CVS→GIT TRANSLATION TABLE ====== */
+.translate-table {
+  margin: 2rem 0;
+  border: 1.5px solid var(--ink);
+  background: var(--paper-warm);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.translate-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.translate-header > div { padding: 0.9rem 1rem; border-right: 1px solid var(--ink-soft); }
+.translate-header > div:last-child { border-right: none; }
+
+.translate-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  border-bottom: 1px solid var(--rule);
+  transition: background 0.2s ease;
+  cursor: pointer;
+}
+.translate-row:hover { background: var(--paper-dark); }
+.translate-row:last-child { border-bottom: none; }
+.translate-row > div { padding: 0.9rem 1rem; border-right: 1px solid var(--rule-faint); }
+.translate-row > div:last-child { border-right: none; }
+.translate-cvs, .translate-git { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
+.translate-cvs { color: var(--red); }
+.translate-git { color: var(--green); }
+.translate-note { font-size: 0.95rem; color: var(--ink-soft); font-style: italic; }
+
+@media (max-width: 700px) {
+  .translate-header { display: none; }
+  .translate-row { grid-template-columns: 1fr; }
+  .translate-row > div { border-right: none; border-bottom: 1px dotted var(--rule-faint); }
+  .translate-row > div:last-child { border-bottom: none; }
+  .translate-cvs::before { content: 'CVS — '; color: var(--ink-soft); font-family: 'JetBrains Mono',monospace; font-size: 0.7rem; letter-spacing: 0.15em; }
+  .translate-git::before { content: 'GIT — '; color: var(--ink-soft); font-family: 'JetBrains Mono',monospace; font-size: 0.7rem; letter-spacing: 0.15em; }
+}
+
+/* ====== DECISION TREES ====== */
+.decision-group { margin-top: 2rem; }
+.decision {
+  background: var(--paper-warm);
+  border: 1.5px solid var(--ink);
+  margin-bottom: 2rem;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 5px 5px 0 var(--shadow);
+  border-radius: 2px;
+}
+.decision-header {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.decision-number {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2.4rem;
+  color: var(--accent);
+  line-height: 1;
+  font-style: italic;
+}
+.decision-header h3 {
+  font-size: 1.9rem;
+  flex: 1;
+  min-width: 260px;
+}
+.decision-header h3 em { color: var(--accent); font-style: italic; }
+
+.decision-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+@media (max-width: 700px) { .decision-compare { grid-template-columns: 1fr; } }
+
+.option {
+  background: var(--paper);
+  border: 1.5px solid var(--rule);
+  padding: 1.2rem;
+  position: relative;
+  border-radius: 2px;
+}
+.option.recommended { border: 2px solid var(--green); }
+.option.risky { border: 2px solid var(--accent); }
+
+.option-badge {
+  position: absolute;
+  top: -10px;
+  right: 1rem;
+  background: var(--paper-warm);
+  padding: 0.2rem 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
+.option.recommended .option-badge { background: var(--green); color: var(--paper); }
+.option.risky .option-badge { background: var(--accent); color: var(--paper); }
+
+.option h4 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.5rem;
+  margin-bottom: 0.6rem;
+}
+.option p { font-size: 0.98rem; margin-bottom: 0.8rem; }
+
+.graph-svg {
+  width: 100%;
+  height: 120px;
+  margin: 0.8rem 0;
+  background: var(--paper);
+}
+
+.verdict {
+  font-style: italic;
+  color: var(--ink-soft);
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  background: var(--paper);
+  border-left: 3px solid var(--green);
+  border-radius: 2px;
+}
+.verdict strong { color: var(--accent); font-style: normal; }
+
+/* ====== VICTORY CONDITIONS ====== */
+.victory-checklist {
+  background: linear-gradient(180deg, var(--paper-warm) 0%, var(--paper-dark) 100%);
+  border: 2px solid var(--green);
+  padding: 2rem;
+  margin: 2rem 0;
+  border-radius: 2px;
+  box-shadow: 6px 6px 0 var(--shadow);
+  position: relative;
+}
+.victory-checklist::before {
+  content: '✓ VICTORY CONDITIONS';
+  position: absolute;
+  top: -12px;
+  left: 1.5rem;
+  background: var(--green);
+  color: var(--paper);
+  padding: 0.25rem 0.9rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  border-radius: 2px;
+}
+.victory-item {
+  display: flex;
+  gap: 1rem;
+  align-items: start;
+  padding: 0.8rem 0;
+  border-bottom: 1px dotted var(--rule);
+}
+.victory-item:last-child { border-bottom: none; }
+.victory-check {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+  font-family: 'Instrument Serif', serif;
+  color: var(--green);
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.victory-text { flex: 1; }
+.victory-text strong {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+/* ====== GAMBITS ====== */
+.gambits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.8rem;
+  margin-top: 2rem;
+}
+.gambit {
+  background: var(--paper-warm);
+  border: 1px solid var(--ink);
+  padding: 1.5rem;
+  position: relative;
+  box-shadow: 4px 4px 0 var(--shadow);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+.gambit:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--shadow);
+}
+.gambit-num {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 3.2rem;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  opacity: 0.85;
+}
+.gambit h4 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+.gambit code {
+  display: inline-block;
+  background: var(--terminal-bg);
+  color: var(--terminal-green);
+  padding: 0.2rem 0.55rem;
+  font-size: 0.82rem;
+  border-radius: 2px;
+  margin-bottom: 0.8rem;
+}
+.gambit p { font-size: 0.98rem; color: var(--ink); }
+
+/* ====== HAZARDS ====== */
+.hazards-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 0;
+}
+.hazard-tab {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.7rem 1.1rem;
+  background: var(--paper-warm);
+  border: 1.5px solid var(--ink);
+  border-bottom: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: -2px;
+  border-radius: 2px 2px 0 0;
+}
+.hazard-tab:hover { background: var(--paper-dark); }
+.hazard-tab.active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.hazard-panel { display: none; padding: 2rem 0 1rem; }
+.hazard-panel.active { display: block; animation: fadeIn 0.3s ease; }
+.hazard-panel h3 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.hazard-panel h3 em { color: var(--accent); font-style: italic; }
+
+.hazard-symptom {
+  background: rgba(139,46,46,0.08);
+  border-left: 3px solid var(--red);
+  padding: 0.8rem 1.1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  border-radius: 2px;
+}
+.hazard-symptom .tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red);
+  display: block;
+  margin-bottom: 0.3rem;
+  font-style: normal;
+}
+
+.terminal {
+  background: var(--terminal-bg);
+  color: var(--terminal-fg);
+  padding: 1.2rem 1.4rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  margin: 1rem 0;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+.terminal .prompt { color: var(--terminal-green); user-select: none; }
+.terminal .comment { color: var(--terminal-yellow); opacity: 0.85; }
+.terminal .red { color: var(--terminal-red); }
+.terminal .blue { color: var(--terminal-blue); }
+.terminal .dim { opacity: 0.6; }
+
+/* ====== EXPERIMENTS (Parameter Variation) ====== */
+.experiment {
+  background: var(--paper-warm);
+  border: 1.5px solid var(--ink);
+  margin-bottom: 2.5rem;
+  padding: 2rem 2.2rem;
+  position: relative;
+  box-shadow: 6px 6px 0 var(--shadow);
+  border-radius: 2px;
+}
+.experiment::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 40px; height: 40px;
+  background:
+    linear-gradient(135deg, transparent 50%, var(--accent) 50%);
+  opacity: 0.9;
+}
+
+.experiment-header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  margin-bottom: 1.8rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--rule);
+}
+.exp-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--paper);
+  border: 1px solid var(--accent);
+  padding: 0.4rem 0.7rem;
+  border-radius: 2px;
+  white-space: nowrap;
+  margin-top: 0.4rem;
+}
+.exp-question h3 {
+  font-size: 1.9rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.15;
+}
+.exp-question h3 em { color: var(--accent); font-style: italic; }
+.exp-question p {
+  font-size: 1rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.experiment-body {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.exp-control {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  padding: 1.3rem 1.5rem;
+  border-radius: 2px;
+}
+.exp-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  display: block;
+  margin-bottom: 0.6rem;
+}
+.exp-value {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 1.9rem;
+  color: var(--accent);
+  margin: 0.3rem 0 0.8rem;
+  line-height: 1;
+}
+
+/* Custom slider */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: var(--paper-dark);
+  border-radius: 3px;
+  outline: none;
+  border: 1px solid var(--rule);
+  margin: 0.8rem 0 0.5rem;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid var(--paper);
+  box-shadow: 0 2px 4px var(--shadow);
+  transition: transform 0.15s ease;
+}
+.slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+.slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid var(--paper);
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.exp-tick-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  opacity: 0.75;
+  margin-top: 0.2rem;
+}
+
+.exp-readout {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.readout-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  padding: 0.75rem 1.2rem;
+  border-bottom: 1px dotted var(--rule-faint);
+  align-items: baseline;
+}
+.readout-row:last-child { border-bottom: none; }
+.readout-label {
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+  color: var(--ink);
+}
+.readout-label code {
+  color: var(--accent);
+}
+.readout-value {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 1.25rem;
+  color: var(--accent);
+  text-align: right;
+  transition: color 0.3s ease;
+}
+.readout-value.warn { color: var(--gold); }
+.readout-value.bad { color: var(--red); }
+.readout-value.good { color: var(--green); }
+
+.exp-debrief {
+  padding: 1rem 1.3rem;
+  background: var(--paper);
+  border-left: 3px solid var(--green);
+  border-radius: 2px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+.exp-debrief.warn { border-left-color: var(--gold); }
+.exp-debrief.bad { border-left-color: var(--red); }
+.exp-debrief strong { color: var(--accent); font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 500; font-size: 1.1em; }
+.exp-debrief code { background: var(--paper-warm); padding: 1px 5px; border-radius: 2px; font-size: 0.85em; }
+
+/* ====== EXPERIMENT DEEP-LINK PILLS ====== */
+.exp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--paper);
+  color: var(--accent);
+  padding: 0.2rem 0.7rem 0.22rem;
+  border: 1px solid var(--accent);
+  border-radius: 99px;
+  text-decoration: none;
+  transition: all 0.18s ease;
+  vertical-align: 0.15em;
+  margin: 0 0.1rem;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.exp-link:hover {
+  background: var(--accent);
+  color: var(--paper);
+  transform: translateY(-1px);
+}
+.exp-link::before {
+  content: '↗';
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+@keyframes expPulse {
+  0%   { box-shadow: 6px 6px 0 var(--shadow), 0 0 0 0 rgba(180,57,10,0.55); }
+  50%  { box-shadow: 6px 6px 0 var(--shadow), 0 0 0 14px rgba(180,57,10,0); }
+  100% { box-shadow: 6px 6px 0 var(--shadow), 0 0 0 0 rgba(180,57,10,0); }
+}
+.experiment.pulse {
+  animation: expPulse 1.4s ease;
+}
+
+/* ====== MASTERY QUESTIONS ====== */
+.mastery-scoreboard {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 2rem;
+  align-items: center;
+  padding: 1.2rem 1.8rem;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 2px;
+  margin-bottom: 2.5rem;
+  box-shadow: 5px 5px 0 var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+@media (max-width: 700px) {
+  .mastery-scoreboard { grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; }
+  .score-bar { grid-column: span 2; }
+}
+.score-stat { display: flex; flex-direction: column; gap: 0.2rem; }
+.score-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.score-value {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 1.9rem;
+  line-height: 1;
+}
+.score-value span { color: var(--accent-soft); }
+.score-bar {
+  height: 10px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+.score-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent-soft), var(--green-bright));
+  transition: width 0.4s ease;
+}
+
+.mq {
+  background: var(--paper-warm);
+  border: 1.5px solid var(--ink);
+  padding: 1.8rem 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 5px 5px 0 var(--shadow);
+  border-radius: 2px;
+  position: relative;
+}
+.mq-header {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  margin-bottom: 1.2rem;
+}
+.mq-num {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 2.6rem;
+  color: var(--accent);
+  line-height: 0.9;
+  flex-shrink: 0;
+}
+.mq-scenario {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.15rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.mq-scenario code {
+  background: var(--paper);
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-size: 0.86em;
+}
+
+.mq-options {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.mq-option {
+  display: flex;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--paper);
+  border: 1.5px solid var(--rule);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 2px;
+  font-size: 1rem;
+  align-items: baseline;
+  text-align: left;
+  font-family: 'EB Garamond', serif;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.mq-option:hover:not(.disabled) {
+  background: var(--paper-dark);
+  border-color: var(--ink);
+  transform: translateX(2px);
+}
+.mq-option.disabled { cursor: default; }
+.mq-option .letter {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--accent);
+  flex-shrink: 0;
+  min-width: 1.2em;
+}
+.mq-option code {
+  background: var(--paper-warm);
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-size: 0.85em;
+}
+.mq-option.correct {
+  background: rgba(47,93,71,0.15);
+  border-color: var(--green);
+  border-width: 2px;
+}
+.mq-option.correct .letter { color: var(--green); }
+.mq-option.incorrect {
+  background: rgba(139,46,46,0.1);
+  border-color: var(--red);
+  opacity: 0.8;
+}
+.mq-option.incorrect .letter { color: var(--red); text-decoration: line-through; }
+.mq-option.revealed-correct {
+  background: rgba(47,93,71,0.08);
+  border-color: var(--green);
+  border-style: dashed;
+}
+.mq-option.revealed-correct .letter { color: var(--green); }
+
+.mq-feedback {
+  margin-top: 1.3rem;
+  padding: 1rem 1.2rem;
+  background: var(--paper);
+  border-left: 3px solid var(--green);
+  border-radius: 2px;
+  font-size: 0.98rem;
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+.mq-feedback.show { display: block; }
+.mq-feedback.incorrect { border-left-color: var(--red); }
+.mq-feedback .tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--green);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.mq-feedback.incorrect .tag { color: var(--red); }
+.mq-feedback code { background: var(--paper-warm); padding: 1px 5px; border-radius: 2px; font-size: 0.87em; }
+
+.mastery-final {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(180deg, var(--paper-warm), var(--paper-dark));
+  border: 2px solid var(--green);
+  border-radius: 2px;
+  margin-top: 2rem;
+  box-shadow: 6px 6px 0 var(--shadow);
+}
+.mastery-final-ornament {
+  font-family: 'Instrument Serif', serif;
+  font-size: 3rem;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+.mastery-final h3 {
+  font-size: 2.2rem;
+  margin-bottom: 0.8rem;
+}
+.mastery-final p {
+  font-size: 1.15rem;
+  max-width: 540px;
+  margin: 0 auto 1.5rem;
+  color: var(--ink);
+  font-style: italic;
+}
+
+/* ====== HAZARDS — removed; section replaced by mastery ====== */
+
+/* ====== FIELD GUIDE / REFERENCE CARDS ====== */
+.references-grid {
+  display: grid;
+  gap: 2.2rem;
+  margin-top: 2.5rem;
+}
+
+.reference {
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  box-shadow: 6px 6px 0 var(--shadow);
+  border-radius: 2px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+.reference:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 var(--shadow);
+}
+
+.ref-main {
+  padding: 2.2rem 2.1rem 1.9rem;
+}
+
+.ref-meta {
+  position: absolute;
+  top: -13px;
+  left: 1.6rem;
+  background: var(--accent);
+  color: var(--paper);
+  padding: 0.38rem 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  box-shadow: 2px 2px 0 var(--shadow);
+  white-space: nowrap;
+  z-index: 2;
+}
+.ref-meta .num {
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-right: 0.4em;
+  opacity: 0.85;
+}
+.ref-meta .dot {
+  opacity: 0.5;
+  margin-right: 0.4em;
+}
+
+.ref-tag {
+  position: absolute;
+  top: -12px;
+  right: 1.6rem;
+  background: var(--paper-warm);
+  color: var(--ink);
+  padding: 0.3rem 0.85rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  white-space: nowrap;
+  z-index: 2;
+}
+.ref-tag::before {
+  content: '§ ';
+  color: var(--accent);
+  opacity: 0.7;
+}
+
+@media (max-width: 560px) {
+  .ref-tag {
+    position: static;
+    display: inline-block;
+    margin: 1.2rem 0 -0.4rem 1.6rem;
+  }
+}
+
+.reference h3 {
+  font-size: 2rem;
+  line-height: 1.1;
+  margin-bottom: 0.25rem;
+}
+.reference h3 em { color: var(--accent); font-style: italic; }
+
+.ref-byline {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+}
+.ref-byline::before { content: '— '; opacity: 0.6; }
+
+.ref-desc {
+  font-size: 1.02rem;
+  line-height: 1.55;
+  margin-bottom: 1.4rem;
+  color: var(--ink);
+}
+
+.ref-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+  background: var(--paper-warm);
+  border: 1.5px solid var(--ink);
+  padding: 0.65rem 1.1rem;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  text-transform: lowercase;
+}
+.ref-link:hover {
+  background: var(--ink);
+  color: var(--paper);
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+.ref-link .arrow {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 1.25em;
+  line-height: 1;
+}
+
+.ref-note {
+  padding: 1.6rem 2.1rem 1.9rem;
+  background: linear-gradient(135deg, var(--paper-warm) 0%, var(--paper-dark) 100%);
+  border-top: 1px dashed var(--rule);
+  position: relative;
+}
+.ref-note::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px; right: -1px; bottom: -1px;
+  border: 1px dashed var(--rule-faint);
+  margin: 4px;
+  pointer-events: none;
+}
+
+.ref-note-header {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.ref-note-avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.ref-note-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.ref-note h4 {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 1.55rem;
+  margin-bottom: 0.7rem;
+  color: var(--ink);
+  line-height: 1.15;
+}
+
+.ref-note p {
+  font-size: 1rem;
+  line-height: 1.55;
+  margin-bottom: 0.8rem;
+}
+.ref-note p:last-child { margin-bottom: 0; }
+.ref-note em { color: var(--accent); font-style: italic; font-family: 'Instrument Serif', serif; font-weight: 500; }
+
+.ref-note ul.action-list {
+  list-style: none;
+  padding: 0.4rem 0 0.6rem;
+  margin: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+.ref-note ul.action-list li {
+  padding: 0.35rem 0 0.35rem 1.6rem;
+  position: relative;
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+.ref-note ul.action-list li::before {
+  content: '›';
+  position: absolute;
+  left: 0.4rem;
+  top: 0.2rem;
+  color: var(--accent);
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.4em;
+  font-style: italic;
+  line-height: 1;
+}
+.ref-note ul.action-list li strong {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent);
+  font-size: 0.86em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-right: 0.3em;
+}
+
+.ref-note code {
+  background: var(--paper);
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-size: 0.85em;
+  color: var(--ink);
+}
+
+footer {
+  border-top: 2px solid var(--ink);
+  padding: 3rem 0;
+  margin-top: 4rem;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  letter-spacing: 0.1em;
+}
+footer .ornament {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2rem;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+/* ====== UTILS ====== */
+.emph { color: var(--accent); font-style: italic; font-family: 'Instrument Serif', serif; font-weight: 500; }
+.strike { text-decoration: line-through; opacity: 0.5; }
+.bigquote { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 1.7rem; line-height: 1.35; max-width: 680px; margin: 2rem 0; color: var(--ink); }
+.bigquote::before { content: '"'; color: var(--accent); font-size: 3rem; vertical-align: -0.3em; margin-right: 0.1em; opacity: 0.6; }
+.bigquote::after { content: '"'; color: var(--accent); font-size: 3rem; vertical-align: -0.5em; margin-left: 0.1em; opacity: 0.6; }
+</style>
+</head>
+<body>
+
+<!-- ========== HERO ========== -->
+<section class="hero">
+  <div class="page">
+    <div class="hero-eyebrow">A Co-op Field Manual</div>
+    <h1>Git <span class="amp">&</span> GitHub<br>for the <em>CVS-Era</em><br>engineer</h1>
+    <p class="hero-sub">Version control is a team sport. This manual walks you through the rhythm a team shares, the experiments that reveal why the rules exist, and the questions that test whether it stuck.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="label">Shared Phases</div><div class="value">5</div></div>
+      <div class="hero-stat"><div class="label">Experiments</div><div class="value">3</div></div>
+      <div class="hero-stat"><div class="label">Decisions</div><div class="value">3</div></div>
+      <div class="hero-stat"><div class="label">Mastery Qs</div><div class="value">8</div></div>
+    </div>
+
+    <svg class="hero-ornament" viewBox="0 0 240 240">
+      <!-- Decorative git graph ornament -->
+      <g stroke="currentColor" fill="none" stroke-width="1.5" opacity="0.7">
+        <path d="M 40 40 L 40 200" stroke="#b4390a"/>
+        <path d="M 120 60 L 120 180" stroke="#2f5d47"/>
+        <path d="M 200 80 L 200 160" stroke="#a27513"/>
+        <path d="M 40 80 Q 80 80 120 80" stroke="#2f5d47"/>
+        <path d="M 120 100 Q 160 100 200 100" stroke="#a27513"/>
+        <path d="M 120 160 Q 80 160 40 160" stroke="#2f5d47" stroke-dasharray="3 3"/>
+      </g>
+      <g>
+        <circle cx="40" cy="40" r="8" fill="#b4390a"/>
+        <circle cx="40" cy="80" r="8" fill="#b4390a"/>
+        <circle cx="40" cy="120" r="8" fill="#b4390a"/>
+        <circle cx="40" cy="160" r="8" fill="#b4390a"/>
+        <circle cx="40" cy="200" r="8" fill="#b4390a"/>
+        <circle cx="120" cy="60" r="7" fill="#2f5d47"/>
+        <circle cx="120" cy="100" r="7" fill="#2f5d47"/>
+        <circle cx="120" cy="140" r="7" fill="#2f5d47"/>
+        <circle cx="120" cy="180" r="7" fill="#2f5d47"/>
+        <circle cx="200" cy="80" r="6" fill="#a27513"/>
+        <circle cx="200" cy="120" r="6" fill="#a27513"/>
+        <circle cx="200" cy="160" r="6" fill="#a27513"/>
+      </g>
+      <text x="40" y="225" font-family="JetBrains Mono, monospace" font-size="10" fill="#b4390a" text-anchor="middle" letter-spacing="2">main</text>
+      <text x="120" y="205" font-family="JetBrains Mono, monospace" font-size="10" fill="#2f5d47" text-anchor="middle" letter-spacing="2">feat</text>
+      <text x="200" y="185" font-family="JetBrains Mono, monospace" font-size="10" fill="#a27513" text-anchor="middle" letter-spacing="2">hotfix</text>
+    </svg>
+
+    <div class="rule-divider" style="margin-top: 3rem;">
+      <span class="ornament">❦</span>
+    </div>
+
+    <!-- FIRST INTERLOCUTOR APPEARANCE -->
+    <div class="cvs-callout">
+      <svg class="cvs-avatar" viewBox="0 0 80 80">
+        <!-- Pixel-art CVS engineer at a CRT -->
+        <rect x="10" y="18" width="60" height="40" rx="3" fill="#3a3f4d"/>
+        <rect x="14" y="22" width="52" height="30" fill="#7ec07b" opacity="0.8"/>
+        <rect x="18" y="26" width="8" height="2" fill="#141a23"/>
+        <rect x="18" y="30" width="16" height="2" fill="#141a23"/>
+        <rect x="18" y="34" width="12" height="2" fill="#141a23"/>
+        <rect x="18" y="38" width="20" height="2" fill="#141a23"/>
+        <rect x="18" y="42" width="6" height="2" fill="#141a23"/>
+        <rect x="18" y="46" width="14" height="2" fill="#141a23"/>
+        <rect x="30" y="58" width="20" height="4" fill="#3a3f4d"/>
+        <rect x="24" y="62" width="32" height="4" fill="#3a3f4d"/>
+        <circle cx="40" cy="10" r="5" fill="#b4390a"/>
+        <rect x="35" y="12" width="10" height="8" fill="#b4390a"/>
+      </svg>
+      <div class="cvs-quote">
+        <div class="cvs-label">The CVS Engineer asks</div>
+        <div class="cvs-question">I already know version control. Why do you keep calling this a team sport?</div>
+      </div>
+    </div>
+
+    <div class="cvs-response">
+      <span class="tag">The Guide Replies</span>
+      CVS had a server that owned history and working copies that borrowed from it. One repository, many readers — a <em>broadcast</em>. Git gives every clone the full repository, and GitHub adds a layer of structured collaboration on top — pull requests, reviews, required checks. What changes isn't the version-control theory, it's the <span class="emph">social protocol</span>. The rules below describe a rhythm a whole team moves to: the timing, the hand-offs, the recovery plays.
+    </div>
+  </div>
+</section>
+
+<!-- ========== THE FIVE-PHASE LOOP (MNEMONIC) ========== -->
+<section id="loop">
+  <div class="page">
+    <div class="section-chapter">Part I — The Shared Rhythm</div>
+    <h2 class="section-title">Every teammate moves through <em>the same five phases.</em></h2>
+    <p class="section-lede">Not in lockstep — at any moment different people are in different phases. But the phases are shared vocabulary. Click any node to inspect it.</p>
+
+    <div class="loop-container">
+      <div class="loop-svg-wrap">
+        <svg class="loop-svg" viewBox="0 0 500 500">
+          <!-- Center label -->
+          <text x="250" y="240" font-family="Instrument Serif, serif" font-style="italic" font-size="32" fill="#b4390a" text-anchor="middle">the</text>
+          <text x="250" y="275" font-family="Instrument Serif, serif" font-style="italic" font-size="44" fill="#111827" text-anchor="middle">Feature</text>
+          <text x="250" y="315" font-family="Instrument Serif, serif" font-style="italic" font-size="44" fill="#111827" text-anchor="middle">Loop</text>
+
+          <!-- Arrows between phase nodes (pentagon) -->
+          <!-- Node positions calculated for pentagon at radius 180 -->
+          <!-- 1: (250, 70) -- 2: (421, 194) -- 3: (356, 395) -- 4: (144, 395) -- 5: (79, 194) -->
+
+          <path class="loop-arrow" d="M 290 80 Q 370 120 400 175" marker-end="url(#ah)"/>
+          <path class="loop-arrow" d="M 415 235 Q 405 330 380 380" marker-end="url(#ah)"/>
+          <path class="loop-arrow" d="M 320 408 Q 250 425 180 408" marker-end="url(#ah)"/>
+          <path class="loop-arrow" d="M 120 380 Q 95 330 85 235" marker-end="url(#ah)"/>
+          <path class="loop-arrow" d="M 100 175 Q 130 120 210 80" marker-end="url(#ah)"/>
+
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" class="loop-arrow-head"/>
+            </marker>
+          </defs>
+
+          <!-- Phase nodes -->
+          <g class="phase-node" data-phase="1">
+            <circle class="phase-ring" cx="250" cy="70" r="40"/>
+            <text class="phase-num" x="250" y="70">1</text>
+            <text class="phase-name" x="250" y="24">SYNC</text>
+          </g>
+          <g class="phase-node" data-phase="2">
+            <circle class="phase-ring" cx="421" cy="194" r="40"/>
+            <text class="phase-num" x="421" y="194">2</text>
+            <text class="phase-name" x="460" y="160">BRANCH</text>
+          </g>
+          <g class="phase-node" data-phase="3">
+            <circle class="phase-ring" cx="356" cy="395" r="40"/>
+            <text class="phase-num" x="356" y="395">3</text>
+            <text class="phase-name" x="395" y="440">BUILD</text>
+          </g>
+          <g class="phase-node" data-phase="4">
+            <circle class="phase-ring" cx="144" cy="395" r="40"/>
+            <text class="phase-num" x="144" y="395">4</text>
+            <text class="phase-name" x="100" y="440">PROPOSE</text>
+          </g>
+          <g class="phase-node" data-phase="5">
+            <circle class="phase-ring" cx="79" cy="194" r="40"/>
+            <text class="phase-num" x="79" y="194">5</text>
+            <text class="phase-name" x="40" y="160">MERGE</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="loop-info">
+        <div class="phase-detail active" data-detail="1">
+          <div class="phase-meta">Phase 01 — Sync</div>
+          <h3>Start from an <em>updated</em> main.</h3>
+          <p>Pull the latest state of the shared branch before you do anything else. Branching from stale <code>main</code> is the single largest source of avoidable merge pain. <a class="exp-link" href="#exp-sync-cadence">Exp. 02 · See the cost</a></p>
+          <p>This is the closest analog to <code>cvs update</code>, but you're also refreshing <em>every</em> branch and tag — not just the files you have checked out.</p>
+          <div class="phase-cmd">
+<span class="prompt">$</span> git switch main
+<span class="prompt">$</span> git pull        <span class="comment"># or: git fetch, if you prefer review</span></div>
+        </div>
+
+        <div class="phase-detail" data-detail="2">
+          <div class="phase-meta">Phase 02 — Branch</div>
+          <h3>Make a <em>new branch</em> for every task.</h3>
+          <p>In CVS, branching hurt — you avoided it. In Git, a branch is a 41-byte file pointing at a commit. Creating and deleting them is effectively free, so the right default is <em>always branch</em>.</p>
+          <p>Even one-line fixes go on a branch. This keeps <code>main</code> always deployable and makes code review possible. <a class="exp-link" href="#exp-team-size">Exp. 01 · Run it</a></p>
+          <div class="phase-cmd">
+<span class="prompt">$</span> git switch -c feature/add-rate-limit
+<span class="comment"># you are now on a new branch; nothing has been published yet</span></div>
+        </div>
+
+        <div class="phase-detail" data-detail="3">
+          <div class="phase-meta">Phase 03 — Build</div>
+          <h3>Commit <em>small &amp; often</em>. Push early.</h3>
+          <p>Write code. Stage hunks intentionally with <code>git add -p</code>. Commit in coherent units with messages that explain the <em>why</em>. Push your branch to GitHub — it costs nothing, gives you an off-machine backup, and triggers CI.</p>
+          <p>This is the phase where the local/remote split really pays off: you can commit a dozen times, reshape them, and only publish a clean sequence.</p>
+          <div class="phase-cmd">
+<span class="prompt">$</span> git add -p
+<span class="prompt">$</span> git commit -m "Rate-limit login attempts to 5/min"
+<span class="prompt">$</span> git push -u origin feature/add-rate-limit</div>
+        </div>
+
+        <div class="phase-detail" data-detail="4">
+          <div class="phase-meta">Phase 04 — Propose</div>
+          <h3>Open a <em>pull request</em>, not a deliverable.</h3>
+          <p>A PR is a <span class="emph">proposed merge</span> plus a review thread. It's meant to be iterated on. Expect follow-up commits in response to review comments — that's how the mechanic works, not a sign of failure.</p>
+          <p>The PR is "done" when reviewers approve and CI is green — not when you open it.</p>
+          <div class="phase-cmd">
+<span class="prompt">$</span> gh pr create --fill
+<span class="comment"># opens a PR; CI starts running; reviewers get pinged</span></div>
+        </div>
+
+        <div class="phase-detail" data-detail="5">
+          <div class="phase-meta">Phase 05 — Merge</div>
+          <h3>Merge, delete, <em>return to Phase 01.</em></h3>
+          <p>Once approved and green, the PR merges into <code>main</code>. Your branch has served its purpose. Delete it on GitHub (usually automatic) and locally. Then pull main again — which is Phase 01 of the next turn.</p>
+          <p>The loop is closed. Short-lived branches are the whole point.</p>
+          <div class="phase-cmd">
+<span class="prompt">$</span> gh pr merge --squash --delete-branch
+<span class="prompt">$</span> git switch main &amp;&amp; git pull
+<span class="comment"># back to the top of the loop</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bigquote" style="margin-top:3rem;">
+      The phases matter most when they're out of sync. While you're in <em>Build</em>, a teammate is opening a <em>Propose</em>, another is coming out of <em>Merge</em>. Shared phases are how everyone stays legible to each other.
+    </div>
+  </div>
+</section>
+
+<div class="page"><div class="rule-divider"><span class="ornament">❦</span></div></div>
+
+<!-- ========== MECHANICS (GUIDED PLAY-THROUGH) ========== -->
+<section id="mechanics">
+  <div class="page">
+    <div class="section-chapter">Part II — Distinctive Mechanics</div>
+    <h2 class="section-title">Three moves that look familiar <em>but behave differently in a team.</em></h2>
+    <p class="section-lede">Each of these is a mechanic you think you understand from CVS. Each has a twist that becomes visible once more than one person is involved.</p>
+
+    <div class="mechanics-grid">
+
+      <!-- MECHANIC 1: COMMIT vs PUSH -->
+      <div class="mechanic">
+        <div class="mechanic-label">Mechanic 01</div>
+        <h3>The <em>commit / push</em> split.</h3>
+        <p class="lede">In CVS, <code>commit</code> meant "publish." In Git it does not. These are two separate decisions — and the gap between them is where most of Git's power lives.</p>
+
+        <p>Below, your local repository is on the left and the shared remote (GitHub) is on the right. Watch what happens when you commit versus when you push.</p>
+
+        <div class="local-remote-demo">
+          <div class="repo-panel">
+            <div class="repo-panel-title">Your Machine</div>
+            <div class="repo-panel-name">local · feature/login</div>
+            <div class="commit-stack" id="local-commits">
+              <div class="commit-node"><span class="commit-sha">a1b2c3</span><span class="commit-msg">Initial commit</span></div>
+            </div>
+          </div>
+          <div class="repo-panel remote">
+            <div class="repo-panel-title">GitHub</div>
+            <div class="repo-panel-name">origin · feature/login</div>
+            <div class="commit-stack" id="remote-commits">
+              <div class="commit-node"><span class="commit-sha">a1b2c3</span><span class="commit-msg">Initial commit</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo-controls">
+          <button class="btn" id="btn-commit">git commit</button>
+          <button class="btn push" id="btn-push">git push</button>
+          <button class="btn ghost" id="btn-reset-demo">reset</button>
+        </div>
+
+        <p style="margin-top:1.5rem;"><em>Notice:</em> committing fills up your local history without touching the remote. The remote only changes on <code>push</code>. That gap — between committing and publishing — is what lets you experiment freely, rewrite sloppy commits into a clean sequence, and work offline for days.</p>
+
+        <div class="cvs-callout">
+          <svg class="cvs-avatar" viewBox="0 0 80 80">
+            <rect x="10" y="18" width="60" height="40" rx="3" fill="#3a3f4d"/>
+            <rect x="14" y="22" width="52" height="30" fill="#7ec07b" opacity="0.7"/>
+            <rect x="18" y="26" width="10" height="2" fill="#141a23"/>
+            <rect x="18" y="30" width="18" height="2" fill="#141a23"/>
+            <rect x="18" y="34" width="6" height="2" fill="#141a23"/>
+            <rect x="30" y="58" width="20" height="4" fill="#3a3f4d"/>
+            <rect x="24" y="62" width="32" height="4" fill="#3a3f4d"/>
+            <circle cx="40" cy="10" r="5" fill="#b4390a"/>
+            <rect x="35" y="12" width="10" height="8" fill="#b4390a"/>
+          </svg>
+          <div class="cvs-quote">
+            <div class="cvs-label">The CVS Engineer asks</div>
+            <div class="cvs-question">Why would I want commits no one else can see? That just sounds like work that isn't saved.</div>
+          </div>
+        </div>
+        <div class="cvs-response">
+          <span class="tag">Reply</span>
+          They are saved — on your machine, with full history. The question reveals a CVS assumption: that "saved" and "shared" are the same event. Git decouples them. Keep that gap open for as long as you need: commit every 15 minutes, reshape the history into three clean commits, and then publish. The remote only ever sees your best work.
+        </div>
+      </div>
+
+      <!-- MECHANIC 2: STAGING -->
+      <div class="mechanic">
+        <div class="mechanic-label">Mechanic 02</div>
+        <h3>The <em>staging area</em> (a.k.a. the index).</h3>
+        <p class="lede">CVS had two places a file could live: on disk and in the repo. Git has three: <em>working tree → index → repository</em>. That middle layer is doing real work.</p>
+
+        <p>Imagine you've been coding for an hour. You have changes across four files, but they split into two <em>conceptual</em> changes: a bug fix and a refactor. In CVS, either you commit them together (muddled history) or you manually revert half your work, commit, and redo it. In Git, you stage hunks one at a time. Click a hunk below to move it through the phases.</p>
+
+        <div class="staging-demo">
+          <div class="staging-col" id="staging-tree">
+            <div class="staging-col-label">Working Tree</div>
+            <div id="staging-tree-hunks"></div>
+          </div>
+          <div class="staging-col staged" id="staging-index">
+            <div class="staging-col-label">Staged (Index)</div>
+            <div id="staging-index-hunks"></div>
+          </div>
+          <div class="staging-col committed" id="staging-repo">
+            <div class="staging-col-label">Committed</div>
+            <div id="staging-repo-hunks"></div>
+          </div>
+        </div>
+        <div class="demo-controls">
+          <button class="btn" id="btn-commit-staged">commit staged</button>
+          <button class="btn ghost" id="btn-staging-reset">reset demo</button>
+        </div>
+
+        <p style="margin-top:1.5rem;"><em>The skill to internalize:</em> a commit should represent <span class="emph">one coherent change</span>, even when your working tree contains several in progress. <code>git add -p</code> is how you achieve this. Good commits make <code>git log</code> readable and <code>git bisect</code> useful; sloppy commits make both useless. <a class="exp-link" href="#exp-commit-granularity">Exp. 03 · Try sizes</a></p>
+      </div>
+
+      <!-- MECHANIC 3: BRANCHES -->
+      <div class="mechanic">
+        <div class="mechanic-label">Mechanic 03</div>
+        <h3>Branches are <em>free.</em></h3>
+        <p class="lede">In CVS a branch was a server-side event with real overhead. In Git a branch is a text file containing a commit hash. The cost structure is so different that the strategy is different.</p>
+
+        <svg viewBox="0 0 640 240" style="width:100%;max-width:640px;display:block;margin:1rem auto;background:var(--paper);border:1px solid var(--rule);border-radius:2px;">
+          <!-- main line -->
+          <line x1="60" y1="120" x2="600" y2="120" stroke="#b4390a" stroke-width="2"/>
+          <text x="30" y="125" font-family="JetBrains Mono, monospace" font-size="11" fill="#b4390a">main</text>
+
+          <!-- main commits -->
+          <circle cx="80" cy="120" r="7" fill="#b4390a"/>
+          <circle cx="160" cy="120" r="7" fill="#b4390a"/>
+          <circle cx="280" cy="120" r="7" fill="#b4390a"/>
+          <circle cx="400" cy="120" r="7" fill="#b4390a"/>
+          <circle cx="520" cy="120" r="7" fill="#b4390a"/>
+
+          <!-- feature branch off at 160 -->
+          <path d="M 160 120 Q 180 100 200 80 L 260 80 Q 280 80 280 100 L 280 120" fill="none" stroke="#2f5d47" stroke-width="2"/>
+          <circle cx="220" cy="80" r="6" fill="#2f5d47"/>
+          <circle cx="260" cy="80" r="6" fill="#2f5d47"/>
+          <text x="230" y="60" font-family="JetBrains Mono, monospace" font-size="10" fill="#2f5d47" text-anchor="middle">feature/login</text>
+
+          <!-- hotfix branch off at 280 -->
+          <path d="M 280 120 Q 300 140 320 160 L 360 160 Q 380 160 400 140 L 400 120" fill="none" stroke="#a27513" stroke-width="2"/>
+          <circle cx="340" cy="160" r="6" fill="#a27513"/>
+          <text x="340" y="185" font-family="JetBrains Mono, monospace" font-size="10" fill="#a27513" text-anchor="middle">hotfix/crash</text>
+
+          <!-- experiment branch off at 400 -->
+          <path d="M 400 120 Q 420 100 440 80 L 500 80" fill="none" stroke="#6b5b95" stroke-width="2" stroke-dasharray="4 3"/>
+          <circle cx="460" cy="80" r="6" fill="#6b5b95"/>
+          <circle cx="500" cy="80" r="6" fill="#6b5b95"/>
+          <text x="480" y="60" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b5b95" text-anchor="middle">experiment/perf</text>
+          <text x="515" y="95" font-family="JetBrains Mono, monospace" font-size="9" fill="#6b5b95" opacity="0.7">(abandoned — fine!)</text>
+
+          <!-- labels -->
+          <text x="80" y="145" font-family="JetBrains Mono, monospace" font-size="9" fill="#666" text-anchor="middle">c1</text>
+          <text x="160" y="145" font-family="JetBrains Mono, monospace" font-size="9" fill="#666" text-anchor="middle">c2</text>
+          <text x="280" y="145" font-family="JetBrains Mono, monospace" font-size="9" fill="#666" text-anchor="middle">c3</text>
+          <text x="400" y="145" font-family="JetBrains Mono, monospace" font-size="9" fill="#666" text-anchor="middle">c4</text>
+          <text x="520" y="145" font-family="JetBrains Mono, monospace" font-size="9" fill="#666" text-anchor="middle">c5</text>
+
+          <text x="320" y="218" font-family="Instrument Serif, serif" font-style="italic" font-size="14" fill="#3a3f4d" text-anchor="middle">Three branches, one timeline. The dotted branch was explored and abandoned — that's a feature, not a failure.</text>
+        </svg>
+
+        <p>The consequence: <span class="emph">branch speculatively</span>. Try an idea on a branch. If it works, open a PR. If it doesn't, delete the branch — the commits will be garbage-collected and you've lost nothing. Long-lived branches are the anti-pattern; <em>short-lived</em> branches are the whole point.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="page"><div class="rule-divider"><span class="ornament">❦</span></div></div>
+
+<!-- ========== TRANSLATION TABLE ========== -->
+<section id="translate">
+  <div class="page">
+    <div class="section-chapter">Part III — Vocabulary</div>
+    <h2 class="section-title">CVS verbs don't map <em>one-to-one.</em></h2>
+    <p class="section-lede">The words collide in confusing ways. Here's the translation table. Click a row for a note on the trap.</p>
+
+    <div class="translate-table" id="translate-table">
+      <div class="translate-header">
+        <div>CVS habit</div>
+        <div>Git equivalent</div>
+        <div>Watch out for</div>
+      </div>
+      <div class="translate-row">
+        <div class="translate-cvs">cvs checkout &lt;module&gt;</div>
+        <div class="translate-git">git clone &lt;url&gt;</div>
+        <div class="translate-note">You get the full history, not just HEAD.</div>
+      </div>
+      <div class="translate-row">
+        <div class="translate-cvs">cvs update</div>
+        <div class="translate-git">git pull  <span style="opacity:0.6;">(= fetch + merge/rebase)</span></div>
+        <div class="translate-note">Consider <code>git fetch</code> alone — it's safer because nothing merges into your branch yet.</div>
+      </div>
+      <div class="translate-row">
+        <div class="translate-cvs">cvs commit</div>
+        <div class="translate-git">git commit <span style="opacity:0.6;">+ git push</span></div>
+        <div class="translate-note">Two distinct steps. This is the whole trick.</div>
+      </div>
+      <div class="translate-row">
+        <div class="translate-cvs">cvs tag</div>
+        <div class="translate-git">git tag <span style="opacity:0.6;">(annotated)</span></div>
+        <div class="translate-note">Immutable refs. Annotated tags carry a message, author, and signature.</div>
+      </div>
+      <div class="translate-row">
+        <div class="translate-cvs">(branching — painful)</div>
+        <div class="translate-git">git branch / git switch -c</div>
+        <div class="translate-note">Now trivial. Change the strategy: branch freely, delete freely.</div>
+      </div>
+      <div class="translate-row">
+        <div class="translate-cvs">(per-file rev numbers)</div>
+        <div class="translate-git">whole-repo SHA commits</div>
+        <div class="translate-note">No file-level version numbers exist. Every commit is a snapshot of the whole tree.</div>
+      </div>
+      <div class="translate-row">
+        <div class="translate-cvs">(server conflict at commit)</div>
+        <div class="translate-git">local conflict at merge/rebase</div>
+        <div class="translate-note">Resolution happens on your machine, before you push. The server never sees your mess.</div>
+      </div>
+      <div class="translate-row">
+        <div class="translate-cvs">"the repository"</div>
+        <div class="translate-git">"a remote" (you can have many)</div>
+        <div class="translate-note"><code>origin</code> is just the default name. You can add upstream, fork, deploy — as many as you want.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="page"><div class="rule-divider"><span class="ornament">❦</span></div></div>
+
+<!-- ========== EXPERIMENTS (PARAMETER VARIATION) ========== -->
+<section id="experiments">
+  <div class="page">
+    <div class="section-chapter">Part IV — Run the Experiment</div>
+    <h2 class="section-title">Change <em>one thing at a time</em> and watch the team's life change with it.</h2>
+    <p class="section-lede">The rules aren't arbitrary. Each one is a response to a parameter getting bigger or smaller. Move the sliders below and see which rule suddenly becomes non-negotiable.</p>
+
+    <!-- EXPERIMENT 1: TEAM SIZE -->
+    <div class="experiment" id="exp-team-size">
+      <div class="experiment-header">
+        <div class="exp-number">Exp. 01</div>
+        <div class="exp-question">
+          <h3>What happens as the team <em>grows?</em></h3>
+          <p>Hold everything else constant. Change only the number of engineers pushing to the same repo.</p>
+        </div>
+      </div>
+      <div class="experiment-body">
+        <div class="exp-control">
+          <label class="exp-label">Team size</label>
+          <input type="range" min="0" max="3" value="0" step="1" class="slider" id="team-size-slider">
+          <div class="exp-value" id="team-size-value">1 engineer</div>
+          <div class="exp-tick-row">
+            <span>1</span><span>3</span><span>10</span><span>30</span>
+          </div>
+        </div>
+        <div class="exp-vis">
+          <svg viewBox="0 0 400 140" id="team-vis" style="width:100%;background:var(--paper);border:1px solid var(--rule);border-radius:2px;">
+            <line x1="20" y1="100" x2="380" y2="100" stroke="#b4390a" stroke-width="2"/>
+            <text x="20" y="125" font-family="JetBrains Mono,monospace" font-size="10" fill="#b4390a">main</text>
+            <g id="team-dots"></g>
+            <g id="team-conflicts"></g>
+          </svg>
+        </div>
+        <div class="exp-readout">
+          <div class="readout-row"><span class="readout-label">Collisions per day</span><span class="readout-value" id="exp1-collisions">~0</span></div>
+          <div class="readout-row"><span class="readout-label">Main stays deployable</span><span class="readout-value" id="exp1-deployable">Yes</span></div>
+          <div class="readout-row"><span class="readout-label">Workflow you'll need</span><span class="readout-value" id="exp1-workflow">Push direct to main</span></div>
+        </div>
+        <div class="exp-debrief" id="exp1-debrief">
+          <p>At <strong>1 engineer</strong>, there are no collisions because nobody else is writing. You can push directly to <code>main</code> without hurting anyone. This is why solo projects often feel like Git doesn't need rules.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPERIMENT 2: SYNC CADENCE -->
+    <div class="experiment" id="exp-sync-cadence">
+      <div class="experiment-header">
+        <div class="exp-number">Exp. 02</div>
+        <div class="exp-question">
+          <h3>How often should the team <em>sync from main?</em></h3>
+          <p>Hold team size and commit rate constant. Change only the interval between <code>git pull</code> operations on your feature branch.</p>
+        </div>
+      </div>
+      <div class="experiment-body">
+        <div class="exp-control">
+          <label class="exp-label">Hours between syncs</label>
+          <input type="range" min="0" max="3" value="0" step="1" class="slider" id="sync-slider">
+          <div class="exp-value" id="sync-value">1 hour</div>
+          <div class="exp-tick-row">
+            <span>1h</span><span>1 workday</span><span>1 week</span><span>2 weeks</span>
+          </div>
+        </div>
+        <div class="exp-vis">
+          <svg viewBox="0 0 400 140" id="sync-vis" style="width:100%;background:var(--paper);border:1px solid var(--rule);border-radius:2px;">
+            <line x1="20" y1="50" x2="380" y2="50" stroke="#b4390a" stroke-width="2"/>
+            <text x="20" y="42" font-family="JetBrains Mono,monospace" font-size="10" fill="#b4390a">main</text>
+            <line x1="20" y1="100" x2="80" y2="100" stroke="#2f5d47" stroke-width="2" id="sync-branch"/>
+            <text x="20" y="118" font-family="JetBrains Mono,monospace" font-size="10" fill="#2f5d47">your branch</text>
+            <g id="sync-main-commits"></g>
+            <g id="sync-branch-commit"></g>
+            <g id="sync-drift-indicator"></g>
+          </svg>
+        </div>
+        <div class="exp-readout">
+          <div class="readout-row"><span class="readout-label">Commits drifted from main</span><span class="readout-value" id="exp2-drift">~2</span></div>
+          <div class="readout-row"><span class="readout-label">Expected conflict hunks</span><span class="readout-value" id="exp2-conflicts">~0</span></div>
+          <div class="readout-row"><span class="readout-label">Merge pain</span><span class="readout-value" id="exp2-pain">Trivial</span></div>
+        </div>
+        <div class="exp-debrief" id="exp2-debrief">
+          <p>At <strong>hourly sync</strong>, your branch tracks <code>main</code> almost perfectly. Rebases are no-ops; conflicts are rare and local. This is the cost structure Phase 01 of the loop assumes.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPERIMENT 3: COMMIT GRANULARITY -->
+    <div class="experiment" id="exp-commit-granularity">
+      <div class="experiment-header">
+        <div class="exp-number">Exp. 03</div>
+        <div class="exp-question">
+          <h3>How big should a <em>single commit</em> be?</h3>
+          <p>Hold total work constant — you're going to write 2,000 lines either way. Change only how many lines land per commit.</p>
+        </div>
+      </div>
+      <div class="experiment-body">
+        <div class="exp-control">
+          <label class="exp-label">Lines of change per commit</label>
+          <input type="range" min="0" max="3" value="1" step="1" class="slider" id="commit-slider">
+          <div class="exp-value" id="commit-value">~50 lines</div>
+          <div class="exp-tick-row">
+            <span>~10</span><span>~50</span><span>~250</span><span>~1000</span>
+          </div>
+        </div>
+        <div class="exp-vis">
+          <svg viewBox="0 0 400 140" id="commit-vis" style="width:100%;background:var(--paper);border:1px solid var(--rule);border-radius:2px;">
+            <line x1="20" y1="70" x2="380" y2="70" stroke="#b4390a" stroke-width="2"/>
+            <g id="commit-dots"></g>
+            <text x="200" y="125" font-family="Instrument Serif,serif" font-style="italic" font-size="13" fill="#3a3f4d" text-anchor="middle" id="commit-vis-label">each dot is one commit</text>
+          </svg>
+        </div>
+        <div class="exp-readout">
+          <div class="readout-row"><span class="readout-label"><code>git bisect</code> steps to find a bug</span><span class="readout-value" id="exp3-bisect">~8</span></div>
+          <div class="readout-row"><span class="readout-label">Review effort per commit</span><span class="readout-value" id="exp3-review">Low</span></div>
+          <div class="readout-row"><span class="readout-label">Revert surface area</span><span class="readout-value" id="exp3-revert">Small</span></div>
+        </div>
+        <div class="exp-debrief" id="exp3-debrief">
+          <p>At <strong>~50 lines per commit</strong>, each commit is one coherent change that a reviewer can hold in their head. <code>git bisect</code> converges quickly. Reverting one bad commit doesn't threaten neighboring work. This is the sweet spot <code>git add -p</code> is built for.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bigquote" style="margin-top:3rem;">
+      Every Git rule is a knob turned to a value that was painful at a smaller one. The experiments show the pain that made the knob necessary.
+    </div>
+  </div>
+</section>
+
+<div class="page"><div class="rule-divider"><span class="ornament">❦</span></div></div>
+
+<!-- ========== DECISIONS ========== -->
+<section id="decisions">
+  <div class="page">
+    <div class="section-chapter">Part V — Decision Points</div>
+    <h2 class="section-title">Three forks where the <em>right move is non-obvious.</em></h2>
+    <p class="section-lede">Experienced Git users recognize these by the trouble that follows picking the wrong one. Here's what each choice costs and when it's right.</p>
+
+    <div class="decision-group">
+
+      <!-- DECISION 1: MERGE vs REBASE -->
+      <div class="decision">
+        <div class="decision-header">
+          <div class="decision-number">I.</div>
+          <h3>When you sync your branch — <em>merge</em> or <em>rebase?</em></h3>
+        </div>
+        <p>You're halfway through a feature branch. <code>main</code> has advanced. You need the new commits. You have two ways to pull them in, and they produce visibly different histories.</p>
+
+        <div class="decision-compare">
+          <div class="option risky">
+            <div class="option-badge">Default</div>
+            <h4>git pull <span style="opacity:0.7;">(merge)</span></h4>
+            <svg class="graph-svg" viewBox="0 0 300 120">
+              <line x1="20" y1="40" x2="280" y2="40" stroke="#b4390a" stroke-width="2"/>
+              <line x1="60" y1="80" x2="220" y2="80" stroke="#2f5d47" stroke-width="2"/>
+              <path d="M 60 80 L 60 40" stroke="#2f5d47" stroke-width="2" fill="none"/>
+              <path d="M 220 80 Q 250 80 260 40" stroke="#2f5d47" stroke-width="2" fill="none"/>
+              <circle cx="60" cy="40" r="5" fill="#b4390a"/>
+              <circle cx="140" cy="40" r="5" fill="#b4390a"/>
+              <circle cx="220" cy="40" r="5" fill="#b4390a"/>
+              <circle cx="260" cy="40" r="7" fill="#a27513" stroke="#111" stroke-width="1.5"/>
+              <circle cx="100" cy="80" r="5" fill="#2f5d47"/>
+              <circle cx="160" cy="80" r="5" fill="#2f5d47"/>
+              <circle cx="220" cy="80" r="5" fill="#2f5d47"/>
+              <text x="260" y="25" font-family="JetBrains Mono,monospace" font-size="9" fill="#a27513" text-anchor="middle">merge commit</text>
+              <text x="10" y="44" font-family="JetBrains Mono,monospace" font-size="9" fill="#b4390a">main</text>
+              <text x="10" y="84" font-family="JetBrains Mono,monospace" font-size="9" fill="#2f5d47">feat</text>
+            </svg>
+            <p>Creates a new "merge commit" joining your branch to <code>main</code>. Preserves exact history but clutters <code>git log</code> with tiny merge nodes every time you sync.</p>
+          </div>
+          <div class="option recommended">
+            <div class="option-badge">Recommended</div>
+            <h4>git pull --rebase</h4>
+            <svg class="graph-svg" viewBox="0 0 300 120">
+              <line x1="20" y1="40" x2="280" y2="40" stroke="#b4390a" stroke-width="2"/>
+              <path d="M 220 40 L 280 40" stroke="#2f5d47" stroke-width="2"/>
+              <circle cx="60" cy="40" r="5" fill="#b4390a"/>
+              <circle cx="140" cy="40" r="5" fill="#b4390a"/>
+              <circle cx="220" cy="40" r="5" fill="#b4390a"/>
+              <circle cx="250" cy="40" r="5" fill="#2f5d47"/>
+              <circle cx="280" cy="40" r="5" fill="#2f5d47"/>
+              <text x="250" y="25" font-family="JetBrains Mono,monospace" font-size="9" fill="#2f5d47" text-anchor="middle">replayed</text>
+              <text x="280" y="25" font-family="JetBrains Mono,monospace" font-size="9" fill="#2f5d47" text-anchor="middle">on top</text>
+              <text x="10" y="44" font-family="JetBrains Mono,monospace" font-size="9" fill="#b4390a">main + feat</text>
+            </svg>
+            <p>Replays your branch's commits on top of the new <code>main</code>. History stays linear. No noise. Your commits get new SHAs but preserve their content.</p>
+          </div>
+        </div>
+
+        <div class="verdict">
+          <strong>Rule of thumb:</strong> set <code>pull.rebase = true</code> globally. You get a linear feature history that reads like a story, not a tangle. The exception: <em>long-lived branches shared with others</em> (release branches, integration branches). For those, rebasing rewrites history that other people have already pulled — use explicit <code>git merge</code> instead. <a class="exp-link" href="#exp-sync-cadence">Exp. 02 · Divergence cost</a>
+        </div>
+
+        <div class="cvs-callout">
+          <svg class="cvs-avatar" viewBox="0 0 80 80">
+            <rect x="10" y="18" width="60" height="40" rx="3" fill="#3a3f4d"/>
+            <rect x="14" y="22" width="52" height="30" fill="#d97a7a" opacity="0.7"/>
+            <rect x="18" y="26" width="12" height="2" fill="#141a23"/>
+            <rect x="18" y="30" width="22" height="2" fill="#141a23"/>
+            <rect x="18" y="34" width="10" height="2" fill="#141a23"/>
+            <rect x="30" y="58" width="20" height="4" fill="#3a3f4d"/>
+            <rect x="24" y="62" width="32" height="4" fill="#3a3f4d"/>
+            <circle cx="40" cy="10" r="5" fill="#b4390a"/>
+            <rect x="35" y="12" width="10" height="8" fill="#b4390a"/>
+          </svg>
+          <div class="cvs-quote">
+            <div class="cvs-label">The CVS Engineer objects</div>
+            <div class="cvs-question">Rebase <em>rewrites</em> history. That sounds like exactly the kind of thing you told me to never do.</div>
+          </div>
+        </div>
+        <div class="cvs-response">
+          <span class="tag">Reply</span>
+          Good instinct — but scope matters. Rewriting history <em>that only exists on your machine</em> is private bookkeeping. Rewriting history <em>others have pulled</em> breaks their clones. Rebasing your own unpushed feature branch is the first kind; force-pushing a shared branch is the second. Keep rebase on private branches and you'll never break anything.
+        </div>
+      </div>
+
+      <!-- DECISION 2: FORK vs BRANCH -->
+      <div class="decision">
+        <div class="decision-header">
+          <div class="decision-number">II.</div>
+          <h3>Contributing to a repo — <em>fork</em> or <em>branch?</em></h3>
+        </div>
+        <p>You want to propose a change. Do you fork the repo first, or just make a branch?</p>
+
+        <div class="decision-compare">
+          <div class="option">
+            <div class="option-badge">Use when</div>
+            <h4>Fork</h4>
+            <p>A fork is a server-side clone under your own GitHub account. You push to your fork and open PRs against the upstream repo.</p>
+            <p style="color:var(--ink-soft);font-style:italic;">Use for: open-source contributions, any repo where you don't have write access, or when you want permanent working space under your own name.</p>
+          </div>
+          <div class="option">
+            <div class="option-badge">Use when</div>
+            <h4>Branch</h4>
+            <p>A branch lives inside the shared repo. You push the branch to <code>origin</code> and open a PR within the same repo.</p>
+            <p style="color:var(--ink-soft);font-style:italic;">Use for: repos where you're a collaborator. No fork to keep synced, no remote juggling. Simpler in every way.</p>
+          </div>
+        </div>
+        <div class="verdict">
+          <strong>Rule of thumb:</strong> if you have write access, branch. If you don't, fork. Never fork inside your own team's repo "to be safe" — you'll just end up with two copies to keep synced.
+        </div>
+      </div>
+
+      <!-- DECISION 3: RESET vs REVERT -->
+      <div class="decision">
+        <div class="decision-header">
+          <div class="decision-number">III.</div>
+          <h3>Undoing a bad commit — <em>reset</em> or <em>revert?</em></h3>
+        </div>
+        <p>You committed something you shouldn't have. The fix depends entirely on whether you've already pushed.</p>
+
+        <div class="decision-compare">
+          <div class="option risky">
+            <div class="option-badge">Local only</div>
+            <h4>git reset</h4>
+            <svg class="graph-svg" viewBox="0 0 300 80">
+              <line x1="20" y1="40" x2="280" y2="40" stroke="#b4390a" stroke-width="2" stroke-dasharray="0"/>
+              <circle cx="60" cy="40" r="6" fill="#b4390a"/>
+              <circle cx="130" cy="40" r="6" fill="#b4390a"/>
+              <circle cx="200" cy="40" r="6" fill="#d97a7a" opacity="0.5"/>
+              <circle cx="260" cy="40" r="6" fill="#d97a7a" opacity="0.5"/>
+              <text x="230" y="25" font-family="JetBrains Mono,monospace" font-size="9" fill="#d97a7a" text-anchor="middle">gone</text>
+              <text x="130" y="65" font-family="JetBrains Mono,monospace" font-size="9" fill="#b4390a" text-anchor="middle">HEAD is here now</text>
+            </svg>
+            <p>Moves the branch pointer backwards. The unwanted commits are discarded (or, with <code>--soft</code>, kept as uncommitted changes).</p>
+            <p style="color:var(--red);font-weight:500;">Never reset commits you've already pushed to a shared branch.</p>
+          </div>
+          <div class="option recommended">
+            <div class="option-badge">Safe anywhere</div>
+            <h4>git revert</h4>
+            <svg class="graph-svg" viewBox="0 0 300 80">
+              <line x1="20" y1="40" x2="280" y2="40" stroke="#b4390a" stroke-width="2"/>
+              <circle cx="60" cy="40" r="6" fill="#b4390a"/>
+              <circle cx="130" cy="40" r="6" fill="#b4390a"/>
+              <circle cx="200" cy="40" r="6" fill="#b4390a"/>
+              <circle cx="260" cy="40" r="7" fill="#2f5d47" stroke="#111" stroke-width="1.5"/>
+              <text x="260" y="25" font-family="JetBrains Mono,monospace" font-size="9" fill="#2f5d47" text-anchor="middle">undo commit</text>
+              <text x="200" y="65" font-family="JetBrains Mono,monospace" font-size="9" fill="#b4390a" text-anchor="middle">the bad one — still there</text>
+            </svg>
+            <p>Creates a <em>new</em> commit whose diff is the inverse of the one you're undoing. History is preserved; the unwanted change is neutralized.</p>
+            <p style="color:var(--green);font-weight:500;">Always safe on public history.</p>
+          </div>
+        </div>
+        <div class="verdict">
+          <strong>Rule of thumb:</strong> before push — <code>reset</code>. After push — <code>revert</code>. The moment commits leave your machine, they become part of other people's clones, and rewriting them is a hostile act.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="page"><div class="rule-divider"><span class="ornament">❦</span></div></div>
+
+<!-- ========== VICTORY CONDITIONS ========== -->
+<section id="victory">
+  <div class="page">
+    <div class="section-chapter">Part VI — When the Team Wins</div>
+    <h2 class="section-title">What a <em>clean turn</em> looks like — together.</h2>
+    <p class="section-lede">A feature loop the team has executed well ends with all of the following true at once. Any of them missing is a signal to tighten the rhythm.</p>
+
+    <div class="victory-checklist">
+      <div class="victory-item">
+        <div class="victory-check">✓</div>
+        <div class="victory-text">
+          <strong>Main advanced by one squashed commit</strong>
+          Your feature branch collapsed cleanly into <code>main</code>. One line in the log, one coherent change, one clear commit message.
+        </div>
+      </div>
+      <div class="victory-item">
+        <div class="victory-check">✓</div>
+        <div class="victory-text">
+          <strong>CI passed before merge</strong>
+          Every status check on the PR was green. The protected-branch rule made this non-negotiable — you couldn't have merged without it.
+        </div>
+      </div>
+      <div class="victory-item">
+        <div class="victory-check">✓</div>
+        <div class="victory-text">
+          <strong>At least one human approved</strong>
+          A reviewer read the diff and said yes. The PR thread recorded the exchange, so the reasoning survives.
+        </div>
+      </div>
+      <div class="victory-item">
+        <div class="victory-check">✓</div>
+        <div class="victory-text">
+          <strong>The feature branch is gone</strong>
+          Deleted on GitHub (automatic after merge) and locally (<code>git branch -d</code>). No stale branches left behind.
+        </div>
+      </div>
+      <div class="victory-item">
+        <div class="victory-check">✓</div>
+        <div class="victory-text">
+          <strong>You never touched <code>main</code> directly</strong>
+          Every commit reached <code>main</code> through a PR. <code>main</code> has no orphan work, no surprises, no "quick fixes" that skipped review. <a class="exp-link" href="#exp-team-size">Exp. 01 · Why</a>
+        </div>
+      </div>
+      <div class="victory-item">
+        <div class="victory-check">✓</div>
+        <div class="victory-text">
+          <strong>The next turn begins from a fresh sync</strong>
+          <code>git switch main &amp;&amp; git pull</code>. Back to Phase 01. The loop continues.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="page"><div class="rule-divider"><span class="ornament">❦</span></div></div>
+
+<!-- ========== CLEVER GAMBITS ========== -->
+<section id="gambits">
+  <div class="page">
+    <div class="section-chapter">Part VII — Clever Gambits</div>
+    <h2 class="section-title">Four tricks that <em>make Git fun.</em></h2>
+    <p class="section-lede">These are the moves that separate competent users from fluent ones. Memorize the names; reach for them when the moment arrives.</p>
+
+    <div class="gambits-grid">
+
+      <div class="gambit">
+        <div class="gambit-num">01</div>
+        <h4>Surgical staging</h4>
+        <code>git add -p</code>
+        <p>Walk through your working tree hunk by hunk, deciding <em>per change</em> what goes into the next commit. Messy work becomes clean commits. This is the feature that makes the staging area actually worth having. <a class="exp-link" href="#exp-commit-granularity">Exp. 03 · Why it matters</a></p>
+      </div>
+
+      <div class="gambit">
+        <div class="gambit-num">02</div>
+        <h4>The time machine</h4>
+        <code>git reflog</code>
+        <p>Every movement of HEAD for the last ~30 days, including ones you thought you destroyed. Reset too far? Deleted the wrong branch? Botched a rebase? The reflog has the SHA. <em>Learn it before you need it.</em></p>
+      </div>
+
+      <div class="gambit">
+        <div class="gambit-num">03</div>
+        <h4>The careful shove</h4>
+        <code>--force-with-lease</code>
+        <p>A force-push that refuses to run if the remote moved since your last fetch. It's the difference between "I'm overwriting history" and "I'm overwriting <em>exactly the history I think is there</em>." Make it your default; plain <code>--force</code> should feel uncomfortable.</p>
+      </div>
+
+      <div class="gambit">
+        <div class="gambit-num">04</div>
+        <h4>The bug hunt</h4>
+        <code>git bisect</code>
+        <p>Binary-search your history to find the commit that introduced a bug. Mark a good commit, a bad commit, and Git checks out the midpoint for you to test. Repeat. In <code>log₂(n)</code> steps you've pinpointed the culprit. This is why good commit messages pay dividends.</p>
+      </div>
+
+    </div>
+
+    <div class="bigquote" style="margin-top:3rem;">
+      The reflog is not a safety feature you turn on. It's the river the repository flows through — always running, always recording. You just have to know it's there.
+    </div>
+  </div>
+</section>
+
+<div class="page"><div class="rule-divider"><span class="ornament">❦</span></div></div>
+
+<!-- ========== HAZARDS (POST-GAME REVIEW) ========== -->
+<section id="mastery">
+  <div class="page">
+    <div class="section-chapter">Part VIII — Mastery Questions</div>
+    <h2 class="section-title">Can you <em>call the play</em> when the pressure's on?</h2>
+    <p class="section-lede">Eight scenarios, one correct move each. The wrong answers aren't strawmen — each is a plausible mistake an experienced engineer might make. Pick what you'd actually do. The debrief tells you why.</p>
+
+    <div class="mastery-scoreboard">
+      <div class="score-stat">
+        <div class="score-label">Answered</div>
+        <div class="score-value"><span id="mastery-answered">0</span> / 8</div>
+      </div>
+      <div class="score-stat">
+        <div class="score-label">Correct</div>
+        <div class="score-value" id="mastery-correct-wrap"><span id="mastery-correct">0</span></div>
+      </div>
+      <div class="score-bar">
+        <div class="score-bar-fill" id="mastery-bar"></div>
+      </div>
+    </div>
+
+    <div class="mastery-questions" id="mastery-questions">
+      <!-- Populated by JS -->
+    </div>
+
+    <div class="mastery-final" id="mastery-final" style="display:none;">
+      <div class="mastery-final-ornament">❦</div>
+      <h3 id="mastery-final-title">The team takes a breath.</h3>
+      <p id="mastery-final-message"></p>
+      <button class="btn ghost" id="mastery-reset">Try again</button>
+    </div>
+
+    <div class="cvs-callout" style="margin-top:4rem;">
+      <svg class="cvs-avatar" viewBox="0 0 80 80">
+        <rect x="10" y="18" width="60" height="40" rx="3" fill="#3a3f4d"/>
+        <rect x="14" y="22" width="52" height="30" fill="#7aa4d1" opacity="0.7"/>
+        <rect x="18" y="26" width="8" height="2" fill="#141a23"/>
+        <rect x="18" y="30" width="14" height="2" fill="#141a23"/>
+        <rect x="18" y="34" width="18" height="2" fill="#141a23"/>
+        <rect x="30" y="58" width="20" height="4" fill="#3a3f4d"/>
+        <rect x="24" y="62" width="32" height="4" fill="#3a3f4d"/>
+        <circle cx="40" cy="10" r="5" fill="#2f5d47"/>
+        <rect x="35" y="12" width="10" height="8" fill="#2f5d47"/>
+      </svg>
+      <div class="cvs-quote">
+        <div class="cvs-label">The CVS Engineer concedes</div>
+        <div class="cvs-question">Alright. I've had worse Mondays in CVS, and there was no reflog to save me.</div>
+      </div>
+    </div>
+    <div class="cvs-response">
+      <span class="tag">The Guide Replies</span>
+      That's the real shift. In CVS, a mistake was often terminal — the authoritative state lived on one server and you had borrowed a piece of it. In Git, every clone is a full backup of history and the reflog is a backup of <em>your</em> backup. The learning curve is steeper — but the <span class="emph">floor is higher</span>. Once you've committed something, it's genuinely hard to lose it. The team gets safer, not scarier.
+    </div>
+  </div>
+</section>
+
+<div class="page"><div class="rule-divider"><span class="ornament">❦</span></div></div>
+
+<!-- ========== FIELD GUIDE (PART IX) ========== -->
+<section id="field-guide">
+  <div class="page">
+    <div class="section-chapter">Part IX — The Field Guide</div>
+    <h2 class="section-title">Four references <em>for the long walk</em> to fluency.</h2>
+    <p class="section-lede">This manual covers the shape of Git. The resources below give you the reps — the graph poked, animated, played with, and searched. Each comes with a note from our traveler on where your CVS instincts still help and where they mislead.</p>
+
+    <div class="cvs-callout">
+      <svg class="cvs-avatar" viewBox="0 0 80 80">
+        <rect x="10" y="18" width="60" height="40" rx="3" fill="#3a3f4d"/>
+        <rect x="14" y="22" width="52" height="30" fill="#7ec07b" opacity="0.75"/>
+        <rect x="18" y="26" width="16" height="2" fill="#141a23"/>
+        <rect x="18" y="30" width="20" height="2" fill="#141a23"/>
+        <rect x="18" y="34" width="8" height="2" fill="#141a23"/>
+        <rect x="18" y="38" width="22" height="2" fill="#141a23"/>
+        <rect x="18" y="42" width="10" height="2" fill="#141a23"/>
+        <rect x="30" y="58" width="20" height="4" fill="#3a3f4d"/>
+        <rect x="24" y="62" width="32" height="4" fill="#3a3f4d"/>
+        <circle cx="40" cy="10" r="5" fill="#2f5d47"/>
+        <rect x="35" y="12" width="10" height="8" fill="#2f5d47"/>
+      </svg>
+      <div class="cvs-quote">
+        <div class="cvs-label">The CVS Engineer asks</div>
+        <div class="cvs-question">Alright. The model is cleaner and the floor is higher. Where do I actually go to get fluent? I don't want another command reference — I want someone to walk me through the graph until I <em>see</em> it.</div>
+      </div>
+    </div>
+    <div class="cvs-response">
+      <span class="tag">The Guide Replies</span>
+      Four resources, each lighting up a different face of the graph — an interactive sandbox, a set of animations, a playful comic, and a hands-on guide to the command that actually changes how you debug. Below, the CVS engineer annotates each one: the mental shift it asks of you, the analogy that made it click, and where old instincts still help versus hinder.
+    </div>
+
+    <div class="references-grid">
+
+      <!-- REFERENCE 01 -->
+      <article class="reference">
+        <div class="ref-meta"><span class="num">01</span><span class="dot">·</span>Interactive Sandbox</div>
+        <div class="ref-tag">Analogy</div>
+        <div class="ref-main">
+          <h3>Learn Git Branching</h3>
+          <div class="ref-byline">Peter Cottle</div>
+          <p class="ref-desc">An interactive sandbox with guided levels. You type real Git commands into a terminal and watch the commit DAG animate above. Covers commits, branches, merge, rebase, cherry-pick, interactive rebase, and remote tracking. The rebase levels in particular show commits being replayed — new hashes, same contents — which makes the idea concrete in a way no static diagram does.</p>
+          <a class="ref-link" href="https://learngitbranching.js.org/" target="_blank" rel="noopener">learngitbranching.js.org <span class="arrow">↗</span></a>
+        </div>
+        <div class="ref-note">
+          <div class="ref-note-header">
+            <svg class="ref-note-avatar" viewBox="0 0 80 80">
+              <rect x="10" y="18" width="60" height="40" rx="3" fill="#3a3f4d"/>
+              <rect x="14" y="22" width="52" height="30" fill="#7ec07b" opacity="0.8"/>
+              <rect x="18" y="26" width="14" height="2" fill="#141a23"/>
+              <rect x="18" y="30" width="20" height="2" fill="#141a23"/>
+              <rect x="18" y="34" width="10" height="2" fill="#141a23"/>
+              <rect x="30" y="58" width="20" height="4" fill="#3a3f4d"/>
+              <rect x="24" y="62" width="32" height="4" fill="#3a3f4d"/>
+              <circle cx="40" cy="10" r="5" fill="#b4390a"/>
+              <rect x="35" y="12" width="10" height="8" fill="#b4390a"/>
+            </svg>
+            <span class="ref-note-label">The CVS Engineer's Note</span>
+          </div>
+          <h4>The train-car metaphor.</h4>
+          <p>If the DAG talk puts you off — mine did — try this instead. Commits are train cars. Parent pointers are the couplings between them. A branch is the locomotive at the front, pulling the cars along.</p>
+          <p>A <em>merge</em> is two trains joining at a junction: the merge commit is a single car with couplings going back to both parents. A <em>rebase</em> is uncoupling your cars, sliding them to a different track, and re-coupling behind a new locomotive. The cars look identical from the outside — same cargo, same diffs — but underneath they are new cars with new SHAs. That is exactly why rebasing a branch others are already riding breaks their tickets. An <em>interactive rebase</em> is the switching yard: before the train leaves, you can uncouple, reorder, drop, or weld cars together.</p>
+          <p>The metaphor strains a bit for <code>rebase --onto</code> and collapses for octopus merges, but it holds for the 90% of daily usage that matters — and it gives rebase the physical intuition most explanations lack.</p>
+        </div>
+      </article>
+
+      <!-- REFERENCE 02 -->
+      <article class="reference">
+        <div class="ref-meta"><span class="num">02</span><span class="dot">·</span>Animated Walkthrough</div>
+        <div class="ref-tag">Principle</div>
+        <div class="ref-main">
+          <h3>CS Visualized: Useful Git Commands</h3>
+          <div class="ref-byline">Lydia Hallie</div>
+          <p class="ref-desc">Each Git operation gets an animated GIF showing the graph transforming. The section on interactive rebase walks through all six actions — pick, reword, edit, squash, fixup, drop — each with its own animation. Watching a messy history of six "WIP" and "fix typo" commits visibly collapse into two clean commits is the most persuasive thirty seconds you will spend on the topic.</p>
+          <a class="ref-link" href="https://dev.to/lydiahallie/cs-visualized-useful-git-commands-37p1" target="_blank" rel="noopener">dev.to/lydiahallie <span class="arrow">↗</span></a>
+        </div>
+        <div class="ref-note">
+          <div class="ref-note-header">
+            <svg class="ref-note-avatar" viewBox="0 0 80 80">
+              <rect x="10" y="18" width="60" height="40" rx="3" fill="#3a3f4d"/>
+              <rect x="14" y="22" width="52" height="30" fill="#e0b86f" opacity="0.7"/>
+              <rect x="18" y="26" width="14" height="2" fill="#141a23"/>
+              <rect x="18" y="30" width="20" height="2" fill="#141a23"/>
+              <rect x="18" y="34" width="8" height="2" fill="#141a23"/>
+              <rect x="30" y="58" width="20" height="4" fill="#3a3f4d"/>
+              <rect x="24" y="62" width="32" height="4" fill="#3a3f4d"/>
+              <circle cx="40" cy="10" r="5" fill="#b4390a"/>
+              <rect x="35" y="12" width="10" height="8" fill="#b4390a"/>
+            </svg>
+            <span class="ref-note-label">The CVS Engineer's Note</span>
+          </div>
+          <h4>Why rewrite history at all?</h4>
+          <p>My first objection — and probably yours — was reasonable: history is a record, so why would I falsify it? I'd watched enough CVS admins corrupt <code>,v</code> files to know what tampering looks like.</p>
+          <p>The reframe that landed: Git effectively keeps <em>two</em> histories. A private workshop where I develop something — false starts, debug prints, "WIP" — and the public record of what got shipped. Interactive rebase is how I clean up the first before publishing the second. A reviewer's actual question is "what does this change do?", and an eight-commit chain of <code>fix typo → actually fix typo → address review → WIP</code> forces them to reconstruct the real change from the noise. Two or three commits each doing one coherent thing answers directly.</p>
+          <p>The iron rule: only rewrite commits you have not yet shared. Rewriting <em>published</em> history is exactly the admin-edits-<code>,v</code>-behind-users'-backs scenario — same chaos, same reason it's forbidden.</p>
+        </div>
+      </article>
+
+      <!-- REFERENCE 03 -->
+      <article class="reference">
+        <div class="ref-meta"><span class="num">03</span><span class="dot">·</span>Illustrated Primer</div>
+        <div class="ref-tag">Quick Reference</div>
+        <div class="ref-main">
+          <h3>Pick. Squash. Drop. Rebase!</h3>
+          <div class="ref-byline">Erika Heidi — a short comic</div>
+          <p class="ref-desc">A short illustrated comic framing interactive rebase as a card game: commits are cards in your hand, and the rebase is laying them on the table to combine pairs, discard duds, and reorder before playing. Pairs naturally with the train-car metaphor — the cards are what's happening inside the switching yard.</p>
+          <a class="ref-link" href="https://dev.to/erikaheidi/pick-squash-drop-rebase-comic-607" target="_blank" rel="noopener">dev.to/erikaheidi <span class="arrow">↗</span></a>
+        </div>
+        <div class="ref-note">
+          <div class="ref-note-header">
+            <svg class="ref-note-avatar" viewBox="0 0 80 80">
+              <rect x="10" y="18" width="60" height="40" rx="3" fill="#3a3f4d"/>
+              <rect x="14" y="22" width="52" height="30" fill="#d97a7a" opacity="0.7"/>
+              <rect x="18" y="26" width="12" height="2" fill="#141a23"/>
+              <rect x="18" y="30" width="22" height="2" fill="#141a23"/>
+              <rect x="18" y="34" width="10" height="2" fill="#141a23"/>
+              <rect x="30" y="58" width="20" height="4" fill="#3a3f4d"/>
+              <rect x="24" y="62" width="32" height="4" fill="#3a3f4d"/>
+              <circle cx="40" cy="10" r="5" fill="#b4390a"/>
+              <rect x="35" y="12" width="10" height="8" fill="#b4390a"/>
+            </svg>
+            <span class="ref-note-label">The CVS Engineer's Note</span>
+          </div>
+          <h4>The six interactive-rebase actions, one line each.</h4>
+          <ul class="action-list">
+            <li><strong>pick</strong> — keep this commit as is (the default).</li>
+            <li><strong>reword</strong> — keep the change, rewrite the commit message.</li>
+            <li><strong>edit</strong> — stop here so you can amend the actual contents.</li>
+            <li><strong>squash</strong> — merge this commit into the one above; you'll be prompted to combine the messages.</li>
+            <li><strong>fixup</strong> — like squash, but throw this message away.</li>
+            <li><strong>drop</strong> — discard this commit entirely.</li>
+          </ul>
+          <p>In a typical pre-review cleanup I mostly reach for <code>pick</code>, <code>fixup</code>, and <code>reword</code>. <code>squash</code> and <code>edit</code> come up occasionally. <code>drop</code> is for the debugging <code>printf</code> I forgot to remove.</p>
+        </div>
+      </article>
+
+      <!-- REFERENCE 04 -->
+      <article class="reference">
+        <div class="ref-meta"><span class="num">04</span><span class="dot">·</span>Hands-On Tutorial</div>
+        <div class="ref-tag">Why It Works</div>
+        <div class="ref-main">
+          <h3>A Beginner's Guide to <em>git bisect</em></h3>
+          <div class="ref-byline">Metal Toad</div>
+          <p class="ref-desc">Walks through a fresh repo so you can follow along hands-on — <code>git bisect start</code>, mark endpoints, test, mark good or bad, repeat. Also covers <code>git bisect run</code> with an automated test script, which is what turns bisect from a neat trick into a routine debugging tool.</p>
+          <a class="ref-link" href="https://www.metaltoad.com/blog/beginners-guide-git-bisect-process-elimination" target="_blank" rel="noopener">metaltoad.com <span class="arrow">↗</span></a>
+        </div>
+        <div class="ref-note">
+          <div class="ref-note-header">
+            <svg class="ref-note-avatar" viewBox="0 0 80 80">
+              <rect x="10" y="18" width="60" height="40" rx="3" fill="#3a3f4d"/>
+              <rect x="14" y="22" width="52" height="30" fill="#7aa4d1" opacity="0.75"/>
+              <rect x="18" y="26" width="10" height="2" fill="#141a23"/>
+              <rect x="18" y="30" width="18" height="2" fill="#141a23"/>
+              <rect x="18" y="34" width="14" height="2" fill="#141a23"/>
+              <rect x="30" y="58" width="20" height="4" fill="#3a3f4d"/>
+              <rect x="24" y="62" width="32" height="4" fill="#3a3f4d"/>
+              <circle cx="40" cy="10" r="5" fill="#2f5d47"/>
+              <rect x="35" y="12" width="10" height="8" fill="#2f5d47"/>
+            </svg>
+            <span class="ref-note-label">The CVS Engineer's Note</span>
+          </div>
+          <h4>Why bisect works in Git and wouldn't in CVS.</h4>
+          <p>This is the command that convinced me the graph model was worth the trouble. In CVS, every file had its own <code>,v</code> file with its own revision numbers — "revision 27 of the project" wasn't a coherent question. You'd be asking "was the build broken when <code>foo.c</code> was at 1.27 and <code>bar.c</code> was at 1.09?" and there was simply no first-class answer mapping that question to anything you could check out.</p>
+          <p>In Git, a commit is a <em>whole-tree snapshot</em>. Checking out commit X puts the entire repository into a specific, reproducible state. Commits form a DAG with well-defined ancestry. That's what makes binary search over history meaningful at all — you're searching an ordered sequence of atomic whole-project states, not a cross product of per-file revision numbers.</p>
+          <p>Once that clicks, the mechanics are almost embarrassingly simple: mark a known-bad endpoint (usually <code>HEAD</code>), mark a known-good one (a tag, a release), and Git checks out the midpoint for you to test. You say <code>good</code> or <code>bad</code>; it narrows. Repeat ~log₂(N) times; it prints the first bad commit. Hand <code>git bisect run</code> a test script that exits 0 for good and nonzero for bad, and it does all of that unattended. This is what the Linux kernel maintainers actually use on 30 million lines of code — it's a genuine superpower that the CVS era could not have given you.</p>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="bigquote" style="margin-top:3.5rem;">
+      The biggest conceptual shift from CVS is not the commands but the data model. CVS is a file-version system with project coordination layered on. Git is a directed graph of whole-project snapshots with commands that walk and rewrite that graph. Every operation that feels confusing — rebase, bisect, cherry-pick, reflog, detached HEAD — becomes obvious once you hold the graph in your head and stop translating it back into per-file revision numbers.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="ornament">❦</div>
+  <div>5 phases · 3 experiments · 3 decisions · 8 mastery questions · 4 field references</div>
+  <div style="margin-top:0.8rem;opacity:0.7;">further reading — Pro Git · GitHub Docs · Oh Shit, Git!?!</div>
+</footer>
+
+<script>
+// ======== THE FIVE-PHASE LOOP ========
+document.querySelectorAll('.phase-node').forEach(node => {
+  node.addEventListener('click', () => {
+    const phase = node.dataset.phase;
+    document.querySelectorAll('.phase-node').forEach(n => n.classList.remove('active'));
+    node.classList.add('active');
+    document.querySelectorAll('.phase-detail').forEach(d => d.classList.remove('active'));
+    document.querySelector(`.phase-detail[data-detail="${phase}"]`).classList.add('active');
+  });
+});
+
+// ======== COMMIT / PUSH DEMO ========
+const commitMessages = [
+  { sha: 'f4a7b2', msg: 'Draft login component' },
+  { sha: '9c1d8e', msg: 'Wire up form validation' },
+  { sha: '3e5f9a', msg: 'Add CSRF token handling' },
+  { sha: 'b2c4d6', msg: 'Tests for happy path' },
+  { sha: '8a7b5c', msg: 'Handle 429 from rate limiter' },
+];
+let localState = [{ sha: 'a1b2c3', msg: 'Initial commit' }];
+let remoteState = [{ sha: 'a1b2c3', msg: 'Initial commit' }];
+let commitIndex = 0;
+
+function renderCommits() {
+  const local = document.getElementById('local-commits');
+  const remote = document.getElementById('remote-commits');
+  local.innerHTML = '';
+  remote.innerHTML = '';
+  localState.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'commit-node';
+    div.innerHTML = `<span class="commit-sha">${c.sha}</span><span class="commit-msg">${c.msg}</span>`;
+    local.appendChild(div);
+  });
+  remoteState.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'commit-node';
+    div.innerHTML = `<span class="commit-sha">${c.sha}</span><span class="commit-msg">${c.msg}</span>`;
+    remote.appendChild(div);
+  });
+}
+
+document.getElementById('btn-commit').addEventListener('click', () => {
+  if (commitIndex < commitMessages.length) {
+    localState.push(commitMessages[commitIndex]);
+    commitIndex++;
+    renderCommits();
+  }
+});
+document.getElementById('btn-push').addEventListener('click', () => {
+  remoteState = [...localState];
+  renderCommits();
+});
+document.getElementById('btn-reset-demo').addEventListener('click', () => {
+  localState = [{ sha: 'a1b2c3', msg: 'Initial commit' }];
+  remoteState = [{ sha: 'a1b2c3', msg: 'Initial commit' }];
+  commitIndex = 0;
+  renderCommits();
+});
+renderCommits();
+
+// ======== STAGING DEMO ========
+const initialHunks = [
+  { id: 1, file: 'auth/login.py', diff: '<span class="del">- return False</span>\n<span class="add">+ return user.is_authenticated</span>', loc: 'tree' },
+  { id: 2, file: 'auth/login.py', diff: '<span class="add">+ log.info("login attempt", user=u)</span>', loc: 'tree' },
+  { id: 3, file: 'utils/format.py', diff: '<span class="del">- def fmt(s): return s.strip()</span>\n<span class="add">+ def format_username(s):</span>\n<span class="add">+     return s.strip().lower()</span>', loc: 'tree' },
+  { id: 4, file: 'tests/test_auth.py', diff: '<span class="add">+ def test_rate_limit(): ...</span>', loc: 'tree' },
+];
+let hunks = JSON.parse(JSON.stringify(initialHunks));
+
+function renderHunks() {
+  ['tree', 'index', 'repo'].forEach(loc => {
+    const target = document.getElementById(`staging-${loc}-hunks`);
+    target.innerHTML = '';
+    hunks.filter(h => h.loc === loc).forEach(h => {
+      const div = document.createElement('div');
+      div.className = 'hunk';
+      div.innerHTML = `<span class="hunk-file">${h.file}</span><span class="hunk-diff">${h.diff.replace(/\n/g,'<br>')}</span>`;
+      div.addEventListener('click', () => {
+        if (h.loc === 'tree') h.loc = 'index';
+        else if (h.loc === 'index') h.loc = 'tree';
+        renderHunks();
+      });
+      target.appendChild(div);
+    });
+  });
+}
+document.getElementById('btn-commit-staged').addEventListener('click', () => {
+  hunks.forEach(h => { if (h.loc === 'index') h.loc = 'repo'; });
+  renderHunks();
+});
+document.getElementById('btn-staging-reset').addEventListener('click', () => {
+  hunks = JSON.parse(JSON.stringify(initialHunks));
+  renderHunks();
+});
+renderHunks();
+
+// ======== EXPERIMENT DEEP-LINK PULSE ========
+function pulseExperiment(id) {
+  const target = document.getElementById(id);
+  if (!target || !target.classList.contains('experiment')) return;
+  target.classList.remove('pulse');
+  void target.offsetWidth; // force reflow so the animation restarts
+  target.classList.add('pulse');
+}
+document.querySelectorAll('.exp-link').forEach(link => {
+  link.addEventListener('click', () => {
+    const href = link.getAttribute('href') || '';
+    if (href.startsWith('#')) {
+      // browser handles scroll; we pulse shortly after
+      setTimeout(() => pulseExperiment(href.slice(1)), 450);
+    }
+  });
+});
+// Direct hash arrival (e.g. bookmarked link)
+window.addEventListener('load', () => {
+  if (window.location.hash) {
+    setTimeout(() => pulseExperiment(window.location.hash.slice(1)), 500);
+  }
+});
+
+// ======== EXPERIMENT 1: TEAM SIZE ========
+const teamSizeData = [
+  {
+    label: '1 engineer',
+    collisions: '0',
+    deployable: 'Always',
+    workflow: 'Push direct to main',
+    deployableClass: 'good',
+    workflowClass: 'good',
+    collisionsClass: 'good',
+    debriefClass: '',
+    debrief: `At <strong>1 engineer</strong>, there are no collisions because nobody else is writing. You can push directly to <code>main</code> without hurting anyone. This is why solo projects often feel like Git doesn't need rules — because most of them are about coordination.`
+  },
+  {
+    label: '3 engineers',
+    collisions: '~1 / week',
+    deployable: 'Usually',
+    workflow: 'Feature branches + review',
+    deployableClass: 'warn',
+    workflowClass: '',
+    collisionsClass: 'warn',
+    debriefClass: 'warn',
+    debrief: `At <strong>3 engineers</strong>, the first pair collisions appear. Two people push within minutes, one has to pull and replay. You'll feel the need for feature branches and light review — not because of rules, but because the last five minutes of someone else's work keep landing in your lap.`
+  },
+  {
+    label: '10 engineers',
+    collisions: '~3 / day',
+    deployable: 'Sometimes',
+    workflow: 'PRs + CI required',
+    deployableClass: 'warn',
+    workflowClass: 'warn',
+    collisionsClass: 'warn',
+    debriefClass: 'warn',
+    debrief: `At <strong>10 engineers</strong>, direct-to-main breaks down. Every push has a good chance of landing on a commit older than 30 minutes. You need <em>pull requests</em> to serialize changes and <em>CI</em> to catch the conflicts humans miss. Phase 04 of the loop becomes mandatory.`
+  },
+  {
+    label: '30 engineers',
+    collisions: '~10 / day',
+    deployable: 'Rarely (without controls)',
+    workflow: 'Protected main + required review',
+    deployableClass: 'bad',
+    workflowClass: 'bad',
+    collisionsClass: 'bad',
+    debriefClass: 'bad',
+    debrief: `At <strong>30 engineers</strong>, <code>main</code> becomes a shared resource under constant pressure. Without protected branches, required reviews, and mandatory CI, it would be broken more often than deployable. The controls stop feeling like ceremony and start feeling like the floor.`
+  }
+];
+
+function renderTeamVis(idx) {
+  const dotCount = [1, 3, 10, 30][idx];
+  const dotsGroup = document.getElementById('team-dots');
+  const conflictsGroup = document.getElementById('team-conflicts');
+  dotsGroup.innerHTML = '';
+  conflictsGroup.innerHTML = '';
+  const colors = ['#b4390a', '#2f5d47', '#a27513', '#6b5b95', '#8b2e2e', '#2a6a8a', '#7e5a2e', '#4a6b2e', '#8a2a6a', '#2a4d3e'];
+  // draw dots scattered across, connected to main line by a tick
+  for (let i = 0; i < dotCount; i++) {
+    const x = 40 + (i / Math.max(dotCount - 1, 1)) * 320;
+    const y = 40 + (i % 3) * 15;
+    const color = colors[i % colors.length];
+    dotsGroup.innerHTML += `<line x1="${x}" y1="${y}" x2="${x}" y2="100" stroke="${color}" stroke-width="1" opacity="0.5"/>`;
+    dotsGroup.innerHTML += `<circle cx="${x}" cy="${y}" r="4" fill="${color}"/>`;
+    dotsGroup.innerHTML += `<circle cx="${x}" cy="100" r="3" fill="${color}"/>`;
+  }
+  // overlay collision X marks where dot count is high
+  if (dotCount >= 3) {
+    const conflicts = Math.min(dotCount - 2, 5);
+    for (let i = 0; i < conflicts; i++) {
+      const x = 80 + Math.random() * 280;
+      conflictsGroup.innerHTML += `<text x="${x}" y="105" font-family="JetBrains Mono,monospace" font-size="14" fill="#8b2e2e" text-anchor="middle" font-weight="700">×</text>`;
+    }
+  }
+}
+
+document.getElementById('team-size-slider').addEventListener('input', (e) => {
+  const idx = parseInt(e.target.value);
+  const data = teamSizeData[idx];
+  document.getElementById('team-size-value').textContent = data.label;
+  const coll = document.getElementById('exp1-collisions');
+  const dep = document.getElementById('exp1-deployable');
+  const wf = document.getElementById('exp1-workflow');
+  coll.textContent = data.collisions; coll.className = 'readout-value ' + data.collisionsClass;
+  dep.textContent = data.deployable; dep.className = 'readout-value ' + data.deployableClass;
+  wf.textContent = data.workflow; wf.className = 'readout-value ' + data.workflowClass;
+  const debrief = document.getElementById('exp1-debrief');
+  debrief.innerHTML = '<p>' + data.debrief + '</p>';
+  debrief.className = 'exp-debrief ' + data.debriefClass;
+  renderTeamVis(idx);
+});
+renderTeamVis(0);
+
+// ======== EXPERIMENT 2: SYNC CADENCE ========
+const syncData = [
+  { label: '1 hour', drift: '~1 commit', conflicts: '~0', pain: 'Trivial',
+    driftClass:'good', conflictsClass:'good', painClass:'good', debriefClass:'',
+    branchEnd: 85, mainCommits: 1,
+    debrief: `At <strong>hourly sync</strong>, your branch tracks <code>main</code> almost perfectly. Rebases are no-ops; conflicts are rare and local. This is the cost structure Phase 01 of the loop assumes — it's designed for teams that sync often.` },
+  { label: '1 workday', drift: '~6 commits', conflicts: '~2 files', pain: 'Mild',
+    driftClass:'', conflictsClass:'', painClass:'', debriefClass:'',
+    branchEnd: 150, mainCommits: 6,
+    debrief: `At <strong>daily sync</strong>, you'll hit the occasional conflict hunk. Manageable, but each merge is now a real event requiring attention — not a reflex.` },
+  { label: '1 week', drift: '~25 commits', conflicts: '~8 files', pain: 'Painful',
+    driftClass:'warn', conflictsClass:'warn', painClass:'warn', debriefClass:'warn',
+    branchEnd: 260, mainCommits: 12,
+    debrief: `At <strong>weekly sync</strong>, every merge becomes an archaeology expedition. Files you touched were refactored; tests you wrote now conflict with someone else's. The longer the drift, the more <em>code that wasn't there when you started</em> you have to reason about.` },
+  { label: '2 weeks', drift: '~60 commits', conflicts: '~20 files', pain: 'Severe',
+    driftClass:'bad', conflictsClass:'bad', painClass:'bad', debriefClass:'bad',
+    branchEnd: 360, mainCommits: 18,
+    debrief: `At <strong>two weeks without sync</strong>, you're effectively developing against a fork. Merges take hours and frequently end with "give up, rewrite on top of fresh main." This is what long-lived branches cost — and why Phase 01 says <em>start every task from an updated main</em>.` }
+];
+
+function renderSyncVis(idx) {
+  const data = syncData[idx];
+  const branch = document.getElementById('sync-branch');
+  branch.setAttribute('x2', data.branchEnd);
+  const mainCommitsGroup = document.getElementById('sync-main-commits');
+  const branchCommitGroup = document.getElementById('sync-branch-commit');
+  const driftGroup = document.getElementById('sync-drift-indicator');
+  mainCommitsGroup.innerHTML = '';
+  branchCommitGroup.innerHTML = '';
+  driftGroup.innerHTML = '';
+  const count = data.mainCommits;
+  for (let i = 0; i < count; i++) {
+    const x = 60 + (i / Math.max(count, 1)) * 310;
+    mainCommitsGroup.innerHTML += `<circle cx="${x}" cy="50" r="3.5" fill="#b4390a"/>`;
+  }
+  branchCommitGroup.innerHTML = `<circle cx="${data.branchEnd}" cy="100" r="5" fill="#2f5d47"/>`;
+  // drift indicator
+  if (idx > 0) {
+    driftGroup.innerHTML = `<line x1="${data.branchEnd}" y1="100" x2="${data.branchEnd}" y2="50" stroke="${idx >= 2 ? '#8b2e2e' : '#a27513'}" stroke-width="1" stroke-dasharray="2 2"/>
+      <text x="${data.branchEnd - 5}" y="78" font-family="JetBrains Mono,monospace" font-size="9" fill="${idx >= 2 ? '#8b2e2e' : '#a27513'}" text-anchor="end">drift</text>`;
+  }
+}
+
+document.getElementById('sync-slider').addEventListener('input', (e) => {
+  const idx = parseInt(e.target.value);
+  const data = syncData[idx];
+  document.getElementById('sync-value').textContent = data.label;
+  const d = document.getElementById('exp2-drift');
+  const c = document.getElementById('exp2-conflicts');
+  const p = document.getElementById('exp2-pain');
+  d.textContent = data.drift; d.className = 'readout-value ' + data.driftClass;
+  c.textContent = data.conflicts; c.className = 'readout-value ' + data.conflictsClass;
+  p.textContent = data.pain; p.className = 'readout-value ' + data.painClass;
+  const debrief = document.getElementById('exp2-debrief');
+  debrief.innerHTML = '<p>' + data.debrief + '</p>';
+  debrief.className = 'exp-debrief ' + data.debriefClass;
+  renderSyncVis(idx);
+});
+renderSyncVis(0);
+
+// ======== EXPERIMENT 3: COMMIT GRANULARITY ========
+const commitData = [
+  { label: '~10 lines', bisect: '~8 steps', review: 'Trivial per commit', revert: 'Surgical',
+    bisectClass:'good', reviewClass:'good', revertClass:'good', debriefClass:'',
+    dots: 200,
+    debrief: `At <strong>~10 lines per commit</strong>, history is a <em>narrative</em>. Every step of reasoning is preserved. <code>git bisect</code> nails the bug fast. But review fatigue is real — 200 commits to approve is its own burden.` },
+  { label: '~50 lines', bisect: '~5 steps', review: 'Comfortable', revert: 'Safe',
+    bisectClass:'good', reviewClass:'good', revertClass:'good', debriefClass:'',
+    dots: 40,
+    debrief: `At <strong>~50 lines per commit</strong>, each commit is one coherent change a reviewer can hold in their head. <code>git bisect</code> converges quickly. Reverting one bad commit doesn't threaten neighboring work. This is the sweet spot <code>git add -p</code> is built for.` },
+  { label: '~250 lines', bisect: '~3 steps', review: 'Heavy', revert: 'Risky',
+    bisectClass:'warn', reviewClass:'warn', revertClass:'warn', debriefClass:'warn',
+    dots: 8,
+    debrief: `At <strong>~250 lines per commit</strong>, each commit bundles multiple concepts. Reviewers lose track of what they're evaluating. A revert of "the bad commit" takes out good work along with bad. You can still find bugs, but the granularity costs you.` },
+  { label: '~1000 lines', bisect: '~1 step (useless)', review: 'Overwhelming', revert: 'Dangerous',
+    bisectClass:'bad', reviewClass:'bad', revertClass:'bad', debriefClass:'bad',
+    dots: 2,
+    debrief: `At <strong>~1000 lines per commit</strong>, <code>git bisect</code> tells you the bug is "somewhere in this 1000-line commit" — which is no better than knowing it's in your codebase. Review becomes approval-by-exhaustion. Every Git tool that operates on commits quietly stops being useful.` }
+];
+
+function renderCommitVis(idx) {
+  const dotCount = commitData[idx].dots;
+  const group = document.getElementById('commit-dots');
+  group.innerHTML = '';
+  // clamp visible dots
+  const visible = Math.min(dotCount, 100);
+  const step = 340 / visible;
+  const startX = 30;
+  for (let i = 0; i < visible; i++) {
+    const x = startX + i * step;
+    // size grows with commit size
+    const r = [2, 3.5, 6.5, 11][idx];
+    group.innerHTML += `<circle cx="${x}" cy="70" r="${r}" fill="#2f5d47" opacity="0.85"/>`;
+  }
+  document.getElementById('commit-vis-label').textContent = `${dotCount} commits to land 2,000 lines`;
+}
+
+document.getElementById('commit-slider').addEventListener('input', (e) => {
+  const idx = parseInt(e.target.value);
+  const data = commitData[idx];
+  document.getElementById('commit-value').textContent = data.label;
+  const b = document.getElementById('exp3-bisect');
+  const r = document.getElementById('exp3-review');
+  const v = document.getElementById('exp3-revert');
+  b.textContent = data.bisect; b.className = 'readout-value ' + data.bisectClass;
+  r.textContent = data.review; r.className = 'readout-value ' + data.reviewClass;
+  v.textContent = data.revert; v.className = 'readout-value ' + data.revertClass;
+  const debrief = document.getElementById('exp3-debrief');
+  debrief.innerHTML = '<p>' + data.debrief + '</p>';
+  debrief.className = 'exp-debrief ' + data.debriefClass;
+  renderCommitVis(idx);
+});
+// start at the middle-good value (index 1)
+renderCommitVis(1);
+
+// ======== MASTERY QUESTIONS ========
+const masteryQs = [
+  {
+    scenario: `You've made four local commits on a feature branch. You realize the third commit has a typo in its message. <strong>You have not pushed yet.</strong> What's the right move?`,
+    options: [
+      { letter: 'A', text: '<code>git reset --hard HEAD~2</code> and redo the work', correct: false,
+        explain: `<code>reset --hard</code> would discard the actual code changes, not just the message. A good fix for the message would lose perfectly good commits.` },
+      { letter: 'B', text: '<code>git rebase -i HEAD~2</code>, mark the commit as "reword", save', correct: true,
+        explain: `Interactive rebase lets you edit a commit message surgically. Because nothing has been pushed, rewriting history here is purely a private bookkeeping operation — perfectly safe.` },
+      { letter: 'C', text: 'Add a new commit titled "fix typo in message of previous commit"', correct: false,
+        explain: `That commit is visible noise forever. A pre-push rewrite is free; a post-push rewrite is the one you avoid. Your situation is the former.` },
+      { letter: 'D', text: 'Leave it — commit messages aren\'t important', correct: false,
+        explain: `Commit messages are how <code>git log</code>, <code>git blame</code>, and <code>git bisect</code> become useful instead of noise. They matter most for the people reading them months from now.` }
+    ]
+  },
+  {
+    scenario: `A teammate pings you: "My <code>git pull</code> is failing on the <code>shared-branch</code> with weird divergence errors. Did something happen?" You realize you rebased and force-pushed that branch an hour ago. What did you do wrong?`,
+    options: [
+      { letter: 'A', text: 'Nothing — they need to <code>git pull --force</code>', correct: false,
+        explain: `There's no such thing as <code>pull --force</code> in the way this implies, and even if they force their local state, you've silently destroyed any commits they'd made on top. You created the mess.` },
+      { letter: 'B', text: 'Force-pushed a shared branch — that rewrote history others had pulled', correct: true,
+        explain: `Force-pushing a branch that teammates have already pulled invalidates their clones. Their commits now point at SHAs that no longer exist on the remote. The right rule: never force-push a shared branch. Use <code>--force-with-lease</code> on your own feature branches only.` },
+      { letter: 'C', text: 'Used the wrong merge strategy', correct: false,
+        explain: `Merge strategy isn't the issue — the problem was created at the moment of force-push, before any merge strategy came into play.` },
+      { letter: 'D', text: 'Rebased when they should have merged', correct: false,
+        explain: `Rebasing locally is fine. Rebasing and then force-pushing a shared branch is the specific error. The scope of the rewrite is what matters, not the operation that produced it.` }
+    ]
+  },
+  {
+    scenario: `You ran <code>git reset --hard HEAD~3</code> thinking you were discarding three WIP commits. You actually wanted to keep their changes — they contained a whole afternoon of work. Your working tree is empty. Recovery plan?`,
+    options: [
+      { letter: 'A', text: 'Check <code>git reflog</code>, find the pre-reset SHA, reset to it', correct: true,
+        explain: `The reflog records every movement of HEAD for ~30 days, including ones you thought you destroyed. The commits are unreachable from any branch but still exist in the object database. <code>git reset --hard &lt;old-sha&gt;</code> restores everything.` },
+      { letter: 'B', text: 'Re-clone the repository from origin', correct: false,
+        explain: `The commits were never pushed. Re-cloning gives you the remote's view, which doesn't include your afternoon's work. This would make the loss permanent.` },
+      { letter: 'C', text: 'Accept the loss and rewrite from memory', correct: false,
+        explain: `Almost never necessary in Git. Committed work is extraordinarily hard to lose — the reflog is exactly the safety net for this mistake. Learn it <em>before</em> you need it.` },
+      { letter: 'D', text: '<code>git fsck --lost-found</code> and dig through dangling objects', correct: false,
+        explain: `Technically works as a last resort, but the reflog is faster, cleaner, and labeled — you can see exactly which SHA was HEAD before the reset. Reach for <code>fsck</code> only when reflog is unavailable.` }
+    ]
+  },
+  {
+    scenario: `A bug shipped in last week's release. The offending commit is on <code>main</code> and several newer features have been merged on top. You need to undo <em>just</em> the bad commit. What do you use?`,
+    options: [
+      { letter: 'A', text: '<code>git reset --hard &lt;bad-commit&gt;~1</code> and force-push main', correct: false,
+        explain: `This rewrites public history and throws away every feature merged since. It's the classic "undo that makes things worse" — a Hazard #2 in the making.` },
+      { letter: 'B', text: '<code>git revert &lt;bad-commit&gt;</code>, which creates an inverse commit', correct: true,
+        explain: `<code>revert</code> is the right tool for public history. It creates a <em>new</em> commit whose diff is the inverse of the bad one — history is preserved, no teammate's clone is broken, and the commit message can explain exactly what was undone and why.` },
+      { letter: 'C', text: 'Open a new PR that manually re-writes the broken code', correct: false,
+        explain: `Works, but it's <code>git revert</code> the hard way. The tool exists precisely to produce the correct inverse diff without manual error.` },
+      { letter: 'D', text: '<code>git commit --amend</code> on the bad commit', correct: false,
+        explain: `<code>--amend</code> only touches the previous commit, and amending public history is its own disaster. You want to counter an old commit, not rewrite it.` }
+    ]
+  },
+  {
+    scenario: `You've been on a feature branch for six hours. <code>main</code> has moved forward by about 15 commits from other teammates. You want to bring those changes into your branch. Right move?`,
+    options: [
+      { letter: 'A', text: '<code>git pull origin main</code> from your branch (creates a merge commit)', correct: false,
+        explain: `Works, but produces a merge commit cluttering your branch every time you sync. Multiply across a team and <code>git log</code> becomes unreadable. Not <em>wrong</em>, but not the default the rulebook recommends.` },
+      { letter: 'B', text: '<code>git pull --rebase origin main</code> — replay your commits on top', correct: true,
+        explain: `Rebasing keeps your feature branch linear on top of current <code>main</code>. Your commits get new SHAs but preserve their content. No merge-commit noise, clean history, and because your branch is private this is safe rewriting.` },
+      { letter: 'C', text: 'Close your PR, delete your branch, start over from fresh <code>main</code>', correct: false,
+        explain: `Radical overkill. You'd throw away six hours of correct work to avoid a sync operation that takes seconds.` },
+      { letter: 'D', text: 'Do nothing — your branch has its own copy of the code', correct: false,
+        explain: `The longer you wait, the harder the eventual merge. Divergence compounds (Experiment 02). The right habit is sync early, sync often.` }
+    ]
+  },
+  {
+    scenario: `You want to contribute a small bug fix to an open-source project on GitHub. You've never contributed before and you don't have write access to the repo. What's the standard workflow?`,
+    options: [
+      { letter: 'A', text: 'Email a patch file to the maintainers', correct: false,
+        explain: `Used to be standard in the mailing-list era; still works in some projects (e.g. Linux kernel). But on GitHub the native workflow is fork + PR, which gives you CI, review threads, and discoverability.` },
+      { letter: 'B', text: 'Open an issue asking to be added as a collaborator', correct: false,
+        explain: `Maintainers almost never grant write access to first-time contributors, and they shouldn't need to. The fork-and-PR model exists precisely so strangers can propose changes without trust up front.` },
+      { letter: 'C', text: 'Fork the repo, branch on the fork, push, open a PR from fork to upstream', correct: true,
+        explain: `This is the canonical open-source flow. Your fork is your own server-side clone where you have full write access. You branch and push there, then GitHub lets you open a PR <em>from your fork's branch</em> into the upstream repo's branch. The maintainer reviews and merges — no write access required.` },
+      { letter: 'D', text: 'Clone the repo, commit, push (it\'ll fail — then figure it out)', correct: false,
+        explain: `The push will fail because you lack write permissions. Fine as a "discover the right workflow" experiment, but the correct answer is already known — fork and PR.` }
+    ]
+  },
+  {
+    scenario: `You ran <code>git checkout abc1234</code> to inspect what the code looked like at that historical commit. Curious, you made some edits and committed them. Three commits later, Git warns about "detached HEAD" and orphaned work. What's happening?`,
+    options: [
+      { letter: 'A', text: 'Your commits are corrupted and must be discarded', correct: false,
+        explain: `Not corrupted — they exist and are valid commit objects. They're just not reachable from any branch. If you move HEAD away and they age out of the reflog, <em>then</em> they'll be garbage-collected. Until then, they're fine.` },
+      { letter: 'B', text: 'You\'re not on a branch. Run <code>git switch -c new-branch</code> to anchor them', correct: true,
+        explain: `Detached HEAD means HEAD points directly at a commit SHA rather than at a branch. Commits you make have no branch pointing at them, so once HEAD moves they become unreachable. Creating a new branch while still in detached HEAD pins the chain to a ref, making them permanent and findable.` },
+      { letter: 'C', text: 'You need to force-push to <code>origin/abc1234</code>', correct: false,
+        explain: `<code>origin/abc1234</code> isn't a branch — SHAs aren't push targets. This command wouldn't do anything meaningful.` },
+      { letter: 'D', text: 'Nothing — Git will automatically create a branch for you', correct: false,
+        explain: `Git will <em>warn</em> you but won't auto-create anything. If you switch away without creating a branch, the commits become unreachable and will eventually be garbage-collected. The warning is Git saying "act now or lose these."` }
+    ]
+  },
+  {
+    scenario: `Your team's <code>main</code> branch has no protection rules. A new teammate, on their first day, runs <code>git push origin main</code> from their laptop with some WIP code. Production breaks. Who's primarily at fault — and what's the fix going forward?`,
+    options: [
+      { letter: 'A', text: 'The teammate — they should have known better', correct: false,
+        explain: `They made a mistake, but a mistake this consequential shouldn't be possible with a casual command. When the only thing standing between WIP code and production is individual discipline, eventual failure is certain. The rulebook's stance: make the class of error <em>impossible</em>, not just discouraged.` },
+      { letter: 'B', text: 'The team — no branch protection, no required CI, no required review', correct: true,
+        explain: `A rule enforced only by convention will eventually be broken by someone who didn't know the convention. Protected branches, required status checks, and required reviews turn "please don't push to main" into "you <em>cannot</em> push to main." Set these up on day one — they're cheap insurance against exactly this class of incident.` },
+      { letter: 'C', text: 'Git — for not preventing it by default', correct: false,
+        explain: `Git is a tool; it does what you ask. The protections live at the GitHub layer (or equivalent), and they're configurable precisely because different teams want different policies. The fix is policy, applied correctly.` },
+      { letter: 'D', text: 'Nobody — accidents happen', correct: false,
+        explain: `A useful response to individual errors; not a useful response to systemic risk. "Accidents happen" is an argument <em>for</em> protected branches, not against doing anything.` }
+    ]
+  }
+];
+
+const mqContainer = document.getElementById('mastery-questions');
+let answered = 0;
+let correct = 0;
+
+function renderMastery() {
+  mqContainer.innerHTML = '';
+  masteryQs.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'mq';
+    let optionsHtml = q.options.map((o, oi) => `
+      <button class="mq-option" data-q="${qi}" data-o="${oi}">
+        <span class="letter">${o.letter}.</span>
+        <span>${o.text}</span>
+      </button>
+    `).join('');
+    card.innerHTML = `
+      <div class="mq-header">
+        <div class="mq-num">${String(qi + 1).padStart(2, '0')}</div>
+        <div class="mq-scenario">${q.scenario}</div>
+      </div>
+      <div class="mq-options">${optionsHtml}</div>
+      <div class="mq-feedback" id="mq-feedback-${qi}"></div>
+    `;
+    mqContainer.appendChild(card);
+  });
+
+  document.querySelectorAll('.mq-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const qi = parseInt(btn.dataset.q);
+      const oi = parseInt(btn.dataset.o);
+      const q = masteryQs[qi];
+      const chosen = q.options[oi];
+
+      // Only allow answering once
+      const card = btn.closest('.mq');
+      if (card.dataset.answered === '1') return;
+      card.dataset.answered = '1';
+
+      // Mark options
+      card.querySelectorAll('.mq-option').forEach((b, i) => {
+        b.classList.add('disabled');
+        if (i === oi) {
+          b.classList.add(chosen.correct ? 'correct' : 'incorrect');
+        } else if (q.options[i].correct) {
+          b.classList.add('revealed-correct');
+        }
+      });
+
+      // Feedback
+      const fb = document.getElementById(`mq-feedback-${qi}`);
+      const label = chosen.correct ? 'Correct' : 'Not quite';
+      fb.className = 'mq-feedback show' + (chosen.correct ? '' : ' incorrect');
+      fb.innerHTML = `<span class="tag">${label}</span>${chosen.explain}`;
+
+      // Update score
+      answered++;
+      if (chosen.correct) correct++;
+      updateScoreboard();
+    });
+  });
+}
+
+function updateScoreboard() {
+  document.getElementById('mastery-answered').textContent = answered;
+  document.getElementById('mastery-correct').textContent = correct;
+  document.getElementById('mastery-bar').style.width = ((answered / masteryQs.length) * 100) + '%';
+  if (answered === masteryQs.length) {
+    const final = document.getElementById('mastery-final');
+    final.style.display = 'block';
+    let title, msg;
+    const pct = correct / masteryQs.length;
+    if (pct === 1) {
+      title = 'Eight for eight.';
+      msg = `You're reading Git at the level this rulebook was aiming for. The team is safer with you at the keyboard — you know not just what to do, but <em>why</em> the wrong answers are tempting.`;
+    } else if (pct >= 0.75) {
+      title = `${correct} of 8 — fluent.`;
+      msg = `You're solidly past the CVS-era mental model. A few concepts still shaky — review the scenarios you missed and skim the "Clever Gambits" section. One more lap through the manual and you'll be fully there.`;
+    } else if (pct >= 0.5) {
+      title = `${correct} of 8 — competent.`;
+      msg = `You've got the core loop, but the recovery plays and decision points are where Git fluency actually lives. Re-read Part V (Decisions) and Part VII (Gambits), then retry these questions cold.`;
+    } else {
+      title = `${correct} of 8 — early days.`;
+      msg = `That's OK. The mental model takes real practice to install — most of the wrong answers above are things competent engineers have done. Walk the five-phase loop on a real repo this week and retry.`;
+    }
+    document.getElementById('mastery-final-title').textContent = title;
+    document.getElementById('mastery-final-message').innerHTML = msg;
+    final.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+document.getElementById('mastery-reset').addEventListener('click', () => {
+  answered = 0;
+  correct = 0;
+  document.getElementById('mastery-final').style.display = 'none';
+  updateScoreboard();
+  renderMastery();
+});
+
+renderMastery();
+updateScoreboard();
+</script>
+
+</body>
+</html>
