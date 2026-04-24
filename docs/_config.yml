@@ -32,6 +32,8 @@ navigation:
   - name: Tutorials
     link: /#tutorials
     sublist:
+      - name: Git explainer
+        link: /tutorials/git-rulebook.html
       - name: Greed
         link: /tutorials/greed.html
       - name: How a GPT Learns
