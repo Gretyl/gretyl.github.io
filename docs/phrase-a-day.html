@@ -90,7 +90,7 @@
     opacity: 0.7;
     letter-spacing: 0.15em;
   }
-  .speaker {
+  .speaker, .share {
     position: fixed;
     background: none;
     border: none;
@@ -103,19 +103,20 @@
     transition: opacity 0.2s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .speaker:hover { opacity: 0.95; }
-  .speaker:focus-visible {
+  .speaker:hover, .share:hover { opacity: 0.95; }
+  .speaker:focus-visible, .share:focus-visible {
     outline: 2px solid currentColor;
     outline-offset: 2px;
     opacity: 0.95;
   }
   .speaker.speaking { opacity: 1; }
-  .speaker.tl { top: 2vh; left: 2vw; }
-  .speaker.tr { top: 2vh; right: 2vw; }
-  .speaker.bl { bottom: 2vh; left: 2vw; }
-  .speaker.br { bottom: 2vh; right: 2vw; }
+  .share.copied { opacity: 1; }
+  .speaker.tl, .share.tl { top: 2vh; left: 2vw; }
+  .speaker.tr, .share.tr { top: 2vh; right: 2vw; }
+  .speaker.bl, .share.bl { bottom: 2vh; left: 2vw; }
+  .speaker.br, .share.br { bottom: 2vh; right: 2vw; }
   @media (prefers-reduced-motion: reduce) {
-    html, body, .phrase, .speaker {
+    html, body, .phrase, .speaker, .share {
       transition: none !important;
     }
   }
@@ -145,6 +146,14 @@
 <body>
   <button class="speaker" id="speaker" type="button" aria-label="Read phrase aloud">
     <span aria-hidden="true">🔊</span>
+  </button>
+  <button class="share tr" id="share" type="button" aria-label="Copy link to this phrase">
+    <span aria-hidden="true" id="share-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+    </span>
   </button>
   <time class="date" id="date"></time>
   <button
@@ -243,7 +252,14 @@ async function init() {
     return;
   }
 
-  const now = new Date();
+  // Support ?d=N to lock to a specific day-of-epoch (for shareable links).
+  // N is a non-negative integer count of days since EPOCH; invalid values
+  // silently fall through to today.
+  const params = new URLSearchParams(window.location.search);
+  const rawD = params.get("d");
+  const parsedD = rawD === null ? NaN : parseInt(rawD, 10);
+  const isLocked = Number.isInteger(parsedD) && parsedD >= 0 && String(parsedD) === rawD;
+  const now = isLocked ? new Date(EPOCH.getTime() + parsedD * 86400000) : new Date();
   const ordered = stableOrder(phrases);
   // Compute all per-day state from a date: phrase, palette, speaker corners.
   // Closes over ordered so rollover can recompute without re-fetching.
@@ -278,7 +294,9 @@ async function init() {
       fgL += step;
     }
 
-    const corners = ["tl", "tr", "bl", "br"];
+    // tr is reserved for the share button, so the speaker rotates among the
+    // other three corners.
+    const corners = ["tl", "bl", "br"];
     const cornerRng = mulberry32(idx * 1000 + dayNum);
 
     return {
@@ -294,8 +312,8 @@ async function init() {
       isoDate: date.toISOString().slice(0, 10),
       bg: `hsl(${hue}, ${bgS}%, ${bgL}%)`,
       fg: `hsl(${altHue}, ${fgS}%, ${fgL}%)`,
-      cornerA: corners[Math.floor(cornerRng() * 4)],
-      cornerB: corners[Math.floor(cornerRng() * 4)]
+      cornerA: corners[Math.floor(cornerRng() * 3)],
+      cornerB: corners[Math.floor(cornerRng() * 3)]
     };
   }
 
@@ -345,6 +363,43 @@ async function init() {
     e.stopPropagation();
     speak(showingAlt ? day.altPhrase : day.phrase);
   });
+
+  // Share button: when unlocked, copies a ?d=N URL pinned to the displayed
+  // day. When the page is already locked (?d= present and valid), the icon
+  // becomes 🔒 and tapping it drops the query and navigates to today.
+  const shareEl = document.getElementById("share");
+  const shareSpan = document.getElementById("share-icon");
+  const originalIcon = shareSpan.innerHTML;
+  if (isLocked) {
+    shareSpan.textContent = "🔒";
+    shareEl.setAttribute("aria-label", "Unlock to today's phrase");
+    shareEl.addEventListener("click", (e) => {
+      e.stopPropagation();
+      window.location.assign(window.location.pathname + window.location.hash);
+    });
+  } else {
+    shareEl.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const url = new URL(window.location.href);
+      url.search = `?d=${daysSinceEpoch(new Date())}`;
+      try {
+        await navigator.clipboard.writeText(url.toString());
+      } catch {
+        const tmp = document.createElement("input");
+        tmp.value = url.toString();
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand("copy");
+        tmp.remove();
+      }
+      shareEl.classList.add("copied");
+      shareSpan.textContent = "✓";
+      setTimeout(() => {
+        shareEl.classList.remove("copied");
+        shareSpan.innerHTML = originalIcon;
+      }, 1500);
+    });
+  }
 
   // Easter egg: tap the phrase to crossfade between today's phrase and its
   // pair at (idx + 366) % phrases.length. The pair inverts the palette — fg and
@@ -396,7 +451,7 @@ async function init() {
   function scheduleRollover() {
     setTimeout(() => { rollover(); scheduleRollover(); }, msUntilMidnight() + 1000);
   }
-  scheduleRollover();
+  if (!isLocked) scheduleRollover();
 
   // React to OS theme changes mid-session by reloading so the palette recomputes.
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
