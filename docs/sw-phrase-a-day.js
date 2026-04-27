@@ -1,4 +1,4 @@
-const CACHE_NAME = 'phrase-a-day-v1.04';
+const CACHE_NAME = 'phrase-a-day-v1.05';
 const APP_FILES = [
   '/phrase-a-day.html',
   '/assets/phrases.md'

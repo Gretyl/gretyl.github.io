@@ -298,6 +298,7 @@ async function init() {
     // other three corners.
     const corners = ["tl", "bl", "br"];
     const cornerRng = mulberry32(idx * 1000 + dayNum);
+		const aIdx = Math.floor(cornerRng() * 3);
 
     return {
       idx,
@@ -312,8 +313,8 @@ async function init() {
       isoDate: date.toISOString().slice(0, 10),
       bg: `hsl(${hue}, ${bgS}%, ${bgL}%)`,
       fg: `hsl(${altHue}, ${fgS}%, ${fgL}%)`,
-      cornerA: corners[Math.floor(cornerRng() * 3)],
-      cornerB: corners[Math.floor(cornerRng() * 3)]
+      cornerA: corners[aIdx],
+      cornerB: corners[(aIdx + 1 + Math.floor(cornerRng() * 2)) % 3]
     };
   }
 
