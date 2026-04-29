@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+
+<meta property="og:title" content="The Hypertext Kitchen — A Tweego Primer">
+<meta property="og:description" content="A clickable primer on Tweego: mise, marry, fire — the three motions of every hypertext kitchen. 🧶">
+<meta property="og:url" content="https://gretyl.maplecrew.org/tutorials/twine-starter.html">
+<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/twine-starter.svg">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Gretyl">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-05N3959YM1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-05N3959YM1');
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Hypertext Kitchen — A Tweego Primer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3e9d2;
+    --paper-soft: #ebe0c1;
+    --paper-deep: #d9caa3;
+    --ink: #2b1f10;
+    --ink-soft: #5e4a30;
+    --ink-faint: #9c8866;
+    --rule: #c5b48b;
+    --accent: #b9711e;
+    --accent-soft: #d18a3a;
+    --accent-glow: rgba(185, 113, 30, 0.10);
+    --olive: #6b6e38;
+    --display: 'DM Serif Display', 'Didot', 'Bodoni 72', serif;
+    --body: 'Cormorant Garamond', 'Garamond', Georgia, serif;
+    --mono: 'JetBrains Mono', Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 21px;
+    line-height: 1.6;
+    background-image:
+      radial-gradient(ellipse at 12% 18%, rgba(185, 113, 30, 0.08), transparent 55%),
+      radial-gradient(ellipse at 88% 80%, rgba(107, 110, 56, 0.06), transparent 55%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.13 0 0 0 0 0.10 0 0 0 0 0.07 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  ::selection { background: var(--accent); color: var(--paper); }
+
+  .frame {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 80px 32px 120px;
+  }
+
+  /* ============ Header ============ */
+  header.masthead {
+    text-align: left;
+    padding-bottom: 60px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 80px;
+    position: relative;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.34em;
+    color: var(--ink-faint);
+    margin-bottom: 38px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .eyebrow::before, .eyebrow::after {
+    content: "";
+    flex: 0 0 28px;
+    height: 1px;
+    background: var(--rule);
+  }
+  .eyebrow::after { flex: 1; }
+
+  h1.title {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(52px, 8vw, 108px);
+    line-height: 0.92;
+    letter-spacing: -0.015em;
+    margin: 0 0 32px;
+  }
+  h1.title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  h1.title .small {
+    display: block;
+    font-size: 0.42em;
+    font-style: italic;
+    color: var(--ink-soft);
+    letter-spacing: 0;
+    margin-top: 14px;
+    line-height: 1.2;
+  }
+
+  .standfirst {
+    font-size: 24px;
+    font-style: italic;
+    color: var(--ink-soft);
+    max-width: 640px;
+    line-height: 1.45;
+    margin: 0 0 26px;
+  }
+  .standfirst strong { font-style: normal; color: var(--ink); }
+
+  .prologue {
+    max-width: 640px;
+    color: var(--ink-soft);
+    font-size: 19px;
+  }
+
+  /* ============ Section structure ============ */
+  section.chapter {
+    margin: 110px 0;
+    position: relative;
+  }
+
+  .chapter-head {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 28px;
+    align-items: start;
+    margin-bottom: 44px;
+  }
+
+  .course-mark {
+    text-align: right;
+    padding-top: 6px;
+  }
+  .course-mark .label {
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+  .course-mark .num {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 70px;
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .chapter-title-block { padding-top: 12px; }
+
+  .chapter-kicker {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--ink-faint);
+    margin-bottom: 14px;
+  }
+
+  h2.chapter-title {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  h2.chapter-title em { font-style: italic; color: var(--accent); }
+
+  .chapter-body { padding-left: 128px; }
+  @media (max-width: 760px) {
+    .chapter-head { grid-template-columns: 1fr; gap: 6px; }
+    .course-mark { text-align: left; }
+    .course-mark .num { font-size: 52px; }
+    .chapter-body { padding-left: 0; }
+  }
+
+  p { margin: 0 0 1.1em; }
+  p.lede {
+    font-size: 23px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  p.lede:first-letter {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 3.6em;
+    line-height: 0.85;
+    float: left;
+    padding: 8px 14px 0 0;
+    color: var(--accent);
+  }
+
+  a { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+  a:hover { color: var(--accent-soft); }
+
+  code.inline {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    background: var(--paper-soft);
+    padding: 1px 6px;
+    border: 1px solid var(--rule);
+    color: var(--ink);
+  }
+
+  /* ============ Mnemonic — three motions ============ */
+  .motions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin: 40px 0 16px;
+    border: 1px solid var(--ink);
+    background: var(--paper-soft);
+    box-shadow: 6px 6px 0 var(--paper-deep);
+  }
+  .motion-cell {
+    padding: 36px 30px;
+    border-right: 1px solid var(--rule);
+    position: relative;
+  }
+  .motion-cell:last-child { border-right: 0; }
+  .motion-cell .step {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.2em;
+  }
+  .motion-word {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .motion-trans {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+  }
+  .motion-desc {
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .motion-desc code.inline { font-size: 14px; }
+  @media (max-width: 760px) {
+    .motions { grid-template-columns: 1fr; }
+    .motion-cell { border-right: 0; border-bottom: 1px solid var(--rule); }
+    .motion-cell:last-child { border-bottom: 0; }
+  }
+
+  /* ============ Playable mini-Twine ============ */
+  .playable {
+    margin: 44px 0;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 0;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    box-shadow: 8px 8px 0 var(--paper-deep);
+  }
+  @media (max-width: 780px) {
+    .playable { grid-template-columns: 1fr; }
+  }
+
+  .stage {
+    padding: 38px 38px 30px;
+    border-right: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+  }
+  @media (max-width: 780px) {
+    .stage { border-right: 0; border-bottom: 1px solid var(--rule); }
+  }
+
+  .stage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: var(--ink-faint);
+    padding-bottom: 14px;
+    margin-bottom: 22px;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .stage-title { color: var(--accent); }
+  .turn-counter span { color: var(--ink); }
+
+  .stage-text {
+    font-size: 21px;
+    line-height: 1.5;
+    flex: 1;
+    margin-bottom: 24px;
+  }
+  .stage-text p { margin: 0 0 0.85em; }
+  .stage-text em { font-style: italic; color: var(--ink-soft); }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice {
+    background: transparent;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 18px;
+    text-align: left;
+    padding: 11px 16px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .choice::before {
+    content: "→";
+    color: var(--accent);
+    font-family: var(--display);
+    transition: transform 0.15s ease;
+  }
+  .choice:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .choice:hover::before { color: var(--paper); transform: translateX(3px); }
+  .choice.restart { border-style: dashed; font-style: italic; }
+
+  .inspector {
+    padding: 38px 32px 30px;
+    background: var(--paper-soft);
+    display: flex;
+    flex-direction: column;
+  }
+  .inspector-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+  }
+
+  .graph { margin-bottom: 22px; }
+  .graph svg { width: 100%; height: auto; display: block; }
+  .graph .node { fill: var(--paper); stroke: var(--ink-faint); stroke-width: 1; transition: all 0.25s ease; }
+  .graph .node.visited { fill: var(--paper-deep); stroke: var(--ink-soft); }
+  .graph .node.current { fill: var(--accent); stroke: var(--accent); }
+  .graph .node-label { font-family: var(--mono); font-size: 9px; fill: var(--ink-soft); text-anchor: middle; pointer-events: none; }
+  .graph .edge { stroke: var(--ink-faint); stroke-width: 1; fill: none; }
+  .graph .edge.traveled { stroke: var(--accent); stroke-width: 1.5; }
+
+  .state-block { font-family: var(--mono); font-size: 12px; }
+  .state-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--rule);
+    color: var(--ink-soft);
+  }
+  .state-row:last-child { border-bottom: 0; }
+  .state-key { color: var(--ink-faint); }
+  .state-val { color: var(--ink); font-weight: 500; }
+  .state-val.true { color: var(--accent); }
+
+  /* ============ Format / pantry comparator ============ */
+  .formats { margin: 44px 0; }
+  .format-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: -1px;
+    flex-wrap: wrap;
+  }
+  .format-tab {
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    border-bottom: 1px solid var(--ink);
+    padding: 14px 24px;
+    font-family: var(--display);
+    font-size: 19px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    margin-right: -1px;
+    transition: all 0.15s ease;
+  }
+  .format-tab:hover { color: var(--ink); }
+  .format-tab.active {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    border-bottom: 1px solid var(--paper);
+    color: var(--accent);
+    font-style: italic;
+  }
+  .format-pane {
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    padding: 36px 38px;
+    box-shadow: 8px 8px 0 var(--paper-deep);
+  }
+  .format-tagline {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 28px;
+    color: var(--accent);
+    margin-bottom: 6px;
+    line-height: 1.1;
+  }
+  .format-vibe {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--ink-faint);
+    margin-bottom: 22px;
+  }
+  .format-blurb { font-size: 19px; line-height: 1.55; color: var(--ink-soft); margin: 0 0 8px; }
+  .format-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 26px;
+    margin: 28px 0 22px;
+  }
+  @media (max-width: 720px) { .format-grid { grid-template-columns: 1fr; } }
+
+  .format-strengths h4, .format-snippet h4 {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: var(--ink-faint);
+    margin: 0 0 12px;
+    font-weight: 500;
+  }
+  .format-strengths ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 17px;
+  }
+  .format-strengths li {
+    padding: 7px 0;
+    border-bottom: 1px dotted var(--rule);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .format-strengths li:last-child { border-bottom: 0; }
+  .format-strengths li::before {
+    content: "❦";
+    color: var(--accent);
+    font-size: 12px;
+    flex: 0 0 auto;
+  }
+
+  pre.code {
+    background: var(--ink);
+    color: #ecdfc4;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    padding: 22px 22px;
+    margin: 0;
+    overflow-x: auto;
+    border: 0;
+    box-shadow: inset 0 0 0 1px rgba(236, 223, 196, 0.07);
+  }
+  pre.code .header { color: var(--accent-soft); font-weight: 700; }
+  pre.code .kw { color: #d99c5c; }
+  pre.code .var { color: #c2a988; }
+  pre.code .str { color: #b3c490; }
+  pre.code .link { color: #e8806a; }
+  pre.code .cmt { color: #807565; font-style: italic; }
+
+  .format-best {
+    margin-top: 22px;
+    padding: 16px 20px;
+    background: var(--accent-glow);
+    border-left: 3px solid var(--accent);
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 18px;
+  }
+  .format-best strong { color: var(--accent); font-style: normal; }
+
+  /* ============ Archetypes / dishes ============ */
+  .menu {
+    margin: 44px 0;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 0;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    box-shadow: 8px 8px 0 var(--paper-deep);
+  }
+  @media (max-width: 820px) {
+    .menu { grid-template-columns: 1fr; }
+  }
+
+  .menu-list {
+    border-right: 1px solid var(--rule);
+    background: var(--paper-soft);
+  }
+  @media (max-width: 820px) {
+    .menu-list { border-right: 0; border-bottom: 1px solid var(--rule); display: flex; overflow-x: auto; }
+  }
+
+  .menu-list-header {
+    padding: 18px 24px 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--rule);
+  }
+  @media (max-width: 820px) { .menu-list-header { display: none; } }
+
+  .dish-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    padding: 18px 24px;
+    cursor: pointer;
+    font-family: var(--display);
+    font-size: 21px;
+    color: var(--ink-soft);
+    transition: all 0.15s ease;
+    position: relative;
+    line-height: 1.15;
+  }
+  .dish-btn:last-child { border-bottom: 0; }
+  .dish-btn:hover { background: var(--paper); color: var(--ink); }
+  .dish-btn.active {
+    background: var(--paper);
+    color: var(--accent);
+    font-style: italic;
+  }
+  .dish-btn.active::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+  }
+  .dish-btn .dish-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    margin-right: 12px;
+    letter-spacing: 0.2em;
+    font-style: normal;
+    font-weight: normal;
+  }
+  .dish-btn .archetype-sub {
+    display: block;
+    font-family: var(--body);
+    font-size: 14px;
+    font-style: italic;
+    color: var(--ink-faint);
+    margin-top: 2px;
+    margin-left: 38px;
+  }
+  .dish-btn.active .archetype-sub { color: var(--ink-soft); }
+  @media (max-width: 820px) {
+    .dish-btn { white-space: nowrap; border-bottom: 0; border-right: 1px solid var(--rule); flex: 0 0 auto; }
+    .dish-btn.active::before { width: 100%; height: 3px; top: auto; bottom: 0; }
+    .dish-btn .archetype-sub { display: none; }
+  }
+
+  .recipe-card {
+    padding: 38px 42px 36px;
+    min-height: 540px;
+    background:
+      linear-gradient(var(--paper), var(--paper)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.13 0 0 0 0 0.10 0 0 0 0 0.07 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .recipe-tagline {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .recipe-name {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 42px;
+    line-height: 1;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .recipe-name em { font-style: italic; color: var(--accent); }
+  .recipe-archetype {
+    font-family: var(--body);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-faint);
+    margin-bottom: 22px;
+  }
+  .recipe-pitch {
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .recipe-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 600px) { .recipe-cols { grid-template-columns: 1fr; } }
+  .recipe-col h5 {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    margin: 0 0 14px;
+    font-weight: 500;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .ingredient-row {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 12px;
+    padding: 7px 0;
+    font-size: 16.5px;
+    border-bottom: 1px dotted var(--rule);
+    line-height: 1.4;
+  }
+  .ingredient-row:last-child { border-bottom: 0; }
+  .ingredient-amt {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    text-align: right;
+    padding-top: 3px;
+  }
+  .ingredient-name { color: var(--ink); }
+  .ingredient-name em { color: var(--ink-soft); font-style: italic; }
+
+  .recipe-pantry {
+    margin-top: 26px;
+    padding: 18px 22px;
+    background: var(--accent-glow);
+    border-left: 3px solid var(--accent);
+    font-size: 17.5px;
+    line-height: 1.55;
+  }
+  .recipe-pantry-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+  .recipe-pantry strong { color: var(--accent); font-style: normal; }
+  .recipe-pantry em { font-style: italic; color: var(--ink-soft); }
+
+  .recipe-card.fade { opacity: 0; }
+  .recipe-card { transition: opacity 0.18s ease; }
+
+  /* ============ Pitfalls ============ */
+  .pitfalls {
+    margin: 44px 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    border: 1px solid var(--rule);
+  }
+  @media (max-width: 720px) { .pitfalls { grid-template-columns: 1fr; } }
+
+  .pitfall {
+    padding: 28px 30px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper);
+  }
+  .pitfall:nth-child(2n) { border-right: 0; }
+  .pitfall:nth-last-child(-n+2) { border-bottom: 0; }
+  @media (max-width: 720px) {
+    .pitfall { border-right: 0 !important; }
+    .pitfall:nth-last-child(-n+2) { border-bottom: 1px solid var(--rule); }
+    .pitfall:last-child { border-bottom: 0; }
+  }
+
+  .pitfall.provision { background: var(--paper-soft); }
+
+  .pitfall-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .pitfall.provision .pitfall-tag { color: var(--olive); }
+  .pitfall h4 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 26px;
+    margin: 0 0 12px;
+    line-height: 1.1;
+  }
+  .pitfall h4 em { font-style: italic; color: var(--accent); }
+  .pitfall.provision h4 em { color: var(--olive); }
+  .pitfall p { font-size: 17px; color: var(--ink-soft); margin: 0; line-height: 1.5; }
+
+  /* ============ Onward ============ */
+  .onward {
+    margin: 64px 0 0;
+    padding: 40px 0 0;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+  }
+  .onward-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.34em;
+    color: var(--ink-faint);
+    margin-bottom: 20px;
+  }
+  .onward h3 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 42px;
+    line-height: 1.1;
+    margin: 0 0 24px;
+  }
+  .onward h3 em { font-style: italic; color: var(--accent); }
+  .onward-links {
+    display: flex;
+    gap: 26px;
+    justify-content: center;
+    flex-wrap: wrap;
+    font-size: 18px;
+  }
+
+  footer {
+    margin-top: 90px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    text-align: center;
+  }
+
+  /* ============ Animations ============ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .stage-text, .choices { animation: fadeUp 0.32s ease both; }
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <!-- ============ HEADER ============ -->
+  <header class="masthead">
+    <div class="eyebrow">A primer in five courses</div>
+    <h1 class="title">The Hypertext<br><em>Kitchen</em><span class="small">A cook's introduction to Tweego.</span></h1>
+    <p class="standfirst"><strong>Interactive fiction is a cuisine.</strong> Tweego is a kitchen built for it — small, sharp, and command-line. What follows is a clickable primer on how the kitchen works, what dishes it can produce, and which ingredients each one wants.</p>
+    <p class="prologue">If you have read your way through hypertext fiction for years and now want to make some, you are in the best possible position. The reading taught you the flavours; the toolkit only adds the seams. This primer will not exhaustively teach you to code — it will give you a felt sense of what a Tweego project tastes like to assemble, and a map of which kinds of stories want which kinds of pantries.</p>
+  </header>
+
+  <!-- ============ I. MISE / MARRY / FIRE ============ -->
+  <section class="chapter" id="loop">
+    <div class="chapter-head">
+      <div class="course-mark">
+        <div class="label">Course</div>
+        <div class="num">I</div>
+      </div>
+      <div class="chapter-title-block">
+        <div class="chapter-kicker">the working rhythm</div>
+        <h2 class="chapter-title"><em>Mise.</em> Marry. Fire.</h2>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p class="lede">Three motions repeat through every Tweego session, in the same order, forever. You <em>mise</em> — gather your passages and lay them out in plain text files. You <em>marry</em> them with bracketed links so the reader can move between them. You <em>fire</em> — run the <code class="inline">tweego</code> command, and your folder of source files compiles into a single self-contained HTML artifact you can open, taste, and adjust.</p>
+
+      <div class="motions">
+        <div class="motion-cell">
+          <div class="step">i</div>
+          <div class="motion-word">Mise.</div>
+          <div class="motion-trans">lay out · prep · stage</div>
+          <div class="motion-desc">A passage is a labelled scene. In Twee notation, it begins with <code class="inline">:: PassageName</code> on a line of its own, then your prose. Lay them out in <code class="inline">.tw</code> files however you like — one per file, or many.</div>
+        </div>
+        <div class="motion-cell">
+          <div class="step">ii</div>
+          <div class="motion-word">Marry.</div>
+          <div class="motion-trans">join · seam · combine</div>
+          <div class="motion-desc">Square brackets are the seam. <code class="inline">[[take the key]]</code> jumps to a passage of that name. The graph builds itself as you type — every link knits two passages together.</div>
+        </div>
+        <div class="motion-cell">
+          <div class="step">iii</div>
+          <div class="motion-word">Fire.</div>
+          <div class="motion-trans">compile · plate · serve</div>
+          <div class="motion-desc">One command — <code class="inline">tweego -o story.html src/</code> — turns your source folder into a finished HTML file. No build pipeline. No deploy. Open it. Taste it. Adjust.</div>
+        </div>
+      </div>
+
+      <p style="margin-top: 28px;">That is the entire authoring surface. Everything else — variables, conditionals, save systems, the whistle of an achievement chime — is bolted onto this loop, never replacing it. A Tweego project is, at root, a sheaf of plain-text recipe cards that compile into a single dish.</p>
+    </div>
+  </section>
+
+  <!-- ============ II. PLAYABLE ============ -->
+  <section class="chapter" id="play">
+    <div class="chapter-head">
+      <div class="course-mark">
+        <div class="label">Course</div>
+        <div class="num">II</div>
+      </div>
+      <div class="chapter-title-block">
+        <div class="chapter-kicker">a sample plate</div>
+        <h2 class="chapter-title">The <em>Lighthouse.</em></h2>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p class="lede">Below is a working hypertext story rendered in plain HTML — six passages, two links per turn, and one small piece of state. It is a single bite, fully cooked. Click through it. The right-hand panel is the kitchen line: it shows what's being tracked as you move.</p>
+
+      <div class="playable">
+        <div class="stage">
+          <div class="stage-header">
+            <div class="stage-title" id="passageName">Start</div>
+            <div class="turn-counter">turn <span id="turnCount">1</span></div>
+          </div>
+          <div class="stage-text" id="stageText"></div>
+          <div class="choices" id="choices"></div>
+        </div>
+        <aside class="inspector">
+          <div class="inspector-label">Story map</div>
+          <div class="graph" id="graph">
+            <svg viewBox="0 0 280 320" xmlns="http://www.w3.org/2000/svg">
+              <g id="edges">
+                <path class="edge" data-edge="Start-Beach" d="M 140 40 Q 70 90 50 140" />
+                <path class="edge" data-edge="Start-Rocks" d="M 140 40 Q 210 90 230 140" />
+                <path class="edge" data-edge="Beach-TakeKey" d="M 50 140 L 50 220" />
+                <path class="edge" data-edge="Beach-Door" d="M 50 140 Q 100 200 130 240" />
+                <path class="edge" data-edge="Rocks-Door" d="M 230 140 Q 180 200 150 240" />
+                <path class="edge" data-edge="TakeKey-Door" d="M 50 220 Q 90 240 130 240" />
+                <path class="edge" data-edge="Door-Lamp" d="M 140 250 L 140 290" />
+              </g>
+              <g id="nodes">
+                <circle class="node" data-node="Start" cx="140" cy="40" r="14"/>
+                <circle class="node" data-node="Beach" cx="50" cy="140" r="14"/>
+                <circle class="node" data-node="Rocks" cx="230" cy="140" r="14"/>
+                <circle class="node" data-node="TakeKey" cx="50" cy="220" r="14"/>
+                <circle class="node" data-node="Door" cx="140" cy="250" r="14"/>
+                <circle class="node" data-node="Lamp" cx="140" cy="296" r="14"/>
+              </g>
+              <g>
+                <text class="node-label" x="140" y="22">Start</text>
+                <text class="node-label" x="50" y="122">Beach</text>
+                <text class="node-label" x="230" y="122">Rocks</text>
+                <text class="node-label" x="50" y="245">Key</text>
+                <text class="node-label" x="140" y="278">Door</text>
+                <text class="node-label" x="140" y="320">Lamp</text>
+              </g>
+            </svg>
+          </div>
+          <div class="inspector-label" style="margin-top: 10px;">Story state</div>
+          <div class="state-block" id="stateBlock"></div>
+        </aside>
+      </div>
+
+      <p style="margin-top: 32px;">Two things to taste. First, the door cares whether you took the key — that is the variable in the right-hand panel, set in one passage and read in another. It is the same primitive that powers every save file in every CRPG you have ever played; here it weighs almost nothing. Second, the graph of passages looks like a graph because it <em>is</em> one. That visual map is also what your editor's directory tree and your <code class="inline">.tw</code> files describe, in text — drag passages around in your head; type brackets to draw arrows.</p>
+    </div>
+  </section>
+
+  <!-- ============ III. PANTRIES (FORMATS) ============ -->
+  <section class="chapter" id="formats">
+    <div class="chapter-head">
+      <div class="course-mark">
+        <div class="label">Course</div>
+        <div class="num">III</div>
+      </div>
+      <div class="chapter-title-block">
+        <div class="chapter-kicker">three pantries to cook from</div>
+        <h2 class="chapter-title">Pick a <em>story format.</em></h2>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p class="lede">Tweego is the kitchen — the compiler, the file structure, the rhythm. The <em>story format</em> is the pantry: the macros, the in-passage syntax, the runtime that turns your source into a playable page. Three are dominant, each with a personality. Click between them; the same passage from The Lighthouse, in each pantry's idiom.</p>
+
+      <div class="formats">
+        <div class="format-tabs" id="formatTabs">
+          <button class="format-tab active" data-format="harlowe">Harlowe</button>
+          <button class="format-tab" data-format="sugarcube">SugarCube</button>
+          <button class="format-tab" data-format="chapbook">Chapbook</button>
+        </div>
+        <div class="format-pane" id="formatPane"></div>
+      </div>
+
+      <p style="margin-top: 28px;">A reasonable rule of thumb: if you're cooking prose-forward, mood-driven work, start in Harlowe. If you suspect you'll want inventories, save slots, or stat sheets, jump straight to SugarCube. Try Chapbook if the syntax of the other two feels noisy on the tongue. Switching pantries later means rewriting your macro-level logic — the prose, the structure, and the link graph all transfer cleanly, but conditionals and variables will need new clothes.</p>
+    </div>
+  </section>
+
+  <!-- ============ IV. DISHES (ARCHETYPES) ============ -->
+  <section class="chapter" id="archetypes">
+    <div class="chapter-head">
+      <div class="course-mark">
+        <div class="label">Course</div>
+        <div class="num">IV</div>
+      </div>
+      <div class="chapter-title-block">
+        <div class="chapter-kicker">six culinary forms a hypertext story can take</div>
+        <h2 class="chapter-title">Choose a <em>dish.</em></h2>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p class="lede">Most published hypertext fiction falls into one of a handful of culinary shapes. Each shape implies a different mise — a different bill of mechanical materials. Click a dish on the left; the recipe card on the right shows what it takes to build, how much it yields, and which pantry makes it easiest.</p>
+
+      <div class="menu">
+        <div class="menu-list">
+          <div class="menu-list-header">The Menu</div>
+          <div id="dishList"></div>
+        </div>
+        <div class="recipe-card" id="recipeCard"></div>
+      </div>
+
+      <p style="margin-top: 32px;">These shapes are not exclusive — most real dishes are blends. A mystery often has stat-driven negotiation; a time loop is usually also a branching tale, just folded over itself. But identifying the dominant shape early gives you a target for your first prototype: cook the narrowest version of your dish that's still recognisable, then build outward. The petit four version of your novel is almost always your sharpest test of the idea.</p>
+    </div>
+  </section>
+
+  <!-- ============ V. PITFALLS / PROVISIONS ============ -->
+  <section class="chapter" id="review">
+    <div class="chapter-head">
+      <div class="course-mark">
+        <div class="label">Course</div>
+        <div class="num">V</div>
+      </div>
+      <div class="chapter-title-block">
+        <div class="chapter-kicker">field notes from the line</div>
+        <h2 class="chapter-title">Mishaps &amp; <em>provisions.</em></h2>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p class="lede">A handful of things every first-time Tweego author runs into. Each is solved more easily once it has a name.</p>
+
+      <div class="pitfalls">
+        <div class="pitfall">
+          <div class="pitfall-tag">Mishap · the unplated course</div>
+          <h4>Passages that lead <em>nowhere.</em></h4>
+          <p>It is shockingly easy to write a beautiful scene, link to it, and forget to give the player a way out. Run <code class="inline">tweego --test</code> with verbose output — orphans are usually the loudest thing in the kitchen.</p>
+        </div>
+        <div class="pitfall">
+          <div class="pitfall-tag">Mishap · the bottomless menu</div>
+          <h4>Branching that <em>explodes.</em></h4>
+          <p>Three meaningful choices per scene across ten scenes is fifty-nine thousand possible meals. Most great branching dishes use a small number of permanent forks and many transient ones that re-converge into a shared corridor.</p>
+        </div>
+        <div class="pitfall">
+          <div class="pitfall-tag">Mishap · the unseasoned reduction</div>
+          <h4>Variables you forgot to <em>surface.</em></h4>
+          <p>If a value is changing in the background and the player can't see or feel its presence, it might as well not exist. Either show the consequence in the prose, or cut the bookkeeping. No silent seasoning.</p>
+        </div>
+        <div class="pitfall provision">
+          <div class="pitfall-tag">Provision · taste as you go</div>
+          <h4>Compile <em>often.</em> Play oftener.</h4>
+          <p>Tweego is fast — compiles take milliseconds. There is no excuse for going more than a few passages without firing the build and clicking through. The errors you catch at the stove are the errors you don't serve to a guest.</p>
+        </div>
+      </div>
+
+      <div class="onward">
+        <div class="onward-eyebrow">When you are ready</div>
+        <h3>Cook the smallest version<br>of your <em>idea</em>, tonight.</h3>
+        <p style="max-width: 580px; margin: 0 auto 28px; color: var(--ink-soft); font-size: 19px;">Three passages. A single variable. One conditional. Whatever your game is, the version of it that fits in three passages exists, and is the only honest first draft. Cook that. Then cook the next thing it asks for.</p>
+        <div class="onward-links">
+          <a href="https://www.motoslave.net/tweego/" target="_blank" rel="noopener">tweego</a>
+          <a href="https://twinery.org/cookbook/" target="_blank" rel="noopener">the cookbook</a>
+          <a href="https://intfiction.org/" target="_blank" rel="noopener">intfiction.org</a>
+          <a href="https://itch.io/games/tag-twine" target="_blank" rel="noopener">itch.io · twine</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    A primer in clickable hypertext &nbsp;·&nbsp; set in DM Serif Display &amp; Cormorant Garamond
+  </footer>
+
+</div>
+
+<script>
+/* =========================================================
+   THE LIGHTHOUSE — embedded mini-Twine
+   ========================================================= */
+const passages = {
+  Start: {
+    text: `<p>The lighthouse rises from a tongue of black rock, white as a fang against the grey sea. Its lamp is dark. The door at its foot is shut, and weather-rusted, and it has been waiting.</p><p><em>What do you do?</em></p>`,
+    choices: [
+      { label: "Look around the beach", to: "Beach" },
+      { label: "Climb the rocks toward the lamp", to: "Rocks" }
+    ]
+  },
+  Beach: {
+    text: `<p>The tideline is littered with the things tides leave: bladderwrack, a torn lobster pot, a single shoe. Half-buried near a tussock of seagrass, you spot something metal.</p><p>It is a key. Iron, almost rusted through, but a key.</p>`,
+    choices: [
+      { label: "Take the key", to: "TakeKey" },
+      { label: "Leave it. Approach the door empty-handed.", to: "Door" }
+    ]
+  },
+  Rocks: {
+    text: `<p>You scramble up the seaward face. The basalt is sharp and the spray is constant and within ten feet you have skinned your palm open. The lamp room is unreachable from outside — the gallery has rusted away.</p><p>You pick your way back down. There is only the door.</p>`,
+    choices: [
+      { label: "Approach the door", to: "Door" }
+    ]
+  },
+  TakeKey: {
+    text: `<p>You pocket the key. It is heavier than it looked, and warm where the sand had held it.</p>`,
+    choices: [
+      { label: "Approach the door", to: "Door" }
+    ]
+  },
+  Door: {
+    text: () => state.hasKey
+      ? `<p>You fit the iron key into the lock. It turns with a low, reluctant clack — the sound of something that has not moved in a very long time agreeing, finally, to move.</p><p>The door swings inward.</p>`
+      : `<p>You set your shoulder to it. The door does not move. You try the handle, the hinges, a stone for a hammer. It is not a door that opens for someone with nothing to open it with.</p>`,
+    choices: () => state.hasKey
+      ? [{ label: "Climb to the lamp room", to: "Lamp" }]
+      : [{ label: "Begin again", to: "Start", restart: true }]
+  },
+  Lamp: {
+    text: `<p>The stairs spiral, and you climb them, and at the top you find the lamp — its great Fresnel lens cold and dust-furred, but intact.</p><p>You strike a match. The light, when it catches, is the colour of an old promise being kept.</p><p><em>— end —</em></p>`,
+    choices: [
+      { label: "Begin again", to: "Start", restart: true }
+    ]
+  }
+};
+
+let state = { hasKey: false, scrapedHand: false, current: "Start", turn: 1, visited: new Set(["Start"]), traveled: new Set() };
+
+function render() {
+  const p = passages[state.current];
+  document.getElementById("passageName").textContent = state.current;
+  document.getElementById("turnCount").textContent = state.turn;
+
+  const stage = document.getElementById("stageText");
+  stage.style.animation = "none";
+  stage.offsetHeight;
+  stage.style.animation = "";
+  stage.innerHTML = typeof p.text === "function" ? p.text() : p.text;
+
+  const choicesEl = document.getElementById("choices");
+  choicesEl.innerHTML = "";
+  const choices = typeof p.choices === "function" ? p.choices() : p.choices;
+  choices.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "choice" + (c.restart ? " restart" : "");
+    btn.textContent = c.label;
+    btn.onclick = () => go(c.to, c.restart);
+    choicesEl.appendChild(btn);
+  });
+
+  const stateBlock = document.getElementById("stateBlock");
+  stateBlock.innerHTML = `
+    <div class="state-row"><span class="state-key">$hasKey</span><span class="state-val ${state.hasKey ? 'true' : ''}">${state.hasKey}</span></div>
+    <div class="state-row"><span class="state-key">$current</span><span class="state-val">"${state.current}"</span></div>
+    <div class="state-row"><span class="state-key">$turn</span><span class="state-val">${state.turn}</span></div>
+  `;
+
+  document.querySelectorAll(".graph .node").forEach(n => {
+    const name = n.dataset.node;
+    n.classList.remove("current", "visited");
+    if (state.visited.has(name)) n.classList.add("visited");
+    if (name === state.current) n.classList.add("current");
+  });
+  document.querySelectorAll(".graph .edge").forEach(e => {
+    e.classList.toggle("traveled", state.traveled.has(e.dataset.edge));
+  });
+}
+
+function go(to, restart) {
+  if (restart) {
+    state = { hasKey: false, scrapedHand: false, current: "Start", turn: 1, visited: new Set(["Start"]), traveled: new Set() };
+    render();
+    return;
+  }
+  state.traveled.add(state.current + "-" + to);
+  if (to === "TakeKey") state.hasKey = true;
+  if (to === "Rocks") state.scrapedHand = true;
+  state.current = to;
+  state.visited.add(to);
+  state.turn++;
+  render();
+}
+
+render();
+
+/* =========================================================
+   FORMAT COMPARATOR — Tweego/Twee source
+   ========================================================= */
+const formats = {
+  harlowe: {
+    tagline: "The house pantry.",
+    vibe: "prose-forward · hooks &amp; round brackets",
+    blurb: "Harlowe is the comfort food of Twine — what most beginners cook in first, and what many never feel a need to leave. Its syntax leans on parenthesised macros: <code class=\"inline\">(set:)</code>, <code class=\"inline\">(if:)</code>, <code class=\"inline\">(link-reveal:)</code>. It uses named &ldquo;hooks&rdquo; that wrap stretches of prose so you can transform them in place. It feels closer to writing than to scripting.",
+    strengths: [
+      "In-passage transformations: revealing, replacing, fading text",
+      "A friendly learning curve for non-programmers",
+      "Beautiful default styling for prose-heavy stories",
+      "Documentation that reads like a book"
+    ],
+    code: `<span class="cmt">/* The 'TakeKey' passage in a Tweego source file */</span>
+<span class="cmt">/* (Harlowe is set as the format in StoryData) */</span>
+
+<span class="header">:: TakeKey</span>
+You pocket the key. It is heavier than it looked.
+
+<span class="kw">(set:</span> <span class="var">$hasKey</span> to <span class="str">true</span><span class="kw">)</span>
+
+<span class="link">[[Approach the door]]</span>
+
+
+<span class="header">:: Door</span>
+<span class="kw">(if:</span> <span class="var">$hasKey</span><span class="kw">)[</span>
+  You fit the key into the lock. It turns.
+  <span class="link">[[Climb to the lamp room]]</span>
+<span class="kw">](else:)[</span>
+  The door does not move.
+  <span class="link">[[Begin again->Start]]</span>
+<span class="kw">]</span>`,
+    best: "Atmosphere pieces, hypertext poems, branching tales where prose is doing nearly all the work and mechanical scaffolding stays light."
+  },
+  sugarcube: {
+    tagline: "The professional brigade.",
+    vibe: "engineered · angle-bracket macros · javascript-adjacent",
+    blurb: "SugarCube is the format under the hood of nearly every Twine game with stats, inventories, save slots, or sidebars. Its syntax mirrors HTML — angle-bracket macros like <code class=\"inline\">&lt;&lt;set&gt;&gt;</code>, <code class=\"inline\">&lt;&lt;if&gt;&gt;</code>, <code class=\"inline\">&lt;&lt;link&gt;&gt;</code> — and it grants you direct access to JavaScript and CSS when you need them. A real working kitchen, knife rack and all.",
+    strengths: [
+      "Robust save / load / autosave system out of the box",
+      "Sidebar UI primitives for health bars, stats, inventory",
+      "Strong community of utility libraries and templates",
+      "A native JavaScript escape hatch for anything custom"
+    ],
+    code: `<span class="cmt">/* The 'TakeKey' passage in a Tweego source file */</span>
+<span class="cmt">/* (SugarCube is set as the format in StoryData) */</span>
+
+<span class="header">:: TakeKey</span>
+You pocket the key. It is heavier than it looked.
+
+<span class="kw">&lt;&lt;set</span> <span class="var">$hasKey</span> to <span class="str">true</span><span class="kw">&gt;&gt;</span>
+
+<span class="link">[[Approach the door]]</span>
+
+
+<span class="header">:: Door</span>
+<span class="kw">&lt;&lt;if</span> <span class="var">$hasKey</span><span class="kw">&gt;&gt;</span>
+  You fit the key into the lock. It turns.
+  <span class="link">[[Climb to the lamp room]]</span>
+<span class="kw">&lt;&lt;else&gt;&gt;</span>
+  The door does not move.
+  <span class="link">[[Begin again|Start]]</span>
+<span class="kw">&lt;&lt;/if&gt;&gt;</span>`,
+    best: "Stat-driven sagas, mysteries, time loops — anything where the underlying systems are doing real work and need to be inspected, saved, and tuned."
+  },
+  chapbook: {
+    tagline: "The minimalist's mise.",
+    vibe: "newer · yaml-style headers · curly directives",
+    blurb: "Chapbook is the youngest of the three, designed by Twine's creator to feel cleaner and more deliberate than its predecessors. Each passage opens with a <em>vars section</em>, separated from prose by a <code class=\"inline\">--</code>. Logic uses curly directives — <code class=\"inline\">{if}</code>, <code class=\"inline\">{embed passage}</code> — that read more like markup than programming. A small, sharp pantry.",
+    strengths: [
+      "Clearest visual separation of state and prose",
+      "Built-in styling for headers, asides, and callouts",
+      "Sound and music with one-line directives",
+      "A smaller surface area to learn"
+    ],
+    code: `<span class="cmt"># The 'TakeKey' passage in a Tweego source file</span>
+<span class="cmt"># (Chapbook is set as the format in StoryData)</span>
+
+<span class="header">:: TakeKey</span>
+<span class="var">hasKey</span>: <span class="str">true</span>
+--
+You pocket the key. It is heavier than it looked.
+
+<span class="link">&gt; [[Approach the door]]</span>
+
+
+<span class="header">:: Door</span>
+<span class="kw">{if</span> <span class="var">hasKey</span><span class="kw">}</span>
+You fit the key into the lock. It turns.
+
+<span class="link">&gt; [[Climb to the lamp room]]</span>
+<span class="kw">{else}</span>
+The door does not move.
+
+<span class="link">&gt; [[Begin again-&gt;Start]]</span>
+<span class="kw">{/if}</span>`,
+    best: "Smaller, clean projects where the prose-vs-logic boundary should stay visually crisp. A good first pantry for writers who balk at angle brackets."
+  }
+};
+
+function renderFormat(key) {
+  const f = formats[key];
+  const pane = document.getElementById("formatPane");
+  pane.innerHTML = `
+    <div class="format-tagline">${f.tagline}</div>
+    <div class="format-vibe">${f.vibe}</div>
+    <p class="format-blurb">${f.blurb}</p>
+    <div class="format-grid">
+      <div class="format-strengths">
+        <h4>What it's good at</h4>
+        <ul>${f.strengths.map(s => `<li>${s}</li>`).join("")}</ul>
+      </div>
+      <div class="format-snippet">
+        <h4>The lighthouse, in this pantry</h4>
+        <pre class="code">${f.code}</pre>
+      </div>
+    </div>
+    <div class="format-best"><strong>Best for:</strong> ${f.best}</div>
+  `;
+}
+
+document.querySelectorAll("#formatTabs .format-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll("#formatTabs .format-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    renderFormat(tab.dataset.format);
+  });
+});
+renderFormat("harlowe");
+
+/* =========================================================
+   DISHES — narrative archetypes as culinary forms
+   ========================================================= */
+const dishes = [
+  {
+    key: "tasting",
+    name: "The Tasting Menu",
+    archetype: "the branching tale",
+    tagline: "courses, choices, a curated arrival",
+    pitch: "The classic shape. A protagonist, a situation, a few defining decisions, and three or four endings that feel earned. The ancestor of every choose-your-own-adventure paperback and the form most readers will recognise on the first bite.",
+    ingredients: [
+      { amt: "1 graph", name: "of passages with meaningful junctions" },
+      { amt: "3–5", name: "permanent flags for major decisions" },
+      { amt: "1", name: "ending tracker that knows which one you reached" },
+      { amt: "many", name: "re-convergent paths for choices that don't fundamentally change the story" }
+    ],
+    yields: [
+      { amt: "passages", name: "roughly 40–120 for a sitting-length meal" },
+      { amt: "endings", name: "3–5 that genuinely differ" },
+      { amt: "playtime", name: "10–20 minutes per pass" }
+    ],
+    pantry: "Harlowe",
+    pantryWhy: "The mechanical needs are light; prose is doing nearly all the work. Harlowe's text-transformation toys — <em>reveal, replace, fade</em> — are the right brushes."
+  },
+  {
+    key: "sourdough",
+    name: "The Sourdough",
+    archetype: "the time loop",
+    tagline: "the starter that persists across bakes",
+    pitch: "Every run ends. But the player accumulates knowledge across runs, and that knowledge is the real progression. Doors that were locked become openable; conversations that were dead ends now branch. Each loop feeds the next; the starter persists.",
+    ingredients: [
+      { amt: "2 buckets", name: "of state — <em>this loaf</em> (the run) and <em>the starter</em> (across runs)" },
+      { amt: "many", name: "knowledge gates on dialogue and choices" },
+      { amt: "1", name: "reset routine that wipes the loaf but preserves the starter" },
+      { amt: "subtle", name: "prose variations that acknowledge prior bakes" }
+    ],
+    yields: [
+      { amt: "passages", name: "often 80–200, many revisited many times" },
+      { amt: "loops", name: "5–15 looping passes for completion" },
+      { amt: "win", name: "a clear condition the player must <em>discover</em>" }
+    ],
+    pantry: "SugarCube",
+    pantryWhy: "Two-tier state is fiddly. SugarCube's variable scoping and save system make it tractable; Harlowe will fight you for it every step."
+  },
+  {
+    key: "braise",
+    name: "The Long Braise",
+    archetype: "the stat-driven saga",
+    tagline: "slow accretion of character",
+    pitch: "The shape of every Choice of Games title. Decisions don't just branch the story — they nudge values for traits like <em>cunning</em>, <em>courage</em>, or <em>temperance</em>, and those values gate later opportunities. The character sheet <em>is</em> the protagonist.",
+    ingredients: [
+      { amt: "1 sidebar", name: "that displays stats live, simmering" },
+      { amt: "consistent", name: "stat-change rules — small, frequent, transparent" },
+      { amt: "many", name: "stat checks that hide some choices and reveal others" },
+      { amt: "4–8", name: "opposed axes so no trait is universally good" }
+    ],
+    yields: [
+      { amt: "passages", name: "often 200–800 for a full novel-length braise" },
+      { amt: "axes", name: "never more than the player can taste at once" },
+      { amt: "endings", name: "multiple, keyed to character build" }
+    ],
+    pantry: "SugarCube",
+    pantryWhy: "The sidebar UI, save slots, and conditional choice lists all but ship in the box. This is the dish the format was designed for."
+  },
+  {
+    key: "amuse",
+    name: "The Amuse-Bouche",
+    archetype: "the atmosphere piece",
+    tagline: "small, intense, sensory",
+    pitch: "Less a game than a space to inhabit. The player moves through prose for the texture of moving through prose. Choices may not branch the story at all — they may simply colour the next paragraph, or unfurl another layer of the same image. One bite; lingering finish.",
+    ingredients: [
+      { amt: "few", name: "passages, written for the click rhythm" },
+      { amt: "many", name: "cycling and revealing links inside passages" },
+      { amt: "optional", name: "sound; custom typography, often" },
+      { amt: "1", name: "clear emotional through-line, even without a plot" }
+    ],
+    yields: [
+      { amt: "passages", name: "frequently small — 20–60" },
+      { amt: "playtime", name: "10–25 minutes for a complete pass" },
+      { amt: "format", name: "often free, often itch.io, often unforgettable" }
+    ],
+    pantry: "Harlowe",
+    pantryWhy: "The in-passage transformation tools — replace, append, fade, cycle — are exactly the brushes this dish wants, and they require no scripting."
+  },
+  {
+    key: "reduction",
+    name: "The Reduction",
+    archetype: "the mystery",
+    tagline: "clues simmer down to truth",
+    pitch: "A crime, a cast, and a finite set of locations the player can revisit. Information gathered in one place opens doors in another. The endgame is an accusation gate — name the suspect, present the evidence, learn whether you reduced it correctly.",
+    ingredients: [
+      { amt: "1", name: "clue inventory the player can review" },
+      { amt: "3–6", name: "locations that can be visited multiple times" },
+      { amt: "many", name: "dialogue lines gated on which clues you currently hold" },
+      { amt: "1", name: "accusation passage that checks against the truth" }
+    ],
+    yields: [
+      { amt: "passages", name: "often 100–250" },
+      { amt: "locations", name: "3–6 with revisitable beats" },
+      { amt: "solutions", name: "one real, ideally several plausible wrong ones" }
+    ],
+    pantry: "SugarCube",
+    pantryWhy: "Inventory tracking and conditional dialogue against arbitrary state are SugarCube's daily bread. The accusation system in particular wants real logic."
+  },
+  {
+    key: "petitfour",
+    name: "The Petit Four",
+    archetype: "the hypertext poem",
+    tagline: "small, perfect, often in sets",
+    pitch: "A handful of passages. A small vocabulary of images. The reader cycles through them in different orders, and meaning accretes through juxtaposition rather than narrative. Closer to lyric than to story. Made to be tasted twice.",
+    ingredients: [
+      { amt: "few", name: "richly written fragments" },
+      { amt: "many", name: "cycling links that change the same word on click" },
+      { amt: "optional", name: "return-to-start mechanism" },
+      { amt: "1", name: "discipline of restraint — most are under fifteen passages" }
+    ],
+    yields: [
+      { amt: "passages", name: "often 5–20 total" },
+      { amt: "playtime", name: "3–8 minutes; encourages multiple passes" },
+      { amt: "form", name: "rewards re-reading the way a poem does" }
+    ],
+    pantry: "Harlowe",
+    pantryWhy: "Cycling links and replaceable text are one-line macros in Harlowe. You can write the entire piece without leaving the prose."
+  }
+];
+
+const dishList = document.getElementById("dishList");
+const recipeCard = document.getElementById("recipeCard");
+
+dishes.forEach((d, i) => {
+  const btn = document.createElement("button");
+  btn.className = "dish-btn" + (i === 0 ? " active" : "");
+  btn.dataset.key = d.key;
+  btn.innerHTML = `
+    <span class="dish-num">${String(i + 1).padStart(2, "0")}</span>${d.name}
+    <span class="archetype-sub">${d.archetype}</span>
+  `;
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".dish-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderDish(d);
+  });
+  dishList.appendChild(btn);
+});
+
+function renderDish(d) {
+  recipeCard.classList.add("fade");
+  setTimeout(() => {
+    recipeCard.innerHTML = `
+      <div class="recipe-tagline">${d.tagline}</div>
+      <h3 class="recipe-name">${d.name.replace(/^The\s+/, "The <em>") + "</em>"}</h3>
+      <div class="recipe-archetype">a.k.a. ${d.archetype}</div>
+      <p class="recipe-pitch">${d.pitch}</p>
+      <div class="recipe-cols">
+        <div class="recipe-col">
+          <h5>Ingredients</h5>
+          ${d.ingredients.map(i => `
+            <div class="ingredient-row">
+              <div class="ingredient-amt">${i.amt}</div>
+              <div class="ingredient-name">${i.name}</div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="recipe-col">
+          <h5>Yields</h5>
+          ${d.yields.map(i => `
+            <div class="ingredient-row">
+              <div class="ingredient-amt">${i.amt}</div>
+              <div class="ingredient-name">${i.name}</div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+      <div class="recipe-pantry">
+        <div class="recipe-pantry-label">Recommended pantry</div>
+        <strong>${d.pantry}.</strong> ${d.pantryWhy}
+      </div>
+    `;
+    recipeCard.classList.remove("fade");
+  }, 180);
+}
+
+renderDish(dishes[0]);
+</script>
+</body>
+</html>
