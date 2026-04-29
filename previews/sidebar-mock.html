@@ -102,9 +102,20 @@
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('[data-group]').forEach(el => {
+      const KEY = 'disclosure-state';
+      const stored = JSON.parse(localStorage.getItem(KEY) || '{}');
+      const groups = document.querySelectorAll('[data-group]');
+      groups.forEach(el => {
+        const g = el.dataset.group;
+        if (g in stored) el.open = stored[g];
+      });
+      groups.forEach(el => {
         el.addEventListener('toggle', () => {
-          document.querySelectorAll(`[data-group="${el.dataset.group}"]`).forEach(p => {
+          const g = el.dataset.group;
+          const state = JSON.parse(localStorage.getItem(KEY) || '{}');
+          state[g] = el.open;
+          localStorage.setItem(KEY, JSON.stringify(state));
+          document.querySelectorAll(`[data-group="${g}"]`).forEach(p => {
             if (p !== el && p.open !== el.open) p.open = el.open;
           });
         });
