@@ -9,7 +9,7 @@
   title: Hypothesis & HypoFuzz
   url: /tutorials/hypothesis-hypofuzz.html
   date: 2026-04-29T13:49:25+00:00
-  summary: Property-based testing in Python — strategies, shrinking, and coverage-driven fuzzing 🧪
+  summary: A small interface yielding large results — property-based testing and coverage fuzzing in Python.
   image: /assets/og/hypothesis-hypofuzz.png
   type: article
 
