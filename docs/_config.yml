@@ -40,3 +40,5 @@ navigation:
         link: /tutorials/how-gpt-learns.html
       - name: The Extremes of Chance
         link: /tutorials/the-extremes-of-chance.html
+      - name: Twine Starter
+        link: /tutorials/twine-starter.html
