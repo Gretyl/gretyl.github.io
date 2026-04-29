@@ -38,6 +38,8 @@ navigation:
         link: /tutorials/greed.html
       - name: How a GPT Learns
         link: /tutorials/how-gpt-learns.html
+      - name: Hypothesis & HypoFuzz
+        link: /tutorials/hypothesis-hypofuzz.html
       - name: The Extremes of Chance
         link: /tutorials/the-extremes-of-chance.html
       - name: Twine Starter

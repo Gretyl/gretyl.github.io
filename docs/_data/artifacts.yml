@@ -5,6 +5,14 @@
 # bullet text on docs/index.html so the feed reads the same as the
 # homepage.
 
+- id: hypothesis-hypofuzz
+  title: Hypothesis & HypoFuzz
+  url: /tutorials/hypothesis-hypofuzz.html
+  date: 2026-04-29T13:49:25+00:00
+  summary: A small interface yielding large results — property-based testing and coverage fuzzing in Python.
+  image: /assets/og/hypothesis-hypofuzz.png
+  type: article
+
 - id: twine-starter
   title: Twine Starter
   url: /tutorials/twine-starter.html
