@@ -8,6 +8,7 @@ title: Gretyl
 navigation:
   - name: Arcade
     link: /#arcade
+    expanded: true
     sublist:
       - name: Artemis Trail
         link: /artemis-trail.html
@@ -22,6 +23,7 @@ navigation:
         link: /functional-data-structures/
   - name: Tools
     link: /#tools
+    expanded: true
     sublist:
       - name: OpenGraph Preview
         link: /tools/opengraph-preview.html
