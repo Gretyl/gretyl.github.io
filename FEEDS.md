@@ -83,6 +83,10 @@ git log --reverse --format='%aI %s' -- docs/my-entry/ | head -1
 
 Copy the `%aI` value (ISO 8601 with local offset, e.g.
 `2026-04-12T02:39:16-05:00`) into the `date` field verbatim.
+Perturb all concurrent items' datestamps by a single second each 
+so every item in our feed has a unique posting time that 
+generates a stable sequence of items in feed readers for 
+widest interoperability.
 
 ## Verifying
 
