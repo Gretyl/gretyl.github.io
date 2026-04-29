@@ -26,6 +26,7 @@ Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, 
 - **Tools** section is for utility applications under `docs/tools/`. Tools can be single-file HTML or directory-based (e.g., `webkitdirectory-demo/`). Follow the same standalone-file conventions as Arcade pages
 - **Favicons:** Follow [FAVICONS.md](FAVICONS.md) when adding emoji favicons to pages
 - **Social preview cards:** Follow [EMBEDDING.md](EMBEDDING.md) when adding OpenGraph `<meta>` tags to standalone HTML pages
+- **Feeds:** Follow [FEEDS.md](FEEDS.md) when adding a new artifact so it shows up in `/feed.xml` and `/feed.json` (manifest at `docs/_data/artifacts.yml`)
 - **PWA / offline support:** Follow [PWA.md](PWA.md) when making standalone HTML pages installable and offline-capable (Home Screen icon, manifest, service worker)
 
 ## Branching workflow

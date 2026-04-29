@@ -1,0 +1,110 @@
+# Atom + JSON Feed manifest. One entry per artifact under /docs/.
+# See FEEDS.md for the conventions: dates come from the first commit
+# that introduced the artifact's OG card (or, for entries without an
+# OG card, the first commit of the directory). Summaries match the
+# bullet text on docs/index.html so the feed reads the same as the
+# homepage.
+
+- id: twine-starter
+  title: Twine Starter
+  url: /tutorials/twine-starter.html
+  date: 2026-04-28T20:04:46-05:00
+  summary: A clickable primer on Tweego — mise, marry, fire 🧶
+  image: /assets/og/twine-starter.svg
+  type: article
+
+- id: git-rulebook
+  title: Git explainer
+  url: /tutorials/git-rulebook.html
+  date: 2026-04-23T19:20:48-05:00
+  summary: Version control is a team sport — rhythms, experiments, and mastery checks for the CVS-era engineer.
+  image: /assets/og/git-rulebook.png
+  type: article
+
+- id: how-gpt-learns
+  title: How a GPT Learns
+  url: /tutorials/how-gpt-learns.html
+  date: 2026-04-12T02:39:16-05:00
+  summary: Highly-nuanced statistical interpolators of language-shaped things.
+  image: /assets/avatar.png
+  type: article
+
+- id: the-extremes-of-chance
+  title: The Extremes of Chance
+  url: /tutorials/the-extremes-of-chance.html
+  date: 2026-04-12T02:39:16-05:00
+  summary: Visualize dice odds in common gaming scenarios.
+  image: /assets/avatar.png
+  type: article
+
+- id: phrase-a-day
+  title: Phrase a Day
+  url: /phrase-a-day.html
+  date: 2026-04-09T19:30:51-05:00
+  summary: Keep them guessing every day!
+  image: /assets/og/phrase-a-day.png
+  type: website
+
+- id: webkitdirectory-demo
+  title: webkitdirectory Demo
+  url: /tools/webkitdirectory-demo/
+  date: 2026-04-05T21:01:55-05:00
+  summary: Browser directory access SPA showcasing three input modes (input picker, showDirectoryPicker(), drag/drop) with tree view and file preview.
+  image: /assets/avatar.png
+  type: website
+
+- id: greed
+  title: GREED — A Classic Dice Game of Risk & Reward
+  url: /tutorials/greed.html
+  date: 2026-04-05T01:13:02-05:00
+  summary: Want to push your luck? 🎲
+  image: /assets/og/greed.png
+  type: article
+
+- id: shadertoy
+  title: Shadertoy Harness
+  url: /tools/shadertoy.html
+  date: 2026-04-04T21:45:38-05:00
+  summary: WebGL shader playground with live editing, built-in presets, and auto-generated UI controls via @slider annotations.
+  image: /assets/og/shadertoy.png
+  type: website
+
+- id: implode
+  title: IMPLODE
+  url: /implode.html
+  date: 2026-04-04T21:25:24-05:00
+  summary: Promoting the ethical consumption of billionaires.
+  image: /assets/og/implode.png
+  type: website
+
+- id: artemis-trail
+  title: The Artemis Trail
+  url: /artemis-trail.html
+  date: 2026-04-04T21:16:12-05:00
+  summary: Interactive lunar mission simulator. Guide your crew through the perils of deep-space travel in a retro terminal interface.
+  image: /assets/og/artemis-trail.png
+  type: website
+
+- id: opengraph-preview
+  title: OpenGraph Preview
+  url: /tools/opengraph-preview.html
+  date: 2026-04-04T20:52:48-05:00
+  summary: For Mastodon/Discord card rendering.
+  image: /assets/avatar.png
+  type: website
+
+- id: resnick-algorithms
+  title: Resnick Algorithms
+  url: /resnick-algorithms/
+  date: 2026-04-04T12:05:33-05:00
+  summary: A collection of interactive, testable simulations that showcase how simple agent rules produce complex emergent behaviors, inspired by Mitchel Resnick's <em>Turtles, Termites, and Traffic Jams</em>.
+  image: /assets/avatar.png
+  type: article
+
+- id: functional-data-structures
+  title: Purely Functional Data Structures
+  url: /functional-data-structures/
+  date: 2026-04-04T12:05:33-05:00
+  summary: Harnessing Chris Okasaki's <em>Purely Functional Data Structures</em>, this Python module brings immutable, persistent versions of six foundational structures, from the classic ConsList and BankersQueue to advanced heap and tree variants such as LeftistHeap, PairingHeap, and RedBlackTree.
+  image: /assets/avatar.png
+  type: article

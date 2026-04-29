@@ -1,0 +1,35 @@
+---
+layout: null
+permalink: /feed.json
+---
+{%- assign site_url = "https://gretyl.maplecrew.org" -%}
+{%- assign items = site.data.artifacts | sort: "date" | reverse -%}
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "Gretyl",
+  "description": "A portfolio of curated software.",
+  "home_page_url": "{{ site_url }}/",
+  "feed_url": "{{ site_url }}/feed.json",
+  "language": "en",
+  "authors": [
+    {
+      "name": "Gretyl",
+      "url": "{{ site_url }}/"
+    }
+  ],
+  "items": [
+{%- for item in items %}
+    {
+      "id": {{ site_url | append: item.url | jsonify }},
+      "url": {{ site_url | append: item.url | jsonify }},
+      "title": {{ item.title | jsonify }},
+      "content_html": {{ item.summary | jsonify }},
+      "date_published": {{ item.date | date_to_xmlschema | jsonify }},
+      {%- if item.image %}
+      "image": {{ site_url | append: item.image | jsonify }},
+      {%- endif %}
+      "tags": [{{ item.type | jsonify }}]
+    }{% unless forloop.last %},{% endunless %}
+{%- endfor %}
+  ]
+}

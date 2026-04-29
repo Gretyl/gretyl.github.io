@@ -1,0 +1,37 @@
+---
+layout: null
+permalink: /feed.xml
+---
+{%- assign site_url = "https://gretyl.maplecrew.org" -%}
+{%- assign items = site.data.artifacts | sort: "date" | reverse -%}
+{%- assign updated = items | first -%}
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Gretyl</title>
+  <subtitle>A portfolio of curated software.</subtitle>
+  <link href="{{ site_url }}/feed.xml" rel="self" type="application/atom+xml"/>
+  <link href="{{ site_url }}/" rel="alternate" type="text/html"/>
+  <id>{{ site_url }}/</id>
+  <updated>{{ updated.date | date_to_xmlschema }}</updated>
+  <author>
+    <name>Gretyl</name>
+    <uri>{{ site_url }}/</uri>
+  </author>
+{%- for item in items %}
+  <entry>
+    <title>{{ item.title | xml_escape }}</title>
+    <link href="{{ site_url }}{{ item.url }}" rel="alternate" type="text/html"/>
+    <id>{{ site_url }}{{ item.url }}</id>
+    <published>{{ item.date | date_to_xmlschema }}</published>
+    <updated>{{ item.date | date_to_xmlschema }}</updated>
+    <summary type="html">{{ item.summary | xml_escape }}</summary>
+    {%- if item.image %}
+    <link rel="enclosure" href="{{ site_url }}{{ item.image }}"/>
+    {%- endif %}
+    <category term="{{ item.type }}"/>
+    <author>
+      <name>Gretyl</name>
+    </author>
+  </entry>
+{%- endfor %}
+</feed>
