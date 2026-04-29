@@ -48,6 +48,34 @@ uvx rodney screenshot -w 960 -h 700 previews/hero-headshot-preview.png
 
 The `-w` and `-h` flags set the viewport size. Use `960` width to see the desktop sidebar layout; use `720` or below to test the mobile-responsive collapsed view.
 
+#### Pages that use `localStorage`
+
+If the page being screenshotted reads or writes `localStorage` (e.g., the disclosure-sync feature persists open/closed state under the `disclosure-state` key), Chromium's headless profile **persists that storage across `rodney start`/`stop` cycles** for the same `file://` path. State written by an earlier session (manual exploration, a verification script, an aborted test) leaks into the next session and can flip the canonical screenshot away from markup defaults — silently.
+
+To capture a defaults-only screenshot, clear storage between loads:
+
+```bash
+uvx rodney start
+uvx rodney open "file://$(pwd)/previews/sidebar-mock.html"
+uvx rodney waitload
+uvx rodney js 'localStorage.clear()'
+uvx rodney open "file://$(pwd)/previews/sidebar-mock.html"   # reload so rehydration sees an empty store
+uvx rodney waitload
+uvx rodney sleep 1
+uvx rodney screenshot -w 960 -h 700 previews/my-preview.png
+uvx rodney stop
+```
+
+The first `open` is just to land somewhere `localStorage.clear()` can run — storage is scoped per origin and each `file://` path is its own origin, so you must be on the target page before clearing. The reload then runs rehydration against an empty store, surfacing the markup defaults.
+
+If the screenshot looks "wrong" (e.g., a section that should default open is collapsed), suspect leftover storage first.
+
+#### Verifying state-persisting features
+
+For end-to-end verification of features that involve `localStorage` (rehydration on reload, cross-page persistence), the same caveat applies: explicitly `localStorage.clear()` at the start of each test, then drive the toggles, reload, and assert. `uvx rodney js '<expr>'` accepts a single expression — wrap multi-statement logic in an IIFE: `(()=>{ /* ... */; return result })()`.
+
+For cross-page persistence (e.g., toggle on `/`, navigate to `/artemis-trail.html`, assert side nav rehydrates) the local mock isn't enough — `file://` URLs use per-path opaque origins, so two mock pages don't share storage. Serve via `cd docs && python3 -m http.server 8765` and drive rodney against `http://localhost:8765/...` so all pages share the same origin.
+
 ### 4. Commit the screenshot for PR review
 
 PNGs in `previews/` are gitignored by default to avoid shipping accidental screenshots. To include one for PR review, force-add it:
