@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypothesis &amp; HypoFuzz — Coverage Fuzzing in Python</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400;1,9..144,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1814;
+    --bg-elev: #25211a;
+    --bg-elev-2: #302a1f;
+    --ink: #ede4d2;
+    --ink-muted: #a09484;
+    --ink-dim: #6c624f;
+    --accent-red: #e85d4a;
+    --accent-green: #8fb87a;
+    --accent-amber: #f0b656;
+    --accent-blue: #7aa9c4;
+    --rule: #3a3326;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  body {
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(240, 182, 86, 0.05), transparent 50%),
+      radial-gradient(circle at 80% 60%, rgba(122, 169, 196, 0.04), transparent 50%);
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  .preamble {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent-amber);
+    letter-spacing: 0.22em;
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: clamp(2.1rem, 6vw, 3.8rem);
+    line-height: 1.05;
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+  }
+  h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent-amber);
+    font-variation-settings: "opsz" 144;
+  }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.7rem;
+    margin: 64px 0 12px;
+    letter-spacing: -0.01em;
+  }
+  h2 .num {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent-amber);
+    font-weight: 400;
+    font-size: 0.78em;
+    margin-right: 14px;
+  }
+  h4 { font-family: 'Fraunces', serif; font-weight: 600; margin: 0 0 10px; font-size: 1.05rem; }
+  p { margin: 12px 0; }
+  .lede {
+    font-size: 1.13rem;
+    color: var(--ink-muted);
+    font-style: italic;
+    max-width: 60ch;
+    margin-bottom: 36px;
+  }
+
+  /* Mnemonic banner */
+  .mnemonic {
+    margin: 36px 0 56px;
+    padding: 26px 22px 22px;
+    border: 1px solid var(--rule);
+    background: var(--bg-elev);
+    position: relative;
+  }
+  .mnemonic::before {
+    content: "THE LOOP";
+    position: absolute;
+    top: -10px; left: 18px;
+    background: var(--bg);
+    padding: 0 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    color: var(--accent-amber);
+  }
+  .mnemonic-row {
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+  }
+  .mn-step {
+    padding: 8px 14px;
+    background: var(--bg-elev-2);
+    border-radius: 2px;
+    font-weight: 500;
+  }
+  .mn-arrow { color: var(--accent-amber); font-weight: 700; }
+  .mn-step.shrink {
+    color: var(--accent-red);
+    border: 1px dashed var(--accent-red);
+    background: transparent;
+  }
+  .mn-step.cov {
+    color: var(--accent-blue);
+    border: 1px solid var(--accent-blue);
+    background: transparent;
+  }
+  .mn-note {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    color: var(--ink-muted);
+    margin-top: 14px;
+    font-size: 0.95rem;
+  }
+
+  /* Code */
+  pre, code { font-family: 'JetBrains Mono', monospace; }
+  pre {
+    background: var(--bg-elev);
+    border-left: 3px solid var(--accent-amber);
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 0.86rem;
+    line-height: 1.6;
+    margin: 18px 0;
+  }
+  code { font-size: 0.92em; background: var(--bg-elev); padding: 1px 6px; border-radius: 2px; }
+  pre code { background: transparent; padding: 0; }
+  .kw { color: var(--accent-amber); }
+  .deco { color: var(--accent-red); font-style: italic; }
+  .str { color: var(--accent-green); }
+  .com { color: var(--ink-dim); font-style: italic; }
+  .fn { color: var(--accent-blue); }
+
+  /* Strategy roller */
+  .roller {
+    border: 1px solid var(--rule);
+    padding: 22px;
+    margin: 26px 0;
+    background: var(--bg-elev);
+  }
+  .roller-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  button.strat {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  button.strat:hover { border-color: var(--accent-amber); color: var(--accent-amber); }
+  button.strat.active {
+    border-color: var(--accent-amber);
+    color: var(--accent-amber);
+    background: rgba(240, 182, 86, 0.08);
+  }
+  .roller-output {
+    background: var(--bg);
+    border: 1px dashed var(--rule);
+    padding: 22px 16px;
+    min-height: 78px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    color: var(--accent-amber);
+    word-break: break-all;
+    text-align: center;
+    transition: opacity 0.18s;
+  }
+  button.draw {
+    margin-top: 14px;
+    background: var(--accent-amber);
+    color: var(--bg);
+    border: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 11px 20px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: background 0.15s;
+  }
+  button.draw:hover { background: #ffc870; }
+
+  /* Three rounds */
+  .rounds {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin: 22px 0;
+  }
+  @media (min-width: 760px) {
+    .rounds { grid-template-columns: 1fr 1fr 1fr; }
+  }
+  .round {
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    padding: 18px;
+    display: flex; flex-direction: column;
+  }
+  .round-num {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--ink-dim);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+  }
+  .round-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin: 4px 0 12px;
+  }
+  .round-log {
+    flex: 1;
+    background: var(--bg);
+    padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
+    line-height: 1.65;
+    min-height: 220px;
+    overflow-y: auto;
+    border: 1px dashed var(--rule);
+    color: var(--ink-muted);
+  }
+  .round-log .pass { color: var(--accent-green); }
+  .round-log .fail { color: var(--accent-red); font-weight: 700; }
+  .round-log .info { color: var(--ink-muted); }
+  .round-log .hi { color: var(--accent-amber); }
+
+  button.run {
+    background: var(--accent-red);
+    color: var(--ink);
+    border: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.86rem;
+    font-weight: 700;
+    padding: 13px 28px;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    margin: 14px 0 8px;
+    transition: background 0.15s;
+  }
+  button.run:hover { background: #ff7561; }
+  button.run:disabled { background: var(--ink-dim); cursor: not-allowed; }
+
+  /* Shrinking */
+  .shrink-vis {
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    padding: 18px 22px;
+    margin: 18px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    min-height: 240px;
+  }
+  .shrink-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px dashed var(--rule);
+    color: var(--ink-muted);
+    transition: opacity 0.4s, color 0.4s;
+  }
+  .shrink-row:last-child { border-bottom: none; }
+  .shrink-row.current { color: var(--accent-amber); }
+  .shrink-row.final { color: var(--accent-red); font-weight: 700; }
+  .shrink-row .label {
+    width: 100px;
+    font-size: 0.72rem;
+    color: var(--ink-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .shrink-row.final .label { color: var(--accent-red); }
+
+  /* Two-loop comparison */
+  .loops {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin: 26px 0;
+  }
+  @media (min-width: 760px) { .loops { grid-template-columns: 1fr 1fr; } }
+  .loop-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    padding: 22px;
+  }
+  .loop-card.fuzz { border-left: 3px solid var(--accent-blue); }
+  .loop-card .stack { display: flex; flex-direction: column; gap: 8px; }
+
+  /* Coverage grid */
+  .cov-section {
+    background: var(--bg-elev);
+    border: 1px solid var(--rule);
+    padding: 20px;
+    margin: 20px 0;
+  }
+  .cov-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 12px;
+    font-family: 'Fraunces', serif;
+  }
+  .cov-grid {
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+    gap: 2px;
+    margin: 12px 0 8px;
+  }
+  .cov-cell {
+    aspect-ratio: 1;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    transition: background 0.4s, border-color 0.4s;
+  }
+  .cov-cell.lit { background: var(--accent-amber); border-color: var(--accent-amber); }
+  .cov-cell.deep { background: var(--accent-red); border-color: var(--accent-red); }
+  .cov-stats {
+    display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    margin-top: 12px;
+  }
+
+  /* Footer */
+  hr.fancy {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin: 64px 0 0;
+    position: relative;
+  }
+  hr.fancy::after {
+    content: "✦";
+    position: absolute;
+    top: -10px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg);
+    padding: 0 14px;
+    color: var(--accent-amber);
+  }
+  .footer {
+    margin-top: 60px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--ink-dim);
+    letter-spacing: 0.08em;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="preamble">A TUTORIAL // PROPERTY-BASED TESTING</div>
+<h1>Hypothesis,<br>and how <em>HypoFuzz</em> turns up the volume.</h1>
+<p class="lede">A whirlwind tour of the decorators that let you describe what your code <em>should</em> do — and the fuzzer that takes those same decorators and spends hours hunting for cases where it doesn't.</p>
+
+<!-- The mnemonic -->
+<div class="mnemonic">
+  <div class="mnemonic-row">
+    <span class="mn-step">DRAW</span>
+    <span class="mn-arrow">→</span>
+    <span class="mn-step">INVOKE</span>
+    <span class="mn-arrow">→</span>
+    <span class="mn-step">ASSERT</span>
+    <span class="mn-arrow">→</span>
+    <span class="mn-step shrink">SHRINK</span>
+  </div>
+  <div class="mn-note">Every property test is this loop, repeated. The first three happen on every example. The fourth fires only when something fails — and it's where most of the magic lives.</div>
+</div>
+
+<!-- §01 -->
+<h2><span class="num">§ 01</span>The decorator</h2>
+<p>An ordinary unit test asserts a fact about <em>one specific input</em>. A property test asserts a fact about <em>all inputs of a certain shape</em>, and lets Hypothesis manufacture the inputs for you.</p>
+
+<pre><code><span class="kw">from</span> hypothesis <span class="kw">import</span> given
+<span class="kw">from</span> hypothesis <span class="kw">import</span> strategies <span class="kw">as</span> st
+
+<span class="deco">@given</span>(st.lists(st.integers()))
+<span class="kw">def</span> <span class="fn">test_sort_idempotent</span>(xs):
+    <span class="kw">assert</span> sorted(sorted(xs)) == sorted(xs)</code></pre>
+
+<p>Two pieces. The <code>@given</code> decorator promotes a regular function into a property test. Its argument is a <em>strategy</em> — a recipe for generating values. <code>st.lists(st.integers())</code> reads as <em>lists of integers, of varying lengths and varying contents</em>. Hypothesis runs the function many times — about 100 by default — and each run walks through the loop above: DRAW a list, INVOKE the function, ASSERT the property, and (if anything misbehaves) SHRINK.</p>
+
+<!-- §02 -->
+<h2><span class="num">§ 02</span>Strategies are a small language</h2>
+<p>Strategies compose. You build complex generators from simple ones the way you build complex types from simple ones. Try drawing some yourself — pick a strategy, then click DRAW a few times and watch how the values cluster around boundaries:</p>
+
+<div class="roller">
+  <div class="roller-buttons">
+    <button class="strat active" data-strat="int">st.integers()</button>
+    <button class="strat" data-strat="text">st.text()</button>
+    <button class="strat" data-strat="list">st.lists(st.integers())</button>
+    <button class="strat" data-strat="dict">st.dictionaries(...)</button>
+    <button class="strat" data-strat="tuple">st.tuples(...)</button>
+    <button class="strat" data-strat="email">st.emails()</button>
+  </div>
+  <div class="roller-output" id="rollerOut">click DRAW to see a value</div>
+  <button class="draw" id="drawBtn">DRAW ▶</button>
+</div>
+
+<p>You'll notice the values are <em>weird</em>. Empty strings. Zero. The smallest negative integer your platform supports. Surrogate-pair regions of Unicode. That's not random — Hypothesis biases hard toward edge cases on purpose. Real bugs cluster at the boundaries, and the strategies know it.</p>
+
+<!-- §03 — THE FLOURISH -->
+<h2><span class="num">§ 03</span>The same property, three rounds</h2>
+<p>This is where the tutorial earns its keep. Here's a function that <em>looks</em> right and almost is:</p>
+
+<pre><code><span class="kw">def</span> <span class="fn">dedupe_sort</span>(xs):
+    <span class="com"># sort and remove duplicates</span>
+    <span class="kw">return</span> sorted(set(xs))</code></pre>
+
+<p>And here's the property we'll check: <em>the result has the same length as the input</em>. The function violates this property — but only on inputs that contain duplicates. Watch what each tier of testing does with it.</p>
+
+<button class="run" id="runRounds">RUN ALL THREE ▶</button>
+
+<div class="rounds">
+  <div class="round">
+    <div class="round-num">ROUND 01</div>
+    <div class="round-title">Hand-picked examples</div>
+    <div class="round-log" id="r1log"></div>
+  </div>
+  <div class="round">
+    <div class="round-num">ROUND 02</div>
+    <div class="round-title">Hypothesis @given</div>
+    <div class="round-log" id="r2log"></div>
+  </div>
+  <div class="round">
+    <div class="round-num">ROUND 03</div>
+    <div class="round-title">HypoFuzz, hours later</div>
+    <div class="round-log" id="r3log"></div>
+  </div>
+</div>
+
+<p>Round one passes — every hand-picked input happened to have unique values, so the bug was invisible. Round two finds it: random generation stumbles onto a duplicate within the first hundred draws, and shrinking carves the failure down to a two-element list. Round three is where the conversation shifts. With enough time and coverage feedback, HypoFuzz can stretch into corners the random generator visits only by accident — rare branches, type combinations, latent assumptions about input distribution.</p>
+
+<!-- §04 -->
+<h2><span class="num">§ 04</span>Shrinking — the part that earns the name</h2>
+<p>When Hypothesis catches a failure, it doesn't just hand you the offending input. It hands you the <em>simplest input it can find</em> that still fails. The replay below shows what that looks like — an arbitrary 8-element list, whittled down step by step to the irreducible minimum:</p>
+
+<div class="shrink-vis" id="shrinkVis"></div>
+<button class="draw" id="shrinkBtn">REPLAY SHRINKING ▶</button>
+
+<p>Shrinking is what makes property tests debuggable. A 47-element list with the failure buried inside is operationally useless; a two-element list <code>[0, 0]</code> tells you instantly what the problem is. The shrinker is generic — Hypothesis knows how to reduce any value any strategy can produce, because the strategies and the shrinker are two faces of the same machinery.</p>
+
+<!-- §05 -->
+<h2><span class="num">§ 05</span>HypoFuzz — same decorators, longer view</h2>
+<p>Here is the move. HypoFuzz reads your existing <code>@given</code> tests — the same files, the same decorators, no rewrites — and runs them <em>continuously</em>, with a coverage feedback loop bolted onto the side of the standard Hypothesis loop.</p>
+
+<div class="loops">
+  <div class="loop-card">
+    <h4>Hypothesis (in CI)</h4>
+    <div class="stack">
+      <div class="mnemonic-row">
+        <span class="mn-step">DRAW</span>
+        <span class="mn-arrow">→</span>
+        <span class="mn-step">INVOKE</span>
+      </div>
+      <div class="mnemonic-row">
+        <span class="mn-step">ASSERT</span>
+        <span class="mn-arrow">→</span>
+        <span class="mn-step shrink">SHRINK</span>
+      </div>
+    </div>
+    <p style="margin-top: 14px; font-size: 0.92rem; color: var(--ink-muted);">~100 examples per test. Finishes in seconds. Stops.</p>
+  </div>
+  <div class="loop-card fuzz">
+    <h4>HypoFuzz (in the background)</h4>
+    <div class="stack">
+      <div class="mnemonic-row">
+        <span class="mn-step">DRAW</span>
+        <span class="mn-arrow">→</span>
+        <span class="mn-step">INVOKE</span>
+      </div>
+      <div class="mnemonic-row">
+        <span class="mn-step">ASSERT</span>
+        <span class="mn-arrow">→</span>
+        <span class="mn-step shrink">SHRINK</span>
+      </div>
+      <div class="mnemonic-row">
+        <span class="mn-arrow">+</span>
+        <span class="mn-step cov">COVERAGE FEEDBACK</span>
+      </div>
+    </div>
+    <p style="margin-top: 14px; font-size: 0.92rem; color: var(--ink-muted);">Millions of examples. Steers toward unexplored branches. Runs as long as you let it.</p>
+  </div>
+</div>
+
+<p>The coverage loop is the trick. After every example, HypoFuzz observes which lines and branches the function exercised. Inputs that hit something <em>new</em> get prioritized — saved as seeds, mutated, returned to. Inputs that retread known ground fall down the queue. Over hours and days, the coverage map fills in:</p>
+
+<div class="cov-section">
+  <div class="cov-head">
+    <strong>Coverage exploration</strong>
+    <button class="draw" id="covBtn">SIMULATE ▶</button>
+  </div>
+  <div class="cov-grid" id="covGrid"></div>
+  <div class="cov-stats">
+    <span id="covTime">elapsed: 00:00</span>
+    <span id="covPct">covered: 0%</span>
+  </div>
+</div>
+
+<p>Each cell stands for a code path. Amber lights up quickly — these are the easy paths a normal CI run would already reach. Red is the deeper material: rare branches, error handlers, weird state combinations. A regular pytest invocation rarely lights up the red cells. That's where the unexplored bugs live.</p>
+
+<p>The cost of all this? Almost nothing on your end. The decorators, the strategies, the properties — all written. HypoFuzz inherits them. The only new artifact is a dashboard you check on Monday morning to see what shook loose over the weekend.</p>
+
+<!-- §06 -->
+<h2><span class="num">§ 06</span>What you actually got</h2>
+<p>If you walked the loop with me, you wrote three things and got four. The three: a <em>strategy</em> (what shape are my inputs?), a <em>property</em> (what stays true?), and the function under test. In return you have example tests, plus a generator, plus a shrinker, plus a fuzzing target — all from the same six lines.</p>
+
+<p>That asymmetry — small surface, large yield — is the entire pitch. <code>@given</code> is the smallest interface that lets a tool do this much work for you. HypoFuzz is what happens when you let that work run for longer than your CI budget.</p>
+
+<hr class="fancy">
+
+<div class="footer">
+END OF TUTORIAL // RHETORICAL FLOURISH: GRADUATED INPUT SCENARIOS // STRUCTURE: TEACHING PIPELINE 4-STEP
+</div>
+
+</div>
+
+<script>
+// === Strategy roller ===
+const strategies = {
+  int: () => {
+    const choices = [0, 1, -1, 42, -42, 2147483647, -2147483648, 9999, -7, 256];
+    return choices[Math.floor(Math.random() * choices.length)];
+  },
+  text: () => {
+    const choices = ['""', '"\\x00"', '"hello"', '"\\u200b"', '"\\n\\n"', '"  "', '"𓀀𓂀"', '"\\u0000\\u0000"', '"a" * 1024'];
+    return choices[Math.floor(Math.random() * choices.length)];
+  },
+  list: () => {
+    const len = Math.floor(Math.random() * 6);
+    const xs = Array.from({length: len}, () => {
+      const c = [0, 1, -1, 100, -100, 2147483647];
+      return c[Math.floor(Math.random() * c.length)];
+    });
+    return '[' + xs.join(', ') + ']';
+  },
+  dict: () => {
+    const opts = ['{}', '{"a": 0}', '{"": ""}', '{"key": -1, "other": 99}', '{"x": [1, 2]}'];
+    return opts[Math.floor(Math.random() * opts.length)];
+  },
+  tuple: () => {
+    const opts = ['(0, "")', '(-1, "x")', '(2147483647, "")', '(0, "\\x00")', '(99, "  ")'];
+    return opts[Math.floor(Math.random() * opts.length)];
+  },
+  email: () => {
+    const opts = ['"a@b"', '"x@x.x"', '"0@0.0"', '"user+tag@example.com"', '"\\u00ff@d.io"'];
+    return opts[Math.floor(Math.random() * opts.length)];
+  }
+};
+
+let activeStrat = 'int';
+document.querySelectorAll('button.strat').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('button.strat').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    activeStrat = b.dataset.strat;
+  });
+});
+
+document.getElementById('drawBtn').addEventListener('click', () => {
+  const out = document.getElementById('rollerOut');
+  out.style.opacity = 0;
+  setTimeout(() => {
+    out.textContent = strategies[activeStrat]();
+    out.style.opacity = 1;
+  }, 130);
+});
+
+// === Three rounds ===
+function logTo(elId, text, cls = '') {
+  const el = document.getElementById(elId);
+  const div = document.createElement('div');
+  div.className = cls;
+  div.textContent = text;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+function clearLogs() {
+  ['r1log', 'r2log', 'r3log'].forEach(id => document.getElementById(id).innerHTML = '');
+}
+const delay = ms => new Promise(r => setTimeout(r, ms));
+
+async function runRounds() {
+  clearLogs();
+  const btn = document.getElementById('runRounds');
+  btn.disabled = true;
+  btn.textContent = 'RUNNING…';
+
+  // Round 1: hand-picked
+  const handPicked = ['[1, 2, 3]', '[]', '[5, 4, 3, 2, 1]', '[-1, 0, 1]'];
+  for (const x of handPicked) {
+    logTo('r1log', `▶ dedupe_sort(${x})`, 'info');
+    await delay(220);
+    logTo('r1log', `  ✓ length preserved`, 'pass');
+    await delay(180);
+  }
+  logTo('r1log', '— 4 / 4 passed —', 'hi');
+
+  // Round 2: hypothesis
+  await delay(380);
+  const r2Inputs = ['[42]', '[-100, 7, 200]', '[0, 1, 2, 3, 4, 5, 6]', '[8, -3, 0, 1, 99, -50]'];
+  for (let i = 0; i < r2Inputs.length; i++) {
+    logTo('r2log', `▶ ex ${i+1}: ${r2Inputs[i]}`, 'info');
+    await delay(170);
+    logTo('r2log', `  ✓ ok`, 'pass');
+    await delay(110);
+  }
+  logTo('r2log', `▶ ex 5: [0, 0, 1, -7, 99, 99, 12]`, 'info');
+  await delay(220);
+  logTo('r2log', `  ✗ FAILED`, 'fail');
+  await delay(280);
+  logTo('r2log', `shrinking…`, 'hi');
+  const shrinks = ['[0, 0, 99, 99, 12]', '[0, 0, 99, 99]', '[0, 0, 99]', '[0, 0]'];
+  for (const s of shrinks) {
+    await delay(220);
+    logTo('r2log', `  → ${s}`, 'info');
+  }
+  await delay(220);
+  logTo('r2log', `MINIMAL: [0, 0]`, 'fail');
+
+  // Round 3: hypofuzz
+  await delay(440);
+  logTo('r3log', '[fuzzer started]', 'info');
+  await delay(160);
+  logTo('r3log', '2.4k examples — no findings', 'info');
+  await delay(200);
+  logTo('r3log', '14.8k examples — coverage 73%', 'info');
+  await delay(240);
+  logTo('r3log', '91.3k examples — coverage 88%', 'info');
+  await delay(220);
+  logTo('r3log', '380k examples — exploring deep', 'info');
+  await delay(260);
+  logTo('r3log', '✗ FAILED on rare path', 'fail');
+  await delay(180);
+  logTo('r3log', `  input contained NaN`, 'hi');
+  await delay(180);
+  logTo('r3log', `  set() + sorted() with NaN`, 'hi');
+  await delay(180);
+  logTo('r3log', `  ordering becomes unstable`, 'hi');
+  await delay(220);
+  logTo('r3log', `[reported + saved as seed]`, 'info');
+
+  btn.disabled = false;
+  btn.textContent = 'RUN AGAIN ▶';
+}
+document.getElementById('runRounds').addEventListener('click', runRounds);
+
+// === Shrinking visualization ===
+const shrinkSteps = [
+  { label: 'failed at',    val: '[42, -17, 0, 99, 0, 1234, -8, 17]' },
+  { label: 'try shorter',  val: '[42, -17, 0, 99, 0, 1234]' },
+  { label: 'try shorter',  val: '[42, 0, 99, 0]' },
+  { label: 'simpler ints', val: '[1, 0, 1, 0]' },
+  { label: 'simpler ints', val: '[0, 0, 0, 0]' },
+  { label: 'try shorter',  val: '[0, 0, 0]' },
+  { label: 'minimal',      val: '[0, 0]' }
+];
+
+async function playShrink() {
+  const vis = document.getElementById('shrinkVis');
+  vis.innerHTML = '';
+  for (let i = 0; i < shrinkSteps.length; i++) {
+    const s = shrinkSteps[i];
+    const row = document.createElement('div');
+    row.className = 'shrink-row current';
+    row.innerHTML = `<span class="label">${s.label}</span><span>${s.val}</span>`;
+    vis.appendChild(row);
+    await delay(440);
+    row.classList.remove('current');
+    if (i === shrinkSteps.length - 1) row.classList.add('final');
+  }
+}
+document.getElementById('shrinkBtn').addEventListener('click', playShrink);
+// Run once on load
+playShrink();
+
+// === Coverage grid ===
+const COV_COLS = 20;
+const COV_ROWS = 6;
+const grid = document.getElementById('covGrid');
+const cells = [];
+for (let i = 0; i < COV_COLS * COV_ROWS; i++) {
+  const c = document.createElement('div');
+  c.className = 'cov-cell';
+  grid.appendChild(c);
+  cells.push(c);
+}
+
+async function simulateCoverage() {
+  cells.forEach(c => { c.className = 'cov-cell'; });
+  const total = cells.length;
+  const easy = [], deep = [];
+  cells.forEach((c, i) => {
+    if (Math.random() < 0.72) easy.push(i); else deep.push(i);
+  });
+  for (let arr of [easy, deep]) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  let elapsed = 0;
+  const timeEl = document.getElementById('covTime');
+  const pctEl = document.getElementById('covPct');
+
+  for (let i = 0; i < easy.length; i++) {
+    cells[easy[i]].classList.add('lit');
+    elapsed += Math.random() * 8 + 1;
+    if (i % 3 === 0) {
+      timeEl.textContent = `elapsed: ${formatTime(elapsed)}`;
+      pctEl.textContent = `covered: ${Math.round(((i + 1) / total) * 100)}%`;
+    }
+    await delay(28);
+  }
+
+  // Stop short of full coverage — real fuzzers asymptote below 100%.
+  // Leave a handful of deep cells permanently dark to reinforce "there's
+  // always more to find."
+  const deepLimit = Math.max(1, deep.length - (5 + Math.floor(Math.random() * 4)));
+  for (let i = 0; i < deepLimit; i++) {
+    cells[deep[i]].classList.add('deep');
+    elapsed += Math.random() * 90 + 30;
+    timeEl.textContent = `elapsed: ${formatTime(elapsed)}`;
+    pctEl.textContent = `covered: ${Math.round(((easy.length + i + 1) / total) * 100)}%`;
+    await delay(120);
+  }
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  if (m >= 60) {
+    const h = Math.floor(m / 60);
+    return `${String(h).padStart(2,'0')}:${String(m%60).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+document.getElementById('covBtn').addEventListener('click', simulateCoverage);
+</script>
+
+</body>
+</html>
