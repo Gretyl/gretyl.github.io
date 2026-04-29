@@ -11,13 +11,18 @@
   <h3 class="sidebar-h3">Contents:</h3>
   <ul class="content">
   {%- for item in site.navigation %}
-    <li><a href="{{ item.link }}">{{ item.name }}</a>
+    <li>
         {% if item.sublist %}
-        <ul class="sublist">
-            {%- for subitem in item.sublist %}
-            <li><a href="{{ subitem.link }}">{{ subitem.name }}</a></li>
-            {%- endfor %}
-        </ul>
+        <details class="nav-group" data-group="{{ item.link | replace: '/#', '' }}"{% if item.expanded %} open{% endif %}>
+            <summary><a href="{{ item.link }}">{{ item.name }}</a></summary>
+            <ul class="sublist">
+                {%- for subitem in item.sublist %}
+                <li><a href="{{ subitem.link }}">{{ subitem.name }}</a></li>
+                {%- endfor %}
+            </ul>
+        </details>
+        {% else %}
+        <a href="{{ item.link }}">{{ item.name }}</a>
         {% endif %}
     </li>
   {%- endfor %}

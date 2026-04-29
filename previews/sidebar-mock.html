@@ -55,8 +55,15 @@
     .feed-link { display: inline-flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--clr-h1-and-bold); line-height: 1.1; font-size: 0.9em; }
     .feed-link .rss-icon { color: #F26522; width: 1.5em; height: 1.5em; margin-bottom: 3px; }
     p.link { margin: 0 0 4px; }
+    ul.content { margin-left: -1.4em; }
     .sublist { margin: 0 0 0; }
     ul.sublist { margin-left: -1.5em; }
+    .sidebar-h3 { margin: 0 0 0.25em; }
+    ul.content > li:has(.nav-group) { list-style: none; }
+    .nav-group > summary { cursor: pointer; display: list-item; }
+    .nav-group > summary > a { color: inherit; }
+    .section-group > summary { cursor: pointer; list-style-position: outside; }
+    .section-group > summary > h2 { display: inline-block; margin: 0; }
 
     strong { color: var(--clr-h1-and-bold); font-weight: 700; }
 
@@ -93,40 +100,83 @@
     }
     .sidebar-footer small { font-size: 11px; }
   </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const KEY = 'disclosure-state';
+      const stored = JSON.parse(localStorage.getItem(KEY) || '{}');
+      const groups = document.querySelectorAll('[data-group]');
+      groups.forEach(el => {
+        const g = el.dataset.group;
+        if (g in stored) el.open = stored[g];
+      });
+      groups.forEach(el => {
+        el.addEventListener('toggle', () => {
+          const g = el.dataset.group;
+          const state = JSON.parse(localStorage.getItem(KEY) || '{}');
+          state[g] = el.open;
+          localStorage.setItem(KEY, JSON.stringify(state));
+          document.querySelectorAll(`[data-group="${g}"]`).forEach(p => {
+            if (p !== el && p.open !== el.open) p.open = el.open;
+          });
+        });
+      });
+    });
+  </script>
 </head>
 <body>
   <div class="wrapper">
     <div class="sidebar">
       <header>
-        <img class="logo" src="../docs/assets/avatar.png" alt="Logo">
-        <h1>Gretyl</h1>
+        <div class="header-title">
+          <img class="logo" src="../docs/assets/avatar.png" alt="Logo">
+          <h1>Gretyl</h1>
+        </div>
         <p><a href="/phrase-a-day.html">🗓️ Motivate me!</a></p>
-        <p>Software portfolio</p>
+        <p class="view"><a href="https://github.com/Gretyl">📊 GitHub Profile</a></p>
         <div class="link-wrapper">
-          <p class="link"><strong>Arcade</strong></p>
-          <ul class="link">
-            <li><a href="#">Artemis Trail</a></li>
-            <li><a href="#">Implode</a></li>
-          </ul>
-          <p class="link"><strong>Entries</strong></p>
-          <ul class="link">
-            <li><a href="#">Resnick Algorithms</a></li>
-            <li><a href="#">Functional Data Structures</a></li>
-          </ul>
-          <p class="link"><strong>Tools</strong></p>
-          <ul class="link">
-            <li><a href="#">OpenGraph Preview</a></li>
-            <li><a href="#">Shadertoy Harness</a></li>
-            <li><a href="#">webkitdirectory Demo</a></li>
-          </ul>
-          <p class="link"><strong>Tutorials</strong></p>
-          <ul class="link">
-            <li><a href="#">Git explainer</a></li>
-            <li><a href="#">Greed</a></li>
-            <li><a href="#">How a GPT Learns</a></li>
-            <li><a href="#">Hypothesis &amp; HypoFuzz</a></li>
-            <li><a href="#">The Extremes of Chance</a></li>
-            <li><a href="#">Twine Starter</a></li>
+          <h3 class="sidebar-h3">Contents:</h3>
+          <ul class="content">
+            <li>
+              <details class="nav-group" data-group="arcade" open>
+                <summary><a href="/#arcade">Arcade</a></summary>
+                <ul class="sublist">
+                  <li><a href="#">Artemis Trail</a></li>
+                  <li><a href="#">Implode</a></li>
+                </ul>
+              </details>
+            </li>
+            <li>
+              <details class="nav-group" data-group="entries">
+                <summary><a href="/#entries">Entries</a></summary>
+                <ul class="sublist">
+                  <li><a href="#">Resnick Algorithms</a></li>
+                  <li><a href="#">Functional Data Structures</a></li>
+                </ul>
+              </details>
+            </li>
+            <li>
+              <details class="nav-group" data-group="tools" open>
+                <summary><a href="/#tools">Tools</a></summary>
+                <ul class="sublist">
+                  <li><a href="#">OpenGraph Preview</a></li>
+                  <li><a href="#">Shadertoy Harness</a></li>
+                  <li><a href="#">webkitdirectory Demo</a></li>
+                </ul>
+              </details>
+            </li>
+            <li>
+              <details class="nav-group" data-group="tutorials">
+                <summary><a href="/#tutorials">Tutorials</a></summary>
+                <ul class="sublist">
+                  <li><a href="#">Git explainer</a></li>
+                  <li><a href="#">Greed</a></li>
+                  <li><a href="#">How a GPT Learns</a></li>
+                  <li><a href="#">Hypothesis &amp; HypoFuzz</a></li>
+                  <li><a href="#">The Extremes of Chance</a></li>
+                  <li><a href="#">Twine Starter</a></li>
+                </ul>
+              </details>
+            </li>
           </ul>
           <div class="feeds-row">
             <a class="feed-link" href="/feed.xml"><svg class="rss-icon" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zm48 224c79.5 0 144 64.5 144 144c0 13.3-10.7 24-24 24s-24-10.7-24-24c0-53-43-96-96-96c-13.3 0-24-10.7-24-24s10.7-24 24-24zm-24-72c0-13.3 10.7-24 24-24c123.7 0 224 100.3 224 224c0 13.3-10.7 24-24 24s-24-10.7-24-24c0-97.2-78.8-176-176-176c-13.3 0-24-10.7-24-24zM160 384a32 32 0 1 1 -64 0 32 32 0 1 1 64 0z"/></svg><span>Atom</span></a>
@@ -139,26 +189,36 @@
       </div>
     </div>
     <section>
-      <h2 id="arcade">Arcade</h2>
-      <p><strong><a href="#">Artemis Trail</a></strong> — Interactive lunar mission simulator. Guide your crew through the perils of deep-space travel in a retro terminal interface.</p>
-      <p><strong><a href="#">Implode</a></strong> - promoting the ethical consumption of billionaires</p>
+      <p>A portfolio of curated software.</p>
 
-      <h2 id="entries">Entries</h2>
-      <p><strong><a href="#">Resnick Algorithms</a></strong> — Resnick Algorithm Artifacts is a collection of interactive, testable simulations that showcase how simple agent rules produce complex emergent behaviors.</p>
-      <p><strong><a href="#">Purely Functional Data Structures</a></strong> — Harnessing Chris Okasaki's <em>Purely Functional Data Structures</em>, this Python module brings immutable, persistent versions of six foundational structures.</p>
+      <details class="section-group" data-group="arcade" open>
+        <summary><h2 id="arcade">Arcade</h2></summary>
+        <p><strong><a href="#">Artemis Trail</a></strong> — Interactive lunar mission simulator. Guide your crew through the perils of deep-space travel in a retro terminal interface.</p>
+        <p><strong><a href="#">Implode</a></strong> - promoting the ethical consumption of billionaires</p>
+      </details>
 
-      <h2 id="tools">Tools</h2>
-      <p><strong><a href="#">OpenGraph Preview</a></strong> — for Mastodon/Discord card rendering</p>
-      <p><strong><a href="#">Shadertoy Harness</a></strong> — WebGL shader playground with live editing, built-in presets, and auto-generated UI controls via <code>@slider</code> annotations.</p>
-      <p><strong><a href="#">webkitdirectory Demo</a></strong> — Browser directory access SPA showcasing three input modes.</p>
+      <details class="section-group" data-group="entries">
+        <summary><h2 id="entries">Entries</h2></summary>
+        <p><strong><a href="#">Resnick Algorithms</a></strong> — Resnick Algorithm Artifacts is a collection of interactive, testable simulations that showcase how simple agent rules produce complex emergent behaviors.</p>
+        <p><strong><a href="#">Purely Functional Data Structures</a></strong> — Harnessing Chris Okasaki's <em>Purely Functional Data Structures</em>, this Python module brings immutable, persistent versions of six foundational structures.</p>
+      </details>
 
-      <h2 id="tutorials">Tutorials</h2>
-      <p><strong><a href="#">Git explainer</a></strong> — version control is a team sport — rhythms, experiments, and mastery checks for the CVS-era engineer</p>
-      <p><strong><a href="#">Greed</a></strong> — want to push your luck? 🎲</p>
-      <p><strong><a href="#">How a GPT Learns</a></strong> — highly-nuanced statistical interpolators of language-shaped things</p>
-      <p><strong><a href="#">Hypothesis &amp; HypoFuzz</a></strong> — a small interface yielding large results — property-based testing and coverage fuzzing in Python</p>
-      <p><strong><a href="#">The Extremes of Chance</a></strong> — visualize dice odds in common gaming scenarios</p>
-      <p><strong><a href="#">Twine Starter</a></strong> — a clickable primer on Tweego — mise, marry, fire 🧶</p>
+      <details class="section-group" data-group="tools" open>
+        <summary><h2 id="tools">Tools</h2></summary>
+        <p><strong><a href="#">OpenGraph Preview</a></strong> — for Mastodon/Discord card rendering</p>
+        <p><strong><a href="#">Shadertoy Harness</a></strong> — WebGL shader playground with live editing, built-in presets, and auto-generated UI controls via <code>@slider</code> annotations.</p>
+        <p><strong><a href="#">webkitdirectory Demo</a></strong> — Browser directory access SPA showcasing three input modes.</p>
+      </details>
+
+      <details class="section-group" data-group="tutorials">
+        <summary><h2 id="tutorials">Tutorials</h2></summary>
+        <p><strong><a href="#">Git explainer</a></strong> — version control is a team sport — rhythms, experiments, and mastery checks for the CVS-era engineer</p>
+        <p><strong><a href="#">Greed</a></strong> — want to push your luck? 🎲</p>
+        <p><strong><a href="#">How a GPT Learns</a></strong> — highly-nuanced statistical interpolators of language-shaped things</p>
+        <p><strong><a href="#">Hypothesis &amp; HypoFuzz</a></strong> — a small interface yielding large results — property-based testing and coverage fuzzing in Python</p>
+        <p><strong><a href="#">The Extremes of Chance</a></strong> — visualize dice odds in common gaming scenarios</p>
+        <p><strong><a href="#">Twine Starter</a></strong> — a clickable primer on Tweego — mise, marry, fire 🧶</p>
+      </details>
     </section>
   </div>
 </body>

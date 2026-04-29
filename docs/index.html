@@ -10,12 +10,15 @@ favicon_emoji: 🖋️
 
 <p>A portfolio of curated software.</p>
 
-<h2 id="arcade">Arcade</h2>
+<details class="section-group" data-group="arcade" open>
+<summary><h2 id="arcade">Arcade</h2></summary>
 
 <p><strong><a href="artemis-trail.html">Artemis Trail</a></strong> - Interactive lunar mission simulator. Guide your crew through the perils of deep-space travel in a retro terminal interface.</p>
-<p><strong><a href="implode.html">Implode</a></strong> - promoting the ethical consumption of billionaires
+<p><strong><a href="implode.html">Implode</a></strong> - promoting the ethical consumption of billionaires</p>
+</details>
 
-<h2 id="entries">Entries</h2>
+<details class="section-group" data-group="entries">
+<summary><h2 id="entries">Entries</h2></summary>
 
 <!--[[[cog
 import pathlib, re
@@ -40,14 +43,18 @@ for href, title, summary_path in entries:
 <p><strong><a href="resnick-algorithms/">Resnick Algorithms</a></strong> - Resnick Algorithms is a collection of interactive, testable simulations that showcase how simple agent rules produce complex emergent behaviors, inspired by Mitchel Resnick’s <em>Turtles, Termites, and Traffic Jams</em>.</p>
 <p><strong><a href="functional-data-structures/">Purely Functional Data Structures</a></strong> - Harnessing Chris Okasaki’s <em>Purely Functional Data Structures</em>, this Python module brings immutable, persistent versions of six foundational structures, from the classic ConsList and BankersQueue to advanced heap and tree variants such as LeftistHeap, PairingHeap, and RedBlackTree.</p>
 <!--[[[end]]]-->
+</details>
 
-<h2 id="tools">Tools</h2>
+<details class="section-group" data-group="tools" open>
+<summary><h2 id="tools">Tools</h2></summary>
 
 <p><strong><a href="tools/opengraph-preview.html">OpenGraph Preview</a></strong> - for Mastodon/Discord card rendering</p>
 <p><strong><a href="tools/shadertoy.html">Shadertoy Harness</a></strong> - WebGL shader playground with live editing, built-in presets, and auto-generated UI controls via <code>@slider</code> annotations.</p>
 <p><strong><a href="tools/webkitdirectory-demo/">webkitdirectory Demo</a></strong> - Browser directory access SPA showcasing three input modes (input picker, <code>showDirectoryPicker()</code>, drag/drop) with tree view and file preview.</p>
+</details>
 
-<h2 id="tutorials">Tutorials</h2>
+<details class="section-group" data-group="tutorials">
+<summary><h2 id="tutorials">Tutorials</h2></summary>
 
 <p><strong><a href="tutorials/git-rulebook.html">Git explainer</a></strong> - version control is a team sport — rhythms, experiments, and mastery checks for the CVS-era engineer</p>
 <p><strong><a href="tutorials/greed.html">Greed</a></strong> - want to push your luck? 🎲</p>
@@ -55,3 +62,4 @@ for href, title, summary_path in entries:
 <p><strong><a href="tutorials/hypothesis-hypofuzz.html">Hypothesis &amp; HypoFuzz</a></strong> - a small interface yielding large results — property-based testing and coverage fuzzing in Python</p>
 <p><strong><a href="tutorials/the-extremes-of-chance.html">The Extremes of Chance</a></strong> - visualize dice odds in common gaming scenarios</p>
 <p><strong><a href="tutorials/twine-starter.html">Twine Starter</a></strong> - a clickable primer on Tweego — mise, marry, fire 🧶</p>
+</details>

@@ -5,7 +5,34 @@
 .feeds-row { display: flex; align-items: center; gap: 28px; margin-top: 14px; }
 .feed-link { display: inline-flex; flex-direction: column; align-items: center; text-decoration: none; line-height: 1.1; font-size: 0.9em; }
 .feed-link .fa-square-rss { color: #F26522; font-size: 1.5em; margin-bottom: 3px; }
+ul.content > li:has(.nav-group) { list-style: none; }
+.nav-group > summary { cursor: pointer; display: list-item; }
+.nav-group > summary > a { color: inherit; }
+.section-group > summary { cursor: pointer; list-style-position: outside; }
+.section-group > summary > h2 { display: inline-block; margin: 0; }
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const KEY = 'disclosure-state';
+  const stored = JSON.parse(localStorage.getItem(KEY) || '{}');
+  const groups = document.querySelectorAll('[data-group]');
+  groups.forEach(el => {
+    const g = el.dataset.group;
+    if (g in stored) el.open = stored[g];
+  });
+  groups.forEach(el => {
+    el.addEventListener('toggle', () => {
+      const g = el.dataset.group;
+      const state = JSON.parse(localStorage.getItem(KEY) || '{}');
+      state[g] = el.open;
+      localStorage.setItem(KEY, JSON.stringify(state));
+      document.querySelectorAll(`[data-group="${g}"]`).forEach(p => {
+        if (p !== el && p.open !== el.open) p.open = el.open;
+      });
+    });
+  });
+});
+</script>
 {% if page.favicon_emoji %}
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>{{ page.favicon_emoji }}</text></svg>">
 {% endif %}
