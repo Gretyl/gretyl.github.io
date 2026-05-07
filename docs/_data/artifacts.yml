@@ -5,6 +5,14 @@
 # bullet text on docs/index.html so the feed reads the same as the
 # homepage.
 
+- id: local-ddb
+  title: Local DuckDB
+  url: /tools/local-ddb.html
+  date: 2026-05-07T04:49:09+00:00
+  summary: In-browser DuckDB-WASM analytics dashboard — drag CSV or Parquet files, run SQL, and chart results with Observable Plot.
+  image: /assets/og/local-ddb.png
+  type: website
+
 - id: hypothesis-hypofuzz
   title: Hypothesis & HypoFuzz
   url: /tutorials/hypothesis-hypofuzz.html
