@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦆</text></svg>">
+
+<meta property="og:title" content="Local DuckDB" />
+<meta property="og:description" content="In-browser DuckDB-WASM analytics dashboard — drag CSV or Parquet files, run SQL, and chart results." />
+<meta property="og:url" content="https://gretyl.maplecrew.org/tools/local-ddb.html" />
+<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/local-ddb.png" />
+<meta property="og:site_name" content="Gretyl" />
+<meta property="og:type" content="website" />
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-05N3959YM1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-05N3959YM1');
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DuckDB Analytics Dashboard</title>
+<style>
+/* =======================================================================
+   CSS — Dark theme with cyan accent, no external framework
+   ======================================================================= */
+:root {
+  --bg: #111827;
+  --surface: #1f2937;
+  --surface2: #374151;
+  --border: #4b5563;
+  --text: #e5e7eb;
+  --text-muted: #9ca3af;
+  --accent: #22d3ee;
+  --accent-dim: #0e7490;
+  --error: #f87171;
+  --success: #4ade80;
+  --mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+  --sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* --- Drop zone (full-page, shown when no tables loaded) --- */
+#drop-zone {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: var(--bg);
+  border: 3px dashed var(--border);
+  border-radius: 0;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: pointer;
+}
+#drop-zone.active {
+  border-color: var(--accent);
+  background: rgba(34, 211, 238, 0.05);
+}
+#drop-zone.hidden { display: none; }
+#drop-zone h1 { font-size: 1.5rem; color: var(--accent); margin-bottom: 0.5rem; }
+#drop-zone p { color: var(--text-muted); margin-bottom: 1rem; }
+#drop-zone .btn { /* file picker fallback button */
+  padding: 0.5rem 1.5rem;
+  background: var(--accent-dim);
+  color: #fff;
+  border: none; border-radius: 6px;
+  font-family: var(--sans); font-size: 0.9rem;
+  cursor: pointer;
+}
+#drop-zone .btn:hover { background: var(--accent); color: var(--bg); }
+
+/* --- Main app layout (CSS Grid: sidebar + main) --- */
+#app {
+  display: none; /* shown after first file load */
+  height: 100vh;
+  grid-template-columns: 260px 1fr;
+  grid-template-rows: auto 1fr;
+}
+#app.visible { display: grid; }
+
+/* --- Top bar --- */
+#topbar {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+#topbar h2 { font-size: 0.9rem; color: var(--accent); flex: 1; }
+#topbar .btn {
+  padding: 0.3rem 0.8rem;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--sans); font-size: 0.8rem;
+  cursor: pointer;
+}
+#topbar .btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* --- Sidebar --- */
+#sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 0.75rem;
+  font-size: 0.82rem;
+}
+.table-entry { margin-bottom: 0.5rem; }
+.table-name {
+  display: flex; align-items: center; gap: 0.4rem;
+  cursor: pointer; padding: 0.3rem 0.4rem;
+  border-radius: 4px; font-weight: 600;
+  color: var(--accent);
+}
+.table-name:hover { background: var(--surface2); }
+.table-name .row-count {
+  margin-left: auto; font-weight: 400;
+  color: var(--text-muted); font-size: 0.75rem;
+}
+.table-name .arrow { transition: transform 0.2s; font-size: 0.7rem; }
+.table-entry.expanded .arrow { transform: rotate(90deg); }
+.table-columns { display: none; padding-left: 1.2rem; }
+.table-entry.expanded .table-columns { display: block; }
+.col-entry {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.15rem 0.3rem; border-radius: 3px; cursor: pointer;
+}
+.col-entry:hover { background: var(--surface2); }
+.col-entry .col-name { color: var(--text); }
+.col-entry .col-type { color: var(--text-muted); font-size: 0.72rem; font-family: var(--mono); }
+
+/* --- Main panel --- */
+#main {
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+/* --- Editor area --- */
+#editor-area {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+#sql-editor {
+  width: 100%; min-height: 100px; max-height: 250px;
+  resize: vertical;
+  background: #0f172a;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  outline: none;
+  tab-size: 2;
+}
+#sql-editor:focus { border-color: var(--accent); }
+#editor-controls {
+  display: flex; align-items: center; gap: 0.75rem;
+}
+#run-btn {
+  padding: 0.35rem 1.2rem;
+  background: var(--accent-dim);
+  color: #fff;
+  border: none; border-radius: 4px;
+  font-family: var(--sans); font-size: 0.85rem;
+  cursor: pointer;
+}
+#run-btn:hover { background: var(--accent); color: var(--bg); }
+#query-time { color: var(--text-muted); font-size: 0.8rem; }
+#query-error {
+  color: var(--error); font-family: var(--mono); font-size: 0.8rem;
+  white-space: pre-wrap; display: none;
+}
+
+/* --- Results area --- */
+#results-area {
+  flex: 1; display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+/* Tab bar */
+#tab-bar {
+  display: flex; gap: 0; padding: 0 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn {
+  padding: 0.45rem 1.2rem;
+  background: none; border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-family: var(--sans); font-size: 0.85rem;
+  cursor: pointer;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* Export button */
+#export-bar {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.4rem 1rem;
+}
+#export-csv {
+  padding: 0.25rem 0.7rem;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.78rem; cursor: pointer;
+}
+#export-csv:hover { border-color: var(--accent); }
+#row-info { color: var(--text-muted); font-size: 0.78rem; }
+
+/* Table view */
+#table-panel {
+  flex: 1; overflow: auto; padding: 0 1rem 1rem;
+}
+#result-table {
+  width: 100%; border-collapse: collapse;
+  font-family: var(--mono); font-size: 0.8rem;
+}
+#result-table thead th {
+  position: sticky; top: 0; z-index: 1;
+  background: var(--surface);
+  color: var(--accent);
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+#result-table thead .type-row th {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.6rem;
+  top: 1.6rem; /* below the name row */
+}
+#result-table tbody td {
+  padding: 0.3rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#result-table tbody tr:hover { background: var(--surface2); }
+.null-val { color: var(--text-muted); font-style: italic; }
+.num-val { text-align: right; }
+
+/* Chart view */
+#chart-panel { display: none; flex: 1; overflow: auto; padding: 0.75rem 1rem; }
+#chart-config {
+  display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+  margin-bottom: 0.75rem;
+}
+#chart-config label {
+  font-size: 0.78rem; color: var(--text-muted);
+}
+#chart-config select {
+  padding: 0.25rem 0.5rem;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--sans); font-size: 0.78rem;
+}
+#chart-container { min-height: 50px; }
+#chart-container svg { max-width: 100%; }
+#chart-message { color: var(--text-muted); font-size: 0.85rem; padding: 1rem 0; }
+#agg-query { color: var(--text-muted); font-family: var(--mono); font-size: 0.72rem; margin-top: 0.5rem; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border); }
+</style>
+</head>
+<body>
+
+<!-- =====================================================================
+     Drop zone — full-page when no tables, hidden afterwards
+     ===================================================================== -->
+<div id="drop-zone">
+  <h1>DuckDB Analytics Dashboard</h1>
+  <p>Drag &amp; drop .csv, .parquet, or .parq files here</p>
+  <button class="btn" id="file-picker-btn">Choose Files</button>
+  <input type="file" id="file-input" multiple accept=".csv,.parquet,.parq" hidden>
+</div>
+
+<!-- =====================================================================
+     Main app layout
+     ===================================================================== -->
+<div id="app">
+  <div id="topbar">
+    <h2>DuckDB Analytics</h2>
+    <button class="btn" id="add-files-btn">+ Add Files</button>
+    <input type="file" id="file-input-2" multiple accept=".csv,.parquet,.parq" hidden>
+  </div>
+
+  <div id="sidebar">
+    <div id="table-list"></div>
+  </div>
+
+  <div id="main">
+    <!-- SQL Editor -->
+    <div id="editor-area">
+      <textarea id="sql-editor" placeholder="SELECT * FROM your_table LIMIT 100;" spellcheck="false"></textarea>
+      <div id="editor-controls">
+        <button id="run-btn">Run</button>
+        <span id="query-time"></span>
+        <span style="flex:1"></span>
+        <span style="color:var(--text-muted);font-size:0.75rem">Ctrl+Enter to run</span>
+      </div>
+      <div id="query-error"></div>
+    </div>
+
+    <!-- Results -->
+    <div id="results-area">
+      <div id="tab-bar">
+        <button class="tab-btn active" data-tab="table">Table</button>
+        <button class="tab-btn" data-tab="chart">Chart</button>
+      </div>
+
+      <!-- Table tab -->
+      <div id="export-bar">
+        <button id="export-csv" style="display:none">Export CSV</button>
+        <span id="row-info"></span>
+      </div>
+      <div id="table-panel">
+        <table id="result-table"></table>
+      </div>
+
+      <!-- Chart tab -->
+      <div id="chart-panel">
+        <div id="chart-config">
+          <label>Type
+            <select id="cfg-type">
+              <option value="bar">Bar</option>
+              <option value="line">Line</option>
+              <option value="dot">Scatter</option>
+              <option value="area">Area</option>
+              <option value="cell">Heatmap</option>
+            </select>
+          </label>
+          <label>X <select id="cfg-x"></select></label>
+          <label>Y <select id="cfg-y"></select></label>
+          <label>Color <select id="cfg-color"><option value="">none</option></select></label>
+          <label>Aggregate
+            <select id="cfg-agg">
+              <option value="none">none</option>
+              <option value="count">count</option>
+              <option value="sum">sum</option>
+              <option value="mean">mean</option>
+              <option value="median">median</option>
+            </select>
+          </label>
+        </div>
+        <div id="chart-container"></div>
+        <div id="chart-message"></div>
+        <div id="agg-query"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+// =========================================================================
+// CDN Imports
+// =========================================================================
+import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.32/+esm";
+import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+
+// =========================================================================
+// State
+// =========================================================================
+let db = null;          // AsyncDuckDB instance
+let conn = null;        // persistent connection
+const tables = {};      // { name: { columns: [{name, type}], rowCount: number } }
+let currentResult = null;   // { columns: [{name, type}], rows: Array<Object>, totalRows: number }
+let currentSQL = '';
+
+// =========================================================================
+// DOM references
+// =========================================================================
+const $dropZone    = document.getElementById('drop-zone');
+const $app         = document.getElementById('app');
+const $fileInput   = document.getElementById('file-input');
+const $fileInput2  = document.getElementById('file-input-2');
+const $tableList   = document.getElementById('table-list');
+const $editor      = document.getElementById('sql-editor');
+const $runBtn      = document.getElementById('run-btn');
+const $queryTime   = document.getElementById('query-time');
+const $queryError  = document.getElementById('query-error');
+const $resultTable = document.getElementById('result-table');
+const $tablePanel  = document.getElementById('table-panel');
+const $chartPanel  = document.getElementById('chart-panel');
+const $exportCsv   = document.getElementById('export-csv');
+const $rowInfo     = document.getElementById('row-info');
+const $chartContainer = document.getElementById('chart-container');
+const $chartMessage   = document.getElementById('chart-message');
+const $aggQuery    = document.getElementById('agg-query');
+const $cfgType     = document.getElementById('cfg-type');
+const $cfgX        = document.getElementById('cfg-x');
+const $cfgY        = document.getElementById('cfg-y');
+const $cfgColor    = document.getElementById('cfg-color');
+const $cfgAgg      = document.getElementById('cfg-agg');
+
+// =========================================================================
+// Pure utility functions (also present in tests.html)
+// =========================================================================
+
+/**
+ * Sanitize a filename into a valid SQL table identifier.
+ * Strips extension, replaces non-alphanumeric chars with _, prefixes if starts with digit.
+ */
+function sanitizeTableName(filename) {
+  let name = filename.replace(/\.(csv|parquet|parq)$/i, '');
+  name = name.replace(/[^a-zA-Z0-9_]/g, '_');
+  name = name.replace(/^(\d)/, '_$1');
+  name = name.replace(/_+/g, '_');
+  name = name.replace(/^_+|_+$/g, '') || 'table';
+  if (/^\d/.test(name)) name = '_' + name;
+  return name.toLowerCase();
+}
+
+/**
+ * Classify columns from an Arrow-like schema into categories.
+ * Categories: "numeric" | "temporal" | "categorical" | "other"
+ *
+ * Column classification logic:
+ * - numeric: any integer, float, double, decimal, or real type
+ * - temporal: date, time, timestamp, interval
+ * - categorical: varchar, char, boolean, enum, text
+ * - other: blob, struct, list, etc.
+ */
+function classifyColumns(schema) {
+  return schema.map(col => {
+    const t = col.type.toUpperCase();
+    let category = 'other';
+    if (/INT|FLOAT|DOUBLE|DECIMAL|NUMERIC|REAL|BIGINT|SMALLINT|TINYINT|HUGEINT/.test(t)) {
+      category = 'numeric';
+    } else if (/DATE|TIME|TIMESTAMP|INTERVAL/.test(t)) {
+      category = 'temporal';
+    } else if (/VARCHAR|CHAR|BOOLEAN|BOOL|ENUM|TEXT|STRING/.test(t)) {
+      category = 'categorical';
+    }
+    return { name: col.name, type: col.type, category };
+  });
+}
+
+/**
+ * Infer chart defaults from classified columns.
+ *
+ * Auto-default logic:
+ * - 1 categorical + 1 numeric → bar chart (categorical on X, numeric on Y)
+ * - 1 temporal + 1 numeric → line chart (temporal on X, numeric on Y)
+ * - 2+ numeric → dot/scatter (first numeric on X, second on Y)
+ * - Otherwise → fallback with first two columns
+ */
+function inferChartDefaults(columns) {
+  const numeric = columns.filter(c => c.category === 'numeric');
+  const temporal = columns.filter(c => c.category === 'temporal');
+  const categorical = columns.filter(c => c.category === 'categorical');
+
+  if (categorical.length >= 1 && numeric.length >= 1) {
+    return { type: 'bar', x: categorical[0].name, y: numeric[0].name, color: null, aggregate: 'none' };
+  }
+  if (temporal.length >= 1 && numeric.length >= 1) {
+    return { type: 'line', x: temporal[0].name, y: numeric[0].name, color: null, aggregate: 'none' };
+  }
+  if (numeric.length >= 2) {
+    return { type: 'dot', x: numeric[0].name, y: numeric[1].name, color: null, aggregate: 'none' };
+  }
+  return { type: 'bar', x: columns[0]?.name || null, y: columns[1]?.name || null, color: null, aggregate: 'none' };
+}
+
+/**
+ * Build an aggregate SQL query string.
+ * Returns null if aggregate is 'none', otherwise a GROUP BY query.
+ * Uses DuckDB's AVG for 'mean' since DuckDB doesn't have a MEAN function in standard SQL.
+ */
+function buildAggregateSQL(config, sourceExpr) {
+  if (config.aggregate === 'none') return null;
+  // DuckDB uses AVG, not MEAN. MEDIAN is supported natively.
+  const aggMap = { count: 'COUNT', sum: 'SUM', mean: 'AVG', median: 'MEDIAN' };
+  const aggFn = aggMap[config.aggregate] || config.aggregate.toUpperCase();
+  const x = `"${config.x}"`;
+  const y = `"${config.y}"`;
+  return `SELECT ${x}, ${aggFn}(${y}) AS ${y} FROM (${sourceExpr}) AS __src GROUP BY ${x} ORDER BY ${x}`;
+}
+
+// =========================================================================
+// DuckDB-WASM Initialization
+//
+// Sequence:
+// 1. getJsDelivrBundles() — get pre-configured CDN bundle URLs
+// 2. selectBundle() — pick the best bundle for this browser (EH preferred)
+// 3. Create a Web Worker from a Blob URL pointing to the bundle's worker script
+// 4. Instantiate AsyncDuckDB with the worker and WASM module
+// 5. Open a persistent connection for all queries
+// =========================================================================
+async function initDuckDB() {
+  const BUNDLES = duckdb.getJsDelivrBundles();
+  const bundle = await duckdb.selectBundle(BUNDLES);
+
+  const workerUrl = URL.createObjectURL(
+    new Blob([`importScripts("${bundle.mainWorker}");`], { type: 'text/javascript' })
+  );
+
+  const worker = new Worker(workerUrl);
+  const logger = new duckdb.ConsoleLogger();
+  db = new duckdb.AsyncDuckDB(logger, worker);
+  await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+  URL.revokeObjectURL(workerUrl);
+
+  conn = await db.connect();
+  console.log('DuckDB-WASM initialized');
+}
+
+// =========================================================================
+// File Registration
+//
+// For CSV files:
+//   1. Register the file buffer into DuckDB's virtual filesystem
+//   2. CREATE TABLE via read_csv_auto() which auto-detects schema
+//
+// For Parquet files:
+//   1. Register the file buffer into DuckDB's virtual filesystem
+//   2. CREATE TABLE via read_parquet()
+//
+// After loading, run DESCRIBE and COUNT(*) to populate the schema sidebar.
+// =========================================================================
+async function loadFile(file) {
+  const tableName = sanitizeTableName(file.name);
+  const ext = file.name.split('.').pop().toLowerCase();
+  const buffer = new Uint8Array(await file.arrayBuffer());
+
+  // Register file into DuckDB virtual filesystem
+  const vfsName = `${tableName}.${ext}`;
+  await db.registerFileBuffer(vfsName, buffer);
+
+  // Drop existing table if re-loading same name
+  await conn.query(`DROP TABLE IF EXISTS "${tableName}"`);
+
+  // Create table using appropriate reader
+  if (ext === 'csv') {
+    await conn.query(`CREATE TABLE "${tableName}" AS SELECT * FROM read_csv_auto('${vfsName}')`);
+  } else {
+    // parquet or parq
+    await conn.query(`CREATE TABLE "${tableName}" AS SELECT * FROM read_parquet('${vfsName}')`);
+  }
+
+  // Get schema via DESCRIBE
+  const descResult = await conn.query(`DESCRIBE "${tableName}"`);
+  const descRows = descResult.toArray().map(r => ({ ...r }));
+  const columns = descRows.map(r => ({ name: r.column_name, type: r.column_type }));
+
+  // Get row count
+  const countResult = await conn.query(`SELECT COUNT(*) AS cnt FROM "${tableName}"`);
+  const countRows = countResult.toArray().map(r => ({ ...r }));
+  const rowCount = Number(countRows[0].cnt);
+
+  tables[tableName] = { columns, rowCount };
+  renderSidebar();
+
+  // Show the app layout, hide drop zone
+  $dropZone.classList.add('hidden');
+  $app.classList.add('visible');
+
+  // Pre-fill editor with a helpful query if empty
+  if (!$editor.value.trim()) {
+    $editor.value = `SELECT * FROM "${tableName}" LIMIT 100;`;
+  }
+}
+
+async function loadFiles(fileList) {
+  for (const file of fileList) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (['csv', 'parquet', 'parq'].includes(ext)) {
+      try {
+        await loadFile(file);
+      } catch (e) {
+        console.error(`Failed to load ${file.name}:`, e);
+        showError(`Failed to load ${file.name}: ${e.message}`);
+      }
+    }
+  }
+}
+
+// =========================================================================
+// Sidebar rendering
+// =========================================================================
+function renderSidebar() {
+  $tableList.innerHTML = '';
+  for (const [name, info] of Object.entries(tables)) {
+    const entry = document.createElement('div');
+    entry.className = 'table-entry';
+
+    const header = document.createElement('div');
+    header.className = 'table-name';
+    header.innerHTML = `<span class="arrow">▶</span> ${name} <span class="row-count">${info.rowCount.toLocaleString()} rows</span>`;
+    header.addEventListener('click', () => entry.classList.toggle('expanded'));
+
+    const colList = document.createElement('div');
+    colList.className = 'table-columns';
+    for (const col of info.columns) {
+      const colEl = document.createElement('div');
+      colEl.className = 'col-entry';
+      const colNameEl = document.createElement('span');
+      colNameEl.className = 'col-name';
+      colNameEl.textContent = col.name;
+      const colTypeEl = document.createElement('span');
+      colTypeEl.className = 'col-type';
+      colTypeEl.textContent = col.type;
+      colEl.append(colNameEl, colTypeEl);
+      // Clicking a column name inserts it into the SQL editor at cursor
+      colEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        insertAtCursor(`"${col.name}"`);
+      });
+      colList.appendChild(colEl);
+    }
+
+    entry.append(header, colList);
+    $tableList.appendChild(entry);
+  }
+}
+
+function insertAtCursor(text) {
+  const start = $editor.selectionStart;
+  const end = $editor.selectionEnd;
+  const val = $editor.value;
+  $editor.value = val.substring(0, start) + text + val.substring(end);
+  $editor.selectionStart = $editor.selectionEnd = start + text.length;
+  $editor.focus();
+}
+
+// =========================================================================
+// Query execution
+// =========================================================================
+async function executeQuery() {
+  const sql = $editor.value.trim();
+  if (!sql) return;
+  currentSQL = sql;
+
+  hideError();
+  $queryTime.textContent = '';
+  $resultTable.innerHTML = '';
+  $rowInfo.textContent = '';
+  $exportCsv.style.display = 'none';
+
+  const t0 = performance.now();
+  try {
+    const result = await conn.query(sql);
+    const elapsed = performance.now() - t0;
+    $queryTime.textContent = `${elapsed.toFixed(1)} ms`;
+
+    // Extract schema from Arrow result
+    const schema = result.schema.fields.map(f => ({
+      name: f.name,
+      type: duckdbTypeString(f)
+    }));
+
+    // Convert Arrow table to plain JS objects.
+    // DuckDB-WASM returns Arrow rows with wrapper types (e.g. BigInt, Decimal)
+    // that need coercion to native JS values for charting and display.
+    const allRows = result.toArray().map(r => {
+      const obj = {};
+      for (const key of schema.map(c => c.name)) {
+        const v = r[key];
+        if (v === null || v === undefined) {
+          obj[key] = null;
+        } else if (typeof v === 'bigint') {
+          obj[key] = Number(v);
+        } else if (typeof v === 'object' && v.valueOf && v.constructor !== Date && v.constructor !== Array) {
+          // DuckDB wrapper types (Decimal, Int128, etc.) — coerce via valueOf
+          const prim = v.valueOf();
+          obj[key] = typeof prim === 'bigint' ? Number(prim) : prim;
+        } else {
+          obj[key] = v;
+        }
+      }
+      return obj;
+    });
+    const totalRows = allRows.length;
+
+    currentResult = { columns: schema, rows: allRows, totalRows };
+
+    renderTableView();
+    updateChartConfig();
+
+    // Auto-render chart if on chart tab
+    if ($chartPanel.style.display !== 'none') {
+      await renderCurrentChart();
+    }
+  } catch (e) {
+    showError(e.message);
+  }
+}
+
+/** Extract a human-readable type string from an Arrow field. */
+function duckdbTypeString(field) {
+  // Arrow field.type.toString() gives us the DuckDB type
+  const t = field.type;
+  if (t && t.toString) {
+    const s = t.toString();
+    // Clean up Arrow type representation
+    if (s.startsWith('Utf8')) return 'VARCHAR';
+    if (s.startsWith('Int32')) return 'INTEGER';
+    if (s.startsWith('Int64')) return 'BIGINT';
+    if (s.startsWith('Int16')) return 'SMALLINT';
+    if (s.startsWith('Int8')) return 'TINYINT';
+    if (s.startsWith('Uint')) return s.replace('Uint', 'UINTEGER');
+    if (s.startsWith('Float64') || s.startsWith('Float<DOUBLE>')) return 'DOUBLE';
+    if (s.startsWith('Float32') || s.startsWith('Float<SINGLE>')) return 'FLOAT';
+    if (s.startsWith('Bool')) return 'BOOLEAN';
+    if (s.startsWith('Date')) return 'DATE';
+    if (s.startsWith('Timestamp')) return 'TIMESTAMP';
+    if (s.startsWith('Time')) return 'TIME';
+    if (s.startsWith('Decimal')) return s;
+    return s;
+  }
+  return 'UNKNOWN';
+}
+
+function showError(msg) {
+  $queryError.textContent = msg;
+  $queryError.style.display = 'block';
+}
+
+function hideError() {
+  $queryError.textContent = '';
+  $queryError.style.display = 'none';
+}
+
+// =========================================================================
+// Table view rendering
+// =========================================================================
+function renderTableView() {
+  if (!currentResult) return;
+  const { columns, rows, totalRows } = currentResult;
+  const displayRows = rows.slice(0, 1000);
+  const classified = classifyColumns(columns);
+
+  let html = '<thead><tr>';
+  for (const col of columns) html += `<th>${escapeHtml(col.name)}</th>`;
+  html += '</tr><tr class="type-row">';
+  for (const col of columns) html += `<th>${escapeHtml(col.type)}</th>`;
+  html += '</tr></thead><tbody>';
+
+  for (const row of displayRows) {
+    html += '<tr>';
+    for (let i = 0; i < columns.length; i++) {
+      const val = row[columns[i].name];
+      const cls = classified[i];
+      if (val === null || val === undefined) {
+        html += '<td class="null-val">null</td>';
+      } else if (cls.category === 'numeric') {
+        html += `<td class="num-val">${escapeHtml(String(val))}</td>`;
+      } else {
+        html += `<td>${escapeHtml(String(val))}</td>`;
+      }
+    }
+    html += '</tr>';
+  }
+  html += '</tbody>';
+  $resultTable.innerHTML = html;
+
+  // Row info and export button
+  if (totalRows > 1000) {
+    $rowInfo.textContent = `Showing 1,000 of ${totalRows.toLocaleString()} rows`;
+  } else {
+    $rowInfo.textContent = `${totalRows.toLocaleString()} rows`;
+  }
+  $exportCsv.style.display = 'inline-block';
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// =========================================================================
+// CSV Export
+// =========================================================================
+function exportCSV() {
+  if (!currentResult) return;
+  const { columns, rows } = currentResult;
+  const header = columns.map(c => `"${c.name}"`).join(',');
+  const lines = rows.map(row =>
+    columns.map(c => {
+      const v = row[c.name];
+      if (v === null || v === undefined) return '';
+      const s = String(v);
+      return s.includes(',') || s.includes('"') || s.includes('\n')
+        ? `"${s.replace(/"/g, '""')}"` : s;
+    }).join(',')
+  );
+  const csv = header + '\n' + lines.join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'query_result.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// =========================================================================
+// Chart configuration
+// =========================================================================
+function updateChartConfig() {
+  if (!currentResult) return;
+  const { columns } = currentResult;
+  const classified = classifyColumns(columns);
+
+  // Populate dropdowns
+  populateSelect($cfgX, columns.map(c => c.name));
+  populateSelect($cfgY, columns.map(c => c.name));
+  populateSelect($cfgColor, ['', ...columns.map(c => c.name)], ['none', ...columns.map(c => c.name)]);
+
+  // Apply auto-defaults
+  const defaults = inferChartDefaults(classified);
+  $cfgType.value = defaults.type;
+  if (defaults.x) $cfgX.value = defaults.x;
+  if (defaults.y) $cfgY.value = defaults.y;
+  $cfgColor.value = defaults.color || '';
+  $cfgAgg.value = defaults.aggregate;
+}
+
+function populateSelect(select, values, labels) {
+  const current = select.value;
+  select.innerHTML = '';
+  values.forEach((v, i) => {
+    const opt = document.createElement('option');
+    opt.value = v;
+    opt.textContent = labels ? labels[i] : v;
+    select.appendChild(opt);
+  });
+  // Restore selection if still valid
+  if (values.includes(current)) select.value = current;
+}
+
+// =========================================================================
+// Observable Plot rendering pipeline
+//
+// 1. Read config from dropdowns
+// 2. If aggregate != 'none', run aggregation query via DuckDB
+// 3. Call renderChart() with data and config
+// 4. renderChart() builds Plot options and calls Plot.plot()
+// 5. The resulting SVG is appended to the chart container
+// =========================================================================
+
+async function renderCurrentChart() {
+  if (!currentResult || !currentResult.rows.length) {
+    $chartMessage.textContent = 'No data to chart. Run a query first.';
+    $chartContainer.innerHTML = '';
+    $aggQuery.textContent = '';
+    return;
+  }
+
+  const config = {
+    type: $cfgType.value,
+    x: $cfgX.value,
+    y: $cfgY.value,
+    color: $cfgColor.value || null,
+    aggregate: $cfgAgg.value,
+  };
+
+  if (!config.x || !config.y) {
+    $chartMessage.textContent = 'Select X and Y columns to render a chart.';
+    $chartContainer.innerHTML = '';
+    $aggQuery.textContent = '';
+    return;
+  }
+
+  $chartMessage.textContent = '';
+  $aggQuery.textContent = '';
+
+  try {
+    // Aggregation: run follow-up DuckDB query if needed
+    const { data, query } = await aggregateData(config);
+    if (query) {
+      $aggQuery.textContent = `Aggregation query: ${query}`;
+    }
+
+    // Edge case: too many categories for bar chart
+    if (config.type === 'bar') {
+      const uniqueX = new Set(data.map(r => r[config.x]));
+      if (uniqueX.size > 100) {
+        $chartMessage.textContent = `Warning: ${uniqueX.size} unique X values. Consider aggregating or filtering.`;
+      }
+    }
+
+    renderChart($chartContainer, data, config);
+  } catch (e) {
+    $chartMessage.textContent = `Chart error: ${e.message}`;
+    $chartContainer.innerHTML = '';
+  }
+}
+
+/**
+ * Aggregate data via DuckDB if config.aggregate != 'none'.
+ * Wraps the current user SQL in a CTE and runs a GROUP BY query.
+ * Returns { data: Array<Object>, query: string|null }
+ */
+async function aggregateData(config) {
+  if (config.aggregate === 'none') {
+    return { data: currentResult.rows, query: null };
+  }
+
+  const sql = buildAggregateSQL(config, currentSQL.replace(/;\s*$/, ''));
+  const result = await conn.query(sql);
+  const fields = result.schema.fields.map(f => f.name);
+  const rows = result.toArray().map(r => {
+    const obj = {};
+    for (const key of fields) {
+      const v = r[key];
+      if (v === null || v === undefined) {
+        obj[key] = null;
+      } else if (typeof v === 'bigint') {
+        obj[key] = Number(v);
+      } else if (typeof v === 'object' && v.valueOf && v.constructor !== Date && v.constructor !== Array) {
+        const prim = v.valueOf();
+        obj[key] = typeof prim === 'bigint' ? Number(prim) : prim;
+      } else {
+        obj[key] = v;
+      }
+    }
+    return obj;
+  });
+  return { data: rows, query: sql };
+}
+
+/**
+ * Render a chart into a container using Observable Plot.
+ *
+ * This is a pure rendering function that:
+ * 1. Clears the container
+ * 2. Builds Plot mark options based on chart type
+ * 3. Calls Plot.plot() to generate an SVG
+ * 4. Appends the SVG to the container
+ *
+ * Chart type → Plot mark mapping:
+ *   bar  → Plot.barY with Plot.sort by y descending
+ *   line → Plot.lineY sorted by x
+ *   dot  → Plot.dot
+ *   area → Plot.areaY sorted by x
+ *   cell → Plot.cell with fill color
+ */
+function renderChart(container, data, config) {
+  container.innerHTML = '';
+
+  if (!data.length) {
+    return;
+  }
+
+  const { type, x, y, color } = config;
+  const width = Math.min(container.clientWidth || 800, 960);
+  const height = 380;
+
+  // Common plot options for dark theme
+  const commonOptions = {
+    width,
+    height,
+    grid: true,
+    nice: true,
+    marginLeft: 70,
+    marginBottom: 50,
+    marginTop: 20,
+    marginRight: 20,
+    style: {
+      background: 'transparent',
+      color: '#9ca3af',
+      fontSize: '12px',
+    },
+  };
+
+  let marks;
+  const colorOpt = color ? { fill: color } : { fill: '#22d3ee' };
+  const strokeOpt = color ? { stroke: color } : { stroke: '#22d3ee' };
+
+  switch (type) {
+    case 'bar':
+      marks = [
+        Plot.barY(data, { x, y, ...colorOpt, tip: true, sort: { x: '-y' } }),
+        Plot.ruleY([0]),
+      ];
+      break;
+
+    case 'line':
+      marks = [
+        Plot.lineY(data, { x, y, ...strokeOpt, tip: true, sort: x }),
+        Plot.ruleY([0]),
+      ];
+      break;
+
+    case 'dot':
+      marks = [
+        Plot.dot(data, { x, y, ...(color ? { stroke: color, fill: color } : { stroke: '#22d3ee', fill: '#22d3ee' }), fillOpacity: 0.5, tip: true }),
+      ];
+      break;
+
+    case 'area':
+      marks = [
+        Plot.areaY(data, { x, y, ...colorOpt, fillOpacity: 0.3, sort: x }),
+        Plot.lineY(data, { x, y, ...strokeOpt, sort: x }),
+        Plot.ruleY([0]),
+      ];
+      break;
+
+    case 'cell':
+      marks = [
+        Plot.cell(data, { x, y, fill: color || y, tip: true }),
+      ];
+      break;
+
+    default:
+      marks = [Plot.dot(data, { x, y, ...strokeOpt, tip: true })];
+  }
+
+  try {
+    const plot = Plot.plot({ ...commonOptions, marks });
+    container.appendChild(plot);
+  } catch (e) {
+    container.innerHTML = `<div style="color:var(--error);padding:1rem">Plot error: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+// =========================================================================
+// Tab switching
+// =========================================================================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const tab = btn.dataset.tab;
+    if (tab === 'table') {
+      $tablePanel.style.display = '';
+      document.getElementById('export-bar').style.display = '';
+      $chartPanel.style.display = 'none';
+    } else {
+      $tablePanel.style.display = 'none';
+      document.getElementById('export-bar').style.display = 'none';
+      $chartPanel.style.display = '';
+      await renderCurrentChart();
+    }
+  });
+});
+
+// =========================================================================
+// Event listeners
+// =========================================================================
+
+// --- Drag and drop ---
+$dropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  $dropZone.classList.add('active');
+});
+$dropZone.addEventListener('dragleave', () => {
+  $dropZone.classList.remove('active');
+});
+$dropZone.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  $dropZone.classList.remove('active');
+  await loadFiles(e.dataTransfer.files);
+});
+
+// Also support drop on the whole page when app is visible
+document.body.addEventListener('dragover', (e) => e.preventDefault());
+document.body.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  if ($app.classList.contains('visible')) {
+    await loadFiles(e.dataTransfer.files);
+  }
+});
+
+// --- File picker buttons ---
+$fileInput.addEventListener('change', (e) => loadFiles(e.target.files));
+document.getElementById('file-picker-btn').addEventListener('click', () => $fileInput.click());
+$fileInput2.addEventListener('change', (e) => loadFiles(e.target.files));
+document.getElementById('add-files-btn').addEventListener('click', () => $fileInput2.click());
+
+// --- SQL editor keyboard shortcuts ---
+$editor.addEventListener('keydown', (e) => {
+  // Ctrl+Enter or Cmd+Enter → execute query
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    executeQuery();
+  }
+  // Tab → insert two spaces instead of changing focus
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    insertAtCursor('  ');
+  }
+});
+
+// --- Run button ---
+$runBtn.addEventListener('click', () => executeQuery());
+
+// --- Export CSV ---
+$exportCsv.addEventListener('click', exportCSV);
+
+// --- Chart config changes → re-render ---
+[$cfgType, $cfgX, $cfgY, $cfgColor, $cfgAgg].forEach(el => {
+  el.addEventListener('change', () => {
+    if ($chartPanel.style.display !== 'none') {
+      renderCurrentChart();
+    }
+  });
+});
+
+// =========================================================================
+// Expose for testing / automation
+// =========================================================================
+window.__app = {
+  loadFiles,
+  executeQuery,
+  getEditor: () => $editor,
+  getState: () => ({ tables, currentResult, db: !!db, conn: !!conn }),
+};
+
+// =========================================================================
+// Initialize
+// =========================================================================
+window.__duckdbReady = initDuckDB().then(() => {
+  window.__app.ready = true;
+}).catch(e => {
+  console.error('DuckDB init failed:', e);
+  showError(`Failed to initialize DuckDB: ${e.message}`);
+});
+</script>
+</body>
+</html>

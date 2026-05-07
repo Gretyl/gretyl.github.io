@@ -25,6 +25,8 @@ navigation:
     link: /#tools
     expanded: true
     sublist:
+      - name: Local DuckDB
+        link: /tools/local-ddb.html
       - name: OpenGraph Preview
         link: /tools/opengraph-preview.html
       - name: Shadertoy Harness
