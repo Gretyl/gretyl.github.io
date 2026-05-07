@@ -362,7 +362,7 @@ body {
 // =========================================================================
 // CDN Imports
 // =========================================================================
-import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@latest/+esm";
+import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.32/+esm";
 import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
 
 // =========================================================================
@@ -601,7 +601,13 @@ function renderSidebar() {
     for (const col of info.columns) {
       const colEl = document.createElement('div');
       colEl.className = 'col-entry';
-      colEl.innerHTML = `<span class="col-name">${col.name}</span><span class="col-type">${col.type}</span>`;
+      const colNameEl = document.createElement('span');
+      colNameEl.className = 'col-name';
+      colNameEl.textContent = col.name;
+      const colTypeEl = document.createElement('span');
+      colTypeEl.className = 'col-type';
+      colTypeEl.textContent = col.type;
+      colEl.append(colNameEl, colTypeEl);
       // Clicking a column name inserts it into the SQL editor at cursor
       colEl.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -732,9 +738,9 @@ function renderTableView() {
   const classified = classifyColumns(columns);
 
   let html = '<thead><tr>';
-  for (const col of columns) html += `<th>${col.name}</th>`;
+  for (const col of columns) html += `<th>${escapeHtml(col.name)}</th>`;
   html += '</tr><tr class="type-row">';
-  for (const col of columns) html += `<th>${col.type}</th>`;
+  for (const col of columns) html += `<th>${escapeHtml(col.type)}</th>`;
   html += '</tr></thead><tbody>';
 
   for (const row of displayRows) {
