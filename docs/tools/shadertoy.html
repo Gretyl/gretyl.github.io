@@ -30,9 +30,15 @@
 <title>WebGL Shadertoy Harness</title>
 <style>
 :root {
-  --bg: #1a1a2e; --surface: #16213e; --text: #e4e4e4; --text-muted: #8899aa;
-  --accent: #22d3ee; --border: #2a2a4a; --error: #ff6b6b;
-  --editor-bg: #0d1117;
+  color-scheme: light dark;
+  --bg:          light-dark(#f9fafb, #1a1a2e);
+  --surface:     light-dark(#e5e7eb, #16213e);
+  --text:        light-dark(#1f2937, #e4e4e4);
+  --text-muted:  light-dark(#6b7280, #8899aa);
+  --accent:      light-dark(#0e7490, #22d3ee);
+  --border:      light-dark(#d1d5db, #2a2a4a);
+  --error:       light-dark(#b91c1c, #ff6b6b);
+  --editor-bg:   light-dark(#fafaf9, #0d1117);
   --sans: system-ui, -apple-system, sans-serif;
   --mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
 }
@@ -86,7 +92,7 @@ header h1 { font-size: 1.1rem; color: var(--accent); }
   font-family: var(--mono); font-size: 0.75rem; line-height: 1.4;
   color: var(--error); white-space: pre-wrap; padding: 0 0.25rem;
 }
-#errors.ok { color: #66d9a0; }
+#errors.ok { color: light-dark(#15803d, #66d9a0); }
 
 /* Parameters panel (auto-generated sliders) */
 .params-panel {
