@@ -26,16 +26,17 @@
    CSS — Dark theme with cyan accent, no external framework
    ======================================================================= */
 :root {
-  --bg: #111827;
-  --surface: #1f2937;
-  --surface2: #374151;
-  --border: #4b5563;
-  --text: #e5e7eb;
-  --text-muted: #9ca3af;
-  --accent: #22d3ee;
-  --accent-dim: #0e7490;
-  --error: #f87171;
-  --success: #4ade80;
+  color-scheme: light dark;
+  --bg:          light-dark(#f9fafb, #111827);
+  --surface:     light-dark(#e5e7eb, #1f2937);
+  --surface2:    light-dark(#d1d5db, #374151);
+  --border:      light-dark(#cbd5e1, #4b5563);
+  --text:        light-dark(#1f2937, #e5e7eb);
+  --text-muted:  light-dark(#6b7280, #9ca3af);
+  --accent:      light-dark(#0e7490, #22d3ee);
+  --accent-dim:  light-dark(#0891b2, #0e7490);
+  --error:       light-dark(#b91c1c, #f87171);
+  --success:     light-dark(#15803d, #4ade80);
   --mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
   --sans: 'DM Sans', system-ui, -apple-system, sans-serif;
 }
@@ -63,7 +64,7 @@ body {
 }
 #drop-zone.active {
   border-color: var(--accent);
-  background: rgba(34, 211, 238, 0.05);
+  background: light-dark(rgba(14, 116, 144, 0.08), rgba(34, 211, 238, 0.05));
 }
 #drop-zone.hidden { display: none; }
 #drop-zone h1 { font-size: 1.5rem; color: var(--accent); margin-bottom: 0.5rem; }
@@ -154,7 +155,7 @@ body {
 #sql-editor {
   width: 100%; min-height: 100px; max-height: 250px;
   resize: vertical;
-  background: #0f172a;
+  background: light-dark(#fafaf9, #0f172a);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -971,6 +972,19 @@ function renderChart(container, data, config) {
   const height = 380;
 
   // Common plot options for dark theme
+  // Resolve theme colors at render time so Plot output adapts to the
+  // user's prefers-color-scheme alongside the CSS light-dark() vars.
+  // getPropertyValue() returns the raw light-dark() expression — we need
+  // the resolved color, so probe via a hidden element's computed `color`.
+  const probe = document.createElement('span');
+  probe.style.cssText = 'display:none';
+  document.body.appendChild(probe);
+  probe.style.color = 'var(--text-muted)';
+  const axisColor = getComputedStyle(probe).color || '#9ca3af';
+  probe.style.color = 'var(--accent)';
+  const plotAccent = getComputedStyle(probe).color || '#22d3ee';
+  probe.remove();
+
   const commonOptions = {
     width,
     height,
@@ -982,14 +996,14 @@ function renderChart(container, data, config) {
     marginRight: 20,
     style: {
       background: 'transparent',
-      color: '#9ca3af',
+      color: axisColor,
       fontSize: '12px',
     },
   };
 
   let marks;
-  const colorOpt = color ? { fill: color } : { fill: '#22d3ee' };
-  const strokeOpt = color ? { stroke: color } : { stroke: '#22d3ee' };
+  const colorOpt = color ? { fill: color } : { fill: plotAccent };
+  const strokeOpt = color ? { stroke: color } : { stroke: plotAccent };
 
   switch (type) {
     case 'bar':
@@ -1008,7 +1022,7 @@ function renderChart(container, data, config) {
 
     case 'dot':
       marks = [
-        Plot.dot(data, { x, y, ...(color ? { stroke: color, fill: color } : { stroke: '#22d3ee', fill: '#22d3ee' }), fillOpacity: 0.5, tip: true }),
+        Plot.dot(data, { x, y, ...(color ? { stroke: color, fill: color } : { stroke: plotAccent, fill: plotAccent }), fillOpacity: 0.5, tip: true }),
       ];
       break;
 
