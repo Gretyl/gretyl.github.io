@@ -31,6 +31,8 @@ navigation:
         link: /tools/opengraph-preview.html
       - name: Shadertoy Harness
         link: /tools/shadertoy.html
+      - name: Twine Harness
+        link: /tools/twine-harness/
       - name: webkitdirectory Demo
         link: /tools/webkitdirectory-demo/
   - name: Tutorials

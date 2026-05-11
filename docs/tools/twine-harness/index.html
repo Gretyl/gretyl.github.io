@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧶</text></svg>">
+
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://*.analytics.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com; frame-src 'self'; object-src 'none'; base-uri 'self';">
+
+<meta property="og:title" content="Twine Harness" />
+<meta property="og:description" content="In-browser Tweego compiler — paste Twee 3 source, pick a story format (SugarCube, Harlowe, Snowman, Chapbook), and preview the compiled story instantly." />
+<meta property="og:url" content="https://gretyl.maplecrew.org/tools/twine-harness/" />
+<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/twine-harness.svg" />
+<meta property="og:site_name" content="Gretyl" />
+<meta property="og:type" content="website" />
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-05N3959YM1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-05N3959YM1');
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twine Harness — wasm-twine-compiler</title>
+<style>
+:root {
+  color-scheme: light dark;
+
+  /* Amber chrome — fixed regardless of user color-scheme. Pairs with the 🧶 favicon. */
+  --bg: #f59e0b;           /* amber-500, body background */
+  --surface: #d97706;      /* amber-600, header/footer bands */
+  --border: #92400e;       /* amber-800, separators and field borders */
+  --text: #1a1a1a;         /* near-black on amber — WCAG AA on #f59e0b */
+  --text-muted: #44403c;   /* stone-700 */
+  --accent: #1a1a1a;       /* button/h1 text — same dark tone as body text */
+  --error: #7f1d1d;        /* red-900 — legible on amber */
+  --ok: #14532d;           /* green-900 — legible on amber */
+
+  /* Text surfaces (editor, errors panel) adapt to user color-scheme preference. */
+  --editor-bg: light-dark(#fafaf9, #0d1117);
+  --editor-text: light-dark(#1a1a1a, #e4e4e4);
+  --editor-muted: light-dark(#44403c, #8899aa);
+
+  --sans: system-ui, -apple-system, sans-serif;
+  --mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: var(--sans); background: var(--bg); color: var(--text);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(320px, 45fr) minmax(320px, 55fr);
+}
+
+header {
+  grid-column: 1 / -1;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+header h1 { font-size: 1.05rem; color: var(--accent); margin-right: 0.5rem; }
+header label { font-size: 0.78rem; color: var(--text-muted); }
+select, button, .status {
+  padding: 0.3rem 0.6rem; font-size: 0.8rem;
+  background: #fbbf24;  /* amber-400 — lighter than chrome for affordance */
+  color: var(--text);
+  border: 1px solid var(--border); border-radius: 4px;
+  font-family: var(--sans);
+}
+button { cursor: pointer; color: var(--accent); font-weight: 600; }
+button:hover:not(:disabled) { background: #fcd34d; }  /* amber-300 */
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.status {
+  border: none; background: transparent; color: var(--text-muted);
+  font-family: var(--mono); font-size: 0.75rem; margin-left: auto;
+}
+.status.ok { color: var(--ok); }
+.status.err { color: var(--error); }
+
+.editor-panel {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  padding: 0.5rem; overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+#editor {
+  flex: 1; resize: none;
+  background: var(--editor-bg); color: var(--editor-text);
+  font-family: var(--mono); font-size: 13px; line-height: 1.5;
+  tab-size: 2; padding: 0.5rem;
+  border: 1px solid var(--border); border-radius: 4px;
+  outline: none;
+}
+#errors {
+  flex-shrink: 0; max-height: 8rem; overflow-y: auto;
+  font-family: var(--mono); font-size: 0.75rem; line-height: 1.4;
+  white-space: pre-wrap; padding: 0.4rem 0.5rem;
+  background: var(--editor-bg);
+  border: 1px solid var(--border); border-radius: 4px;
+  color: var(--editor-muted);
+}
+#errors.ok    { color: light-dark(#14532d, #66d9a0); }
+#errors.error { color: light-dark(#7f1d1d, #ff6b6b); }
+.error-row { cursor: pointer; }
+.error-row:hover { text-decoration: underline; }
+
+.preview-panel {
+  display: flex; flex-direction: column;
+  padding: 0.5rem; overflow: hidden; gap: 0.5rem;
+}
+#preview {
+  flex: 1; width: 100%;
+  background: white;
+  border: 1px solid var(--border); border-radius: 4px;
+}
+.preview-meta {
+  flex-shrink: 0; font-family: var(--mono); font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.harness-footer {
+  grid-column: 1 / -1;
+  padding: 0.4rem 1rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.harness-footer code {
+  background: var(--editor-bg);
+  padding: 0 0.25rem;
+  border-radius: 2px;
+  color: var(--editor-text);
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Twine Harness</h1>
+  <label>
+    Preset
+    <select id="preset" aria-label="Preset story">
+      <option value="hello-sugarcube">Hello SugarCube</option>
+      <option value="hello-harlowe">Hello Harlowe</option>
+      <option value="hello-snowman">Hello Snowman</option>
+      <option value="hello-chapbook">Hello Chapbook</option>
+    </select>
+  </label>
+  <label>
+    Format
+    <select id="format" aria-label="Story format">
+      <option value="">(from source)</option>
+    </select>
+  </label>
+  <button id="load-compiler" type="button">Load compiler</button>
+  <button id="compile" type="button" disabled>Compile (Ctrl+Enter)</button>
+  <button id="download" type="button" disabled>Download artifact</button>
+  <span id="status" class="status">Compiler not loaded.</span>
+</header>
+
+<section class="editor-panel">
+  <textarea id="editor" spellcheck="false" aria-label="Twee 3 source"></textarea>
+  <div id="errors" class="ok" role="status">no errors</div>
+</section>
+
+<section class="preview-panel">
+  <iframe id="preview" sandbox="allow-scripts"
+          title="Compiled story preview"
+          srcdoc="<p style='font-family: sans-serif; padding: 1rem; color: #444'>Click <strong>Load compiler</strong> then <strong>Compile</strong> to render the story.</p>"></iframe>
+  <div class="preview-meta" id="preview-meta">no compiled output yet.</div>
+</section>
+
+<footer class="harness-footer">
+  Preview sandbox: compiled stories run in a same-origin-stripped iframe with
+  a strict Content-Security-Policy. Remote scripts, images, audio, video, and
+  fonts are blocked — only inline scripts/styles and <code>data:</code> /
+  <code>blob:</code> assets render. Downloaded <code>.html.gz</code> artifacts
+  are unmodified Tweego output and have no such restrictions.
+</footer>
+
+<script src="./wasm_exec.js"></script>
+<script type="module">
+import { createCompiler } from './compile.js';
+import { storyformats } from './storyformats.js';
+import { presets } from './presets.js';
+
+// Populate format dropdown from the bundled storyformats. Sort by id so
+// chapbook-1, harlowe-3, snowman-2, sugarcube-2 appear in a stable order.
+const formatSel = document.getElementById('format');
+for (const id of Object.keys(storyformats).sort()) {
+  const e = storyformats[id];
+  const opt = document.createElement('option');
+  opt.value = id;
+  opt.textContent = e.version ? `${e.name} ${e.version}` : id;
+  formatSel.appendChild(opt);
+}
+
+const presetSel = document.getElementById('preset');
+const editor    = document.getElementById('editor');
+const errorsEl  = document.getElementById('errors');
+const preview   = document.getElementById('preview');
+const previewMeta = document.getElementById('preview-meta');
+const statusEl  = document.getElementById('status');
+const loadBtn   = document.getElementById('load-compiler');
+const compileBtn = document.getElementById('compile');
+const downloadBtn = document.getElementById('download');
+
+// Load initial preset.
+function loadPreset(id) {
+  if (presets[id]) editor.value = presets[id];
+}
+presetSel.addEventListener('change', () => loadPreset(presetSel.value));
+loadPreset(presetSel.value || 'hello-sugarcube');
+
+// Tab → 2 spaces in editor (matches shadertoy harness).
+editor.addEventListener('keydown', (e) => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = editor.selectionStart, eEnd = editor.selectionEnd;
+    editor.value = editor.value.slice(0, s) + '  ' + editor.value.slice(eEnd);
+    editor.selectionStart = editor.selectionEnd = s + 2;
+  }
+});
+
+let compiler = null;
+let lastResult = null;
+
+// Inject a strict CSP into the compiled HTML so the sandboxed iframe
+// can't beacon out via fetch/XHR/WebSocket/sendBeacon. The original
+// result.html is preserved for the download path — downloaded stories
+// remain media-capable for authors hosting them elsewhere.
+function injectPreviewCsp(html) {
+  const csp =
+    "default-src 'none'; " +
+    "script-src 'unsafe-inline'; " +
+    "style-src 'unsafe-inline'; " +
+    "img-src data: blob:; " +
+    "media-src data: blob:; " +
+    "font-src data:;";
+  const tag = `<meta http-equiv="Content-Security-Policy" content="${csp}">`;
+  return html.replace(/<head\b[^>]*>/i, m => m + tag);
+}
+
+function setStatus(text, kind = '') {
+  statusEl.textContent = text;
+  statusEl.className = 'status' + (kind ? ' ' + kind : '');
+}
+
+function setErrors(errs) {
+  if (!errs.length) {
+    errorsEl.className = 'ok';
+    errorsEl.textContent = 'no errors';
+    return;
+  }
+  errorsEl.className = 'error';
+  errorsEl.innerHTML = '';
+  for (const err of errs) {
+    const row = document.createElement('div');
+    row.className = 'error-row';
+    row.textContent = err.line ? `line ${err.line}: ${err.message}` : err.message;
+    if (err.line) {
+      row.addEventListener('click', () => jumpToLine(err.line));
+    }
+    errorsEl.appendChild(row);
+  }
+}
+
+function jumpToLine(n) {
+  const lines = editor.value.split('\n');
+  let off = 0;
+  for (let i = 0; i < n - 1 && i < lines.length; i++) off += lines[i].length + 1;
+  editor.focus();
+  editor.selectionStart = off;
+  editor.selectionEnd = off + (lines[n - 1] ? lines[n - 1].length : 0);
+}
+
+async function loadCompiler() {
+  loadBtn.disabled = true;
+  setStatus('Loading compiler...');
+  const t0 = performance.now();
+  try {
+    // Two ways to find the WASM bytes:
+    //   1. inline base64+gzip blob (make dist-bundled)
+    //   2. sibling tweego.wasm (make dist-split or `make build`)
+    let bytes;
+    const inline = document.getElementById('tweego-wasm');
+    if (inline && inline.textContent && inline.textContent.trim().length > 100) {
+      const r = await fetch('data:application/octet-stream;base64,' + inline.textContent.trim());
+      const stream = r.body.pipeThrough(new DecompressionStream('gzip'));
+      bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+    } else {
+      const r = await fetch(new URL('./tweego.wasm', import.meta.url));
+      bytes = new Uint8Array(await r.arrayBuffer());
+    }
+    const wasmModule = await WebAssembly.compile(bytes);
+    compiler = createCompiler({ wasmModule, GoCtor: globalThis.Go, storyformats });
+    const ms = (performance.now() - t0).toFixed(0);
+    try { localStorage.setItem('twine-harness:loadMs', ms); } catch {}
+    setStatus(`Compiler ready (loaded in ${ms} ms).`, 'ok');
+    compileBtn.disabled = false;
+  } catch (e) {
+    setStatus(`Load failed: ${e.message}`, 'err');
+    loadBtn.disabled = false;
+    throw e;
+  }
+}
+
+async function compileNow() {
+  if (!compiler) return;
+  compileBtn.disabled = true;
+  setStatus('Compiling...');
+  const source = editor.value;
+  const format = formatSel.value || undefined;
+  const t0 = performance.now();
+  try {
+    const result = await compiler.compile({ source, format });
+    const ms = (performance.now() - t0).toFixed(0);
+    lastResult = result;
+    setErrors(result.errors);
+    if (result.html) {
+      preview.srcdoc = injectPreviewCsp(result.html);
+      previewMeta.textContent = `compiled ${(result.html.length / 1024).toFixed(1)} KiB in ${ms} ms`;
+      downloadBtn.disabled = false;
+    } else {
+      previewMeta.textContent = `no html (${result.errors.length} error${result.errors.length === 1 ? '' : 's'})`;
+      downloadBtn.disabled = true;
+    }
+    if (result.errors.length) {
+      setStatus(`Compiled with ${result.errors.length} error${result.errors.length === 1 ? '' : 's'} in ${ms} ms.`, 'err');
+    } else {
+      setStatus(`Compiled in ${ms} ms.`, 'ok');
+    }
+  } catch (e) {
+    setStatus(`Compile failed: ${e.message}`, 'err');
+  } finally {
+    compileBtn.disabled = false;
+  }
+}
+
+// Filename slugger for the Download button. Reads `:: StoryTitle` out of
+// the editor buffer; falls back to "untitled-story".
+function storyTitleSlug() {
+  const m = editor.value.match(/^::\s*StoryTitle\s*$\n([^\n]+)/m);
+  let slug = (m && m[1] ? m[1] : 'untitled-story')
+    .toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  if (!slug) slug = 'untitled-story';
+  return slug.slice(0, 64);
+}
+
+async function downloadArtifact() {
+  if (!lastResult || !lastResult.html) return;
+  const slug = storyTitleSlug();
+  const enc = new TextEncoder();
+  const stream = new Blob([enc.encode(lastResult.html)]).stream()
+    .pipeThrough(new CompressionStream('gzip'));
+  const gz = await new Response(stream).blob();
+  const url = URL.createObjectURL(gz);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${slug}.html.gz`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  setStatus(`Downloaded ${slug}.html.gz`, 'ok');
+}
+
+loadBtn.addEventListener('click', loadCompiler);
+compileBtn.addEventListener('click', compileNow);
+downloadBtn.addEventListener('click', downloadArtifact);
+
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    e.preventDefault();
+    if (!compileBtn.disabled) compileNow();
+  }
+});
+
+// `?autoload=1` skips the click for kiosk-style embeds.
+if (new URLSearchParams(location.search).get('autoload') === '1') {
+  loadCompiler();
+}
+
+// Surface previously-measured load time on the button label.
+try {
+  const cached = localStorage.getItem('twine-harness:loadMs');
+  if (cached) loadBtn.textContent = `Load compiler (~${cached} ms)`;
+} catch {}
+</script>
+</body>
+</html>
