@@ -317,6 +317,37 @@
     font-weight: 700;
   }
 
+  /* Dark mode — follows the user's OS preference. Palette tuned so every
+     text token clears WCAG AA (4.5:1) and the bar colors clear SC 1.4.11
+     (3:1 for graphical objects) against the dark background. Polarity is
+     also encoded by position relative to the zero baseline, so color is
+     not the sole carrier of meaning (SC 1.4.1). */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink:           #ece6d5;
+      --paper:         #15140f;
+      --rule:          #4a443a;
+      --muted:         #b3ac9c;
+      --muted2:        #a8a193;
+      --positive:      #5fb98a;
+      --negative:      #e0796c;
+      --negative-tint: rgba(224, 121, 108, 0.10);
+      --body-text:     #d8d2c2;
+      --callout-text:  #d8d2c2;
+      --legend-text:   #c8c2b2;
+      --indent-text:   #aea798;
+      --surface-tint:  rgba(255, 250, 235, 0.045);
+      --table-border:  rgba(255, 250, 235, 0.12);
+    }
+
+    /* The chart script paints these fills via setAttribute; CSS rules
+       win over SVG presentation attributes, so recoloring happens here
+       without touching the data-binding script. */
+    svg.chart > rect:first-child   { fill: var(--paper); }
+    rect.bar[data-value^="-"]      { fill: var(--negative); }
+    rect.bar:not([data-value^="-"]) { fill: var(--positive); }
+  }
+
   /* Footer */
   .footer {
     margin-top: 24px;
