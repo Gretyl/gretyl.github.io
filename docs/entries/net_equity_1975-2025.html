@@ -37,6 +37,12 @@
     --muted: #555;
     --muted2: #666;
     --negative-tint: rgba(168, 54, 43, 0.06);
+    --body-text: #2a2a2a;
+    --callout-text: #333;
+    --legend-text: #444;
+    --indent-text: #555;
+    --surface-tint: rgba(26, 26, 26, 0.035);
+    --table-border: rgba(0, 0, 0, 0.08);
     --serif: Georgia, "Times New Roman", serif;
     --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   }
@@ -143,7 +149,7 @@
     margin-top: 18px;
     font-size: 12px;
     font-family: var(--serif);
-    color: #444;
+    color: var(--legend-text);
     flex-wrap: wrap;
   }
   .legend-item { display: flex; align-items: center; gap: 8px; }
@@ -175,7 +181,7 @@
     margin: 0;
     font-family: var(--serif);
     font-size: 13px;
-    color: #2a2a2a;
+    color: var(--body-text);
     line-height: 1.55;
   }
   .ak-list li {
@@ -216,10 +222,131 @@
     border-left: 3px solid var(--negative);
     font-size: 13px;
     font-family: var(--serif);
-    color: #333;
+    color: var(--callout-text);
     line-height: 1.55;
   }
   .callout strong { color: var(--ink); }
+
+  /* Methodology Q&A block */
+  .methodology {
+    margin-top: 22px;
+    padding: 18px 20px 20px 20px;
+    background: var(--surface-tint);
+    border: 1px solid var(--rule);
+    font-family: var(--serif);
+    font-size: 13.5px;
+    color: var(--body-text);
+    line-height: 1.6;
+  }
+  .m-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted2);
+    margin-bottom: 10px;
+  }
+  .m-q {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-style: italic;
+    color: var(--ink);
+    margin: 0 0 14px 0;
+    line-height: 1.3;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 12px;
+  }
+  .m-q::before {
+    content: "Q. ";
+    font-family: var(--mono);
+    font-style: normal;
+    font-weight: 700;
+    color: var(--muted2);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    vertical-align: 2px;
+    margin-right: 2px;
+  }
+  .methodology p { margin: 0 0 11px 0; }
+  .methodology p:last-child { margin-bottom: 0; }
+  .methodology strong { color: var(--ink); }
+
+  .m-table {
+    margin: 14px 0;
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 520px;
+    font-family: var(--serif);
+    font-size: 13px;
+  }
+  .m-table caption {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted2);
+    text-align: left;
+    padding-bottom: 6px;
+  }
+  .m-table td {
+    padding: 6px 10px 6px 0;
+    border-bottom: 1px solid var(--table-border);
+    color: var(--body-text);
+  }
+  .m-table td:last-child {
+    padding-right: 0;
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .m-table .indent { padding-left: 16px; color: var(--indent-text); }
+  .m-table .key-row td {
+    border-bottom: 1.5px solid var(--ink);
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .m-table .key-row td:last-child {
+    font-weight: 700;
+  }
+  .m-table .total-row td {
+    border-bottom: none;
+    padding-top: 8px;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* Dark mode — follows the user's OS preference. Palette tuned so every
+     text token clears WCAG AA (4.5:1) and the bar colors clear SC 1.4.11
+     (3:1 for graphical objects) against the dark background. Polarity is
+     also encoded by position relative to the zero baseline, so color is
+     not the sole carrier of meaning (SC 1.4.1). */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink:           #ece6d5;
+      --paper:         #15140f;
+      --rule:          #4a443a;
+      --muted:         #b3ac9c;
+      --muted2:        #a8a193;
+      --positive:      #5fb98a;
+      --negative:      #e0796c;
+      --negative-tint: rgba(224, 121, 108, 0.10);
+      --body-text:     #d8d2c2;
+      --callout-text:  #d8d2c2;
+      --legend-text:   #c8c2b2;
+      --indent-text:   #aea798;
+      --surface-tint:  rgba(255, 250, 235, 0.045);
+      --table-border:  rgba(255, 250, 235, 0.12);
+    }
+
+    /* The chart script paints these fills via setAttribute; CSS rules
+       win over SVG presentation attributes, so recoloring happens here
+       without touching the data-binding script. */
+    svg.chart > rect:first-child   { fill: var(--paper); }
+    rect.bar[data-value^="-"]      { fill: var(--negative); }
+    rect.bar:not([data-value^="-"]) { fill: var(--positive); }
+  }
 
   /* Footer */
   .footer {
@@ -303,12 +430,80 @@
     not just nominally inflated.
   </div>
 
+  <div class="methodology">
+    <div class="m-label">Methodology · Sector scope</div>
+    <p class="m-q">Why exclude the financial sector for this analysis?</p>
+
+    <p>
+      The Z.1 financial sector recorded <strong>+$8.1T</strong> of cumulative
+      net equity issuance over 1975–2025 — which, taken at face value,
+      appears to contradict the headline retirement story when added to the
+      nonfinancial number. Decomposing it shows it does not.
+    </p>
+
+    <table class="m-table" aria-label="Cumulative net equity issuance by sector, 1975 to 2025, nominal dollars">
+      <caption>Cumulative net equity issuance, 1975–2025 (nominal)</caption>
+      <tbody>
+        <tr>
+          <td>Nonfinancial corporate</td>
+          <td>−$10.4T</td>
+        </tr>
+        <tr>
+          <td>Financial sector (total)</td>
+          <td>+$8.1T</td>
+        </tr>
+        <tr>
+          <td class="indent">— of which: ETFs</td>
+          <td>+$8.5T</td>
+        </tr>
+        <tr class="key-row">
+          <td>Financial sector, ex-ETFs</td>
+          <td>−$0.4T</td>
+        </tr>
+        <tr class="total-row">
+          <td>All operating corporate (ex pooled vehicles)</td>
+          <td>−$10.8T</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Net of ETFs — share creation by pooled investment vehicles that wrap
+      already-existing equities — the financial sector cumulatively
+      <em>retired</em> equity by about $0.4T. ETFs alone account for
+      <strong>+$8.5T</strong> of the +$8.1T sector total; banks, insurers,
+      REITs, brokers, holding companies, GSEs, and closed-end funds were
+      collectively small net retirers.
+    </p>
+
+    <p>
+      Including the financial sector but excluding pooled vehicles yields a
+      51-year cumulative of <strong>−$10.8T</strong>, against
+      <strong>−$10.4T</strong> for nonfinancial alone — a 3% difference,
+      within rounding error. The substantive conclusion is identical.
+    </p>
+
+    <p>
+      ETF share creation is portfolio repackaging by households: the ETF
+      receives cash and immediately spends it on already-existing underlying
+      equities held in trust. It funds no productive activity. Counting it
+      as "corporate equity issuance" answers a different question — how
+      households store their equity exposure — than the one this chart is
+      built to answer: how American firms finance their operations. The
+      nonfinancial-only series is the cleaner denominator and is substantively
+      equivalent to the full operating-corporate sector ex pooled vehicles.
+    </p>
+  </div>
+
   <div class="footer">
     <p>
       <strong>Sources:</strong>
       Board of Governors of the Federal Reserve System, Z.1 Financial Accounts
       of the United States, Table F.103, series NCBCEBA027N (Nonfinancial
-      Corporate Business; Corporate Equities; Liability, Transactions), annual,
+      Corporate Business; Corporate Equities; Liability, Transactions); Table
+      F.108 / F.223, series FBCELIA027N (Domestic Financial Sectors; Corporate
+      Equities; Liability, Transactions) and BOGZ1FA564090005A (Exchange-Traded
+      Funds; Total Financial Assets, Transactions). All series annual,
       seasonally adjusted, retrieved from FRED on 19 March 2026. Deflator: U.S.
       Bureau of Labor Statistics, Consumer Price Index for All Urban Consumers
       (CPI-U), all items, U.S. city average, annual average (1982-84 = 100);
@@ -319,9 +514,9 @@
       <strong>Note:</strong>
       Negative values indicate net retirement of corporate equity (gross
       retirements via buybacks, cash M&amp;A, and LBO take-privates exceed gross
-      issuance via IPOs and seasoned offerings). The series covers nonfinancial
-      corporations only; financial-sector net equity issuance has been positive
-      over most of this period.
+      issuance via IPOs and seasoned offerings). For the rationale behind
+      restricting the series to nonfinancial corporate business, see the
+      methodology block above.
     </p>
   </div>
 </div>
