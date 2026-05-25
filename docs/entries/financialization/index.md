@@ -12,9 +12,9 @@ occur in US equities today. Since the SEC adopted Rule 10b-18 in 1982,
 American nonfinancial corporations have retired a cumulative $12.4
 trillion in equity (2025 dollars) &mdash; [a half-century structural shift
 from net issuance to persistent net
-retirement](net_equity_1975-2025.html).
+retirement](net-equity-issuance.html).
 
-[![Net equity issuance bar chart](thumb-net-equity.svg)](net_equity_1975-2025.html)
+[![Net equity issuance bar chart](thumb-net-equity.svg)](net-equity-issuance.html)
 
 Panel II zooms out to contextualize the empirical basis of wealth
 concentration. Five independent methodologies disagree on the magnitude,
