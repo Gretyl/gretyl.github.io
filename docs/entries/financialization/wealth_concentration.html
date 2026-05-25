@@ -27,30 +27,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Forty Years of Wealth Concentration, 1985–2025</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:       #F7F6F1;
-    --bg-card:  #FCFBF6;
-    --ink:      #14181F;
-    --ink-2:    #424954;
-    --ink-3:    #6E7281;
-    --ink-4:    #A2A6B0;
-    --hairline: #DEDBD2;
-    --rule:     #232830;
+    --ink: #1a1a1a;
+    --paper: #f7f3ec;
+    --rule: #c9bfae;
+    --ink-2: #555;
+    --ink-3: #666;
+    --surface-tint: rgba(26, 26, 26, 0.035);
+    --serif: Georgia, "Times New Roman", serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-    /* Median + envelope chart */
-    --c-median:    #1A1D24;  /* deep charcoal — the headline trajectory */
-    --c-envelope:  #E8DCC0;  /* warm sand — the methodological band */
-    --c-env-edge:  #C9B98E;  /* subtle envelope edge */
-    --c-cms:       #9B8147;  /* olive — CMS dashed */
+    /* Chart-specific */
+    --c-median:    #1A1D24;
+    --c-envelope:  #E8DCC0;
+    --c-env-edge:  #C9B98E;
+    --c-cms:       #9B8147;
     --c-cms-faint: rgba(155, 129, 71, 0.6);
-    --c-accent:    #B85A30;  /* burnt sienna — inflection callouts */
+    --c-accent:    #B85A30;
     --c-accent-bg: rgba(184, 90, 48, 0.06);
-
-    /* Dataset colors (for post-2016 individual continuation lines) */
     --c-dfa:  #1B3A57;
     --c-psz:  #C1473A;
     --c-szz:  #2D6A6E;
@@ -60,32 +55,23 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   html, body {
-    background: var(--bg);
+    background: var(--paper);
     color: var(--ink);
-    font-family: 'DM Sans', system-ui, sans-serif;
-    font-feature-settings: 'kern', 'liga';
-    -webkit-font-smoothing: antialiased;
+    font-family: var(--serif);
     line-height: 1.5;
+    margin: 0;
+    padding: 0;
   }
   body {
-    padding: 28px 16px 80px;
+    padding: 32px 24px;
     min-height: 100vh;
-    background-image:
-      radial-gradient(circle at 1px 1px, rgba(20,24,31,0.04) 0.6px, transparent 0);
-    background-size: 5px 5px;
   }
 
-  .mono { font-family: 'DM Mono', monospace; }
-  .news { font-family: 'Newsreader', serif; font-optical-sizing: auto; }
   .tnum { font-variant-numeric: tabular-nums; }
 
   .page {
-    max-width: 1080px;
+    max-width: 1040px;
     margin: 0 auto;
-    background: var(--bg-card);
-    border: 1px solid var(--hairline);
-    box-shadow: 0 24px 60px -32px rgba(20,24,31,0.18);
-    padding: 44px 52px 40px;
     position: relative;
   }
 
@@ -100,7 +86,7 @@
     margin-bottom: 28px;
   }
   .eyebrow {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--mono);
     font-size: 10.5px;
     color: var(--c-accent);
     letter-spacing: 0.22em;
@@ -109,13 +95,12 @@
     font-weight: 500;
   }
   h1 {
-    font-family: 'Newsreader', serif;
+    font-family: var(--serif);
     font-weight: 400;
     font-size: 42px;
     line-height: 1.04;
     letter-spacing: -0.018em;
     color: var(--ink);
-    font-variation-settings: 'opsz' 72;
   }
   h1 .em {
     font-style: italic;
@@ -123,18 +108,18 @@
     color: var(--ink-2);
   }
   .meta {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--mono);
     font-size: 10.5px;
     color: var(--ink-3);
     text-align: right;
     line-height: 1.8;
     letter-spacing: 0.04em;
   }
-  .meta .k { color: var(--ink-4); }
+  .meta .k { color: var(--ink-3); }
   .meta .v { color: var(--ink-2); }
 
   .deck {
-    font-family: 'Newsreader', serif;
+    font-family: var(--serif);
     font-size: 18px;
     line-height: 1.45;
     color: var(--ink-2);
@@ -144,25 +129,24 @@
   }
   .deck em { font-style: italic; color: var(--ink); }
   .deck .drop {
-    font-family: 'Newsreader', serif;
+    font-family: var(--serif);
     font-weight: 500;
     float: left;
     font-size: 56px;
     line-height: 0.82;
     padding: 6px 10px 0 0;
     color: var(--c-accent);
-    font-variation-settings: 'opsz' 72;
   }
 
   /* ---------- Coverage Gantt (compact) ---------- */
   .coverage {
     margin: 0 0 22px;
     padding: 16px 0 14px;
-    border-top: 1px solid var(--hairline);
-    border-bottom: 1px solid var(--hairline);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
   }
   .coverage-title {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--mono);
     font-size: 9.5px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -190,13 +174,13 @@
     overflow: visible;
   }
   .chart-axis-text {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--mono);
     font-size: 10.5px;
     fill: var(--ink-3);
     letter-spacing: 0.04em;
   }
   .chart-axis-text.bold { fill: var(--ink-2); }
-  .chart-gridline { stroke: var(--hairline); stroke-width: 1; }
+  .chart-gridline { stroke: var(--rule); stroke-width: 1; }
   .chart-gridline.major { stroke: #D2CFC4; }
   .chart-axis-baseline { stroke: var(--rule); stroke-width: 1; }
 
@@ -214,7 +198,7 @@
   }
   .median-dot {
     fill: var(--c-median);
-    stroke: var(--bg-card);
+    stroke: var(--paper);
     stroke-width: 2;
   }
 
@@ -228,7 +212,7 @@
   }
   .cms-dot {
     fill: var(--c-cms);
-    stroke: var(--bg-card);
+    stroke: var(--paper);
     stroke-width: 1.5;
   }
 
@@ -242,24 +226,24 @@
   }
   .ext-line.dfa { stroke: var(--c-dfa); }
   .ext-line.psz { stroke: var(--c-psz); }
-  .ext-dot { stroke: var(--bg-card); stroke-width: 1.5; }
+  .ext-dot { stroke: var(--paper); stroke-width: 1.5; }
 
   /* inflection markers — numbered circles */
   .inflect-marker {
     fill: var(--c-accent);
-    stroke: var(--bg-card);
+    stroke: var(--paper);
     stroke-width: 2;
   }
   .inflect-num {
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--serif);
     font-size: 11px;
     font-weight: 700;
-    fill: var(--bg-card);
+    fill: var(--paper);
     text-anchor: middle;
     dominant-baseline: central;
   }
   .inflect-callout {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--mono);
     font-size: 9.5px;
     fill: var(--c-accent);
     letter-spacing: 0.1em;
@@ -269,13 +253,13 @@
 
   /* inline labels */
   .series-label {
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--serif);
     font-size: 12px;
     font-weight: 600;
     letter-spacing: -0.005em;
   }
   .series-label-sub {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--mono);
     font-size: 9.5px;
     letter-spacing: 0.04em;
   }
@@ -284,10 +268,10 @@
   .inflect-block {
     margin: 0 0 36px;
     padding-top: 22px;
-    border-top: 1px solid var(--hairline);
+    border-top: 1px solid var(--rule);
   }
   .inflect-block-title {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--mono);
     font-size: 9.5px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -298,11 +282,11 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1px;
-    background: var(--hairline);
-    border: 1px solid var(--hairline);
+    background: var(--rule);
+    border: 1px solid var(--rule);
   }
   .inflect-card {
-    background: var(--bg-card);
+    background: var(--paper);
     padding: 18px 20px;
     position: relative;
   }
@@ -312,8 +296,8 @@
     height: 22px;
     border-radius: 50%;
     background: var(--c-accent);
-    color: var(--bg-card);
-    font-family: 'DM Sans', sans-serif;
+    color: var(--paper);
+    font-family: var(--serif);
     font-size: 12px;
     font-weight: 700;
     align-items: center;
@@ -322,7 +306,7 @@
     box-shadow: 0 0 0 3px var(--c-accent-bg);
   }
   .inflect-card .yr {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--mono);
     font-size: 11px;
     color: var(--c-accent);
     letter-spacing: 0.1em;
@@ -332,7 +316,7 @@
     font-feature-settings: 'tnum';
   }
   .inflect-card .name {
-    font-family: 'Newsreader', serif;
+    font-family: var(--serif);
     font-size: 19px;
     line-height: 1.18;
     color: var(--ink);
@@ -341,7 +325,7 @@
     letter-spacing: -0.008em;
   }
   .inflect-card .desc {
-    font-family: 'Newsreader', serif;
+    font-family: var(--serif);
     font-size: 13px;
     line-height: 1.5;
     color: var(--ink-2);
@@ -356,10 +340,10 @@
     gap: 36px;
     margin-bottom: 36px;
     padding-top: 22px;
-    border-top: 1px solid var(--hairline);
+    border-top: 1px solid var(--rule);
   }
   .panel-title {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--mono);
     font-size: 9.5px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -372,7 +356,7 @@
     display: block;
   }
   .inset-caption {
-    font-family: 'Newsreader', serif;
+    font-family: var(--serif);
     font-style: italic;
     font-size: 13px;
     line-height: 1.45;
@@ -382,18 +366,17 @@
   .inset-caption strong { font-style: normal; font-weight: 600; color: var(--ink); }
 
   .method-q {
-    font-family: 'Newsreader', serif;
+    font-family: var(--serif);
     font-style: italic;
     font-size: 17px;
     line-height: 1.22;
     color: var(--ink);
     font-weight: 500;
     margin-bottom: 12px;
-    font-variation-settings: 'opsz' 36;
     letter-spacing: -0.005em;
   }
   .method-a {
-    font-family: 'Newsreader', serif;
+    font-family: var(--serif);
     font-size: 13.5px;
     line-height: 1.52;
     color: var(--ink-2);
@@ -404,11 +387,11 @@
   .method-a strong { font-weight: 600; color: var(--ink); }
   .method-a .ds {
     display: inline-block;
-    font-family: 'DM Mono', monospace;
+    font-family: var(--mono);
     font-size: 11px;
     color: var(--ink);
-    background: var(--bg);
-    border: 1px solid var(--hairline);
+    background: var(--paper);
+    border: 1px solid var(--rule);
     padding: 1px 6px;
     border-radius: 2px;
     letter-spacing: 0.02em;
@@ -421,11 +404,11 @@
     gap: 24px;
     padding: 14px 0 0;
     margin-bottom: 4px;
-    font-family: 'DM Mono', monospace;
+    font-family: var(--mono);
     font-size: 10px;
     color: var(--ink-2);
     letter-spacing: 0.04em;
-    border-top: 1px dotted var(--hairline);
+    border-top: 1px dotted var(--rule);
   }
   .legend-strip .li {
     display: inline-flex;
@@ -459,16 +442,16 @@
   .sources {
     margin-top: 16px;
     padding: 22px 24px 20px;
-    background: var(--bg);
-    border: 1px solid var(--hairline);
-    font-family: 'DM Mono', monospace;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    font-family: var(--mono);
     font-size: 10.5px;
     line-height: 1.7;
     color: var(--ink-2);
     letter-spacing: 0.02em;
   }
   .sources .label {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--mono);
     font-size: 9.5px;
     color: var(--ink-3);
     letter-spacing: 0.2em;
@@ -479,20 +462,41 @@
   .sources .vintage {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px dotted var(--hairline);
+    border-top: 1px dotted var(--rule);
     color: var(--ink-3);
     font-size: 10px;
   }
   .sources .tk { color: var(--c-dfa); font-weight: 500; }
   .sources cite {
-    font-family: 'Newsreader', serif;
+    font-family: var(--serif);
     font-style: italic;
     color: var(--ink-2);
     font-size: 11.5px;
   }
 
+  @media (prefers-color-scheme: dark) {
+    :root {
+        --ink: #ece6d5;
+        --paper: #15140f;
+        --rule: #4a443a;
+        --ink-2: #b3ac9c;
+        --ink-3: #a8a193;
+        --surface-tint: rgba(255, 250, 235, 0.045);
+        --c-median: #d4cfc3;
+        --c-envelope: rgba(232, 220, 192, 0.15);
+        --c-env-edge: #C9B98E;
+        --c-cms: #c4a86a;
+        --c-cms-faint: rgba(196, 168, 106, 0.6);
+        --c-accent: #e07a52;
+        --c-accent-bg: rgba(224, 122, 82, 0.12);
+        --c-dfa: #5a9fd4;
+        --c-psz: #e0756a;
+        --c-szz: #5db8bc;
+        --c-kss: #b08ec4;
+    }
+  }
+
   @media (max-width: 820px) {
-    .page { padding: 28px 22px; }
     h1 { font-size: 28px; }
     .deck { font-size: 15px; }
     .head-row { grid-template-columns: 1fr; gap: 12px; }
@@ -584,7 +588,7 @@
   <section class="chart-wrap">
     <div class="chart-head">
       <div class="coverage-title" style="margin-bottom: 0;">[02] Concentration trajectory · median across the marketable-wealth measures</div>
-      <div class="mono" style="font-size:9.5px; color: var(--ink-3); letter-spacing: 0.12em; text-transform: uppercase;">% of household wealth</div>
+      <div style="font-family: var(--mono); font-size:9.5px; color: var(--ink-3); letter-spacing: 0.12em; text-transform: uppercase;">% of household wealth</div>
     </div>
 
     <svg class="chart" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet">
@@ -726,7 +730,7 @@
 
       <!-- Y axis title -->
       <text x="40" y="225" transform="rotate(-90, 40, 225)" text-anchor="middle"
-        class="mono" style="font-size:9.5px; fill:#6E7281; letter-spacing:0.12em; text-transform:uppercase;">
+        style="font-family: var(--mono); font-size:9.5px; fill:#6E7281; letter-spacing:0.12em; text-transform:uppercase;">
         Top-1% share of total household wealth
       </text>
     </svg>
