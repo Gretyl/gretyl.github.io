@@ -1,0 +1,1221 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Financialization, 1975–2025 — The Full Story</title>
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
+
+<meta property="og:title" content="Financialization, 1975–2025 — The Full Story">
+<meta property="og:description" content="A scrollytelling narrative tracing 40 years of stock buybacks, wealth concentration, and the re-plumbing of corporate cash flow — in three acts.">
+<meta property="og:url" content="https://gretyl.maplecrew.org/entries/financialization/scrollytelling.html">
+<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/where-the-money-went.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="672">
+<meta property="og:site_name" content="Gretyl">
+<meta property="og:type" content="article">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-05N3959YM1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-05N3959YM1');
+</script>
+
+<link rel="alternate" type="application/atom+xml" title="Gretyl (Atom)" href="/feed.xml">
+<link rel="alternate" type="application/feed+json" title="Gretyl (JSON Feed)" href="/feed.json">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ink: #1a1a1a;
+  --paper: #f7f3ec;
+  --rule: #c9bfae;
+  --ink-2: #555;
+  --ink-3: #666;
+  --positive: #2f6f4e;
+  --negative: #a8362b;
+  --surface-tint: rgba(26, 26, 26, 0.035);
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --serif: Georgia, "Times New Roman", serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --c-median: #1A1D24;
+  --c-envelope: #E8DCC0;
+  --c-env-edge: #C9B98E;
+  --c-cms: #9B8147;
+  --c-dfa: #1B3A57;
+  --c-psz: #C1473A;
+  --c-szz: #2D6A6E;
+  --c-kss: #7A5C8C;
+  --c-accent: #B85A30;
+
+  --c-ocf: #3F5E48;
+  --c-debt: #6B4A2B;
+  --c-capex: #2A4C66;
+  --c-div: #B08841;
+  --c-buyback: #9B2A21;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #ece6d5;
+    --paper: #1a1d24;
+    --rule: #3a3830;
+    --ink-2: #b0a892;
+    --ink-3: #8a8070;
+    --positive: #5fb98a;
+    --negative: #e0796c;
+    --surface-tint: rgba(236, 230, 213, 0.04);
+
+    --c-median: #d4cfc3;
+    --c-envelope: rgba(232,220,192,0.15);
+    --c-env-edge: #6a6040;
+    --c-cms: #c4a86a;
+    --c-dfa: #5a9fd4;
+    --c-psz: #e0756a;
+    --c-szz: #5abcb8;
+    --c-kss: #b89cd0;
+    --c-accent: #e8965a;
+
+    --c-ocf: #6aad7e;
+    --c-debt: #c49068;
+    --c-capex: #5a9fd4;
+    --c-div: #d4b06a;
+    --c-buyback: #e07060;
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  line-height: 1.6;
+}
+
+/* ═══════════════════════ LAYOUT ═══════════════════════ */
+
+.page { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+.cold-open {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: clamp(80px, 15vh, 200px) 24px clamp(60px, 10vh, 120px);
+}
+.cold-open h1 {
+  font-family: var(--display);
+  font-variation-settings: "opsz" 144;
+  font-weight: 350;
+  font-size: clamp(36px, 6vw, 72px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  margin-bottom: 32px;
+}
+.cold-open .kicker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  margin-bottom: 16px;
+}
+.cold-open p {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--ink-2);
+  margin-bottom: 18px;
+}
+.cold-open .lead { font-size: 21px; color: var(--ink); }
+
+/* ═══════════════════════ SCROLLY SECTION ═══════════════════════ */
+
+.scrolly {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.scrolly__canvas {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.scrolly__canvas svg {
+  width: 100%;
+  max-width: 960px;
+  height: auto;
+  max-height: 80vh;
+}
+
+.scrolly__steps {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.step {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  padding: 20px 0;
+  pointer-events: auto;
+}
+.step:first-child { min-height: 70vh; }
+
+.step__text {
+  max-width: 320px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 20px 24px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  opacity: 0.25;
+  transition: opacity 0.4s ease;
+}
+
+.step.is-active .step__text { opacity: 1; }
+
+.step--right { justify-content: flex-end; }
+.step--left { justify-content: flex-start; }
+.step--center { justify-content: center; }
+
+.step__text em { font-style: italic; }
+.step__text strong { font-weight: 700; }
+.step__text .num {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Morph step is extra tall for scroll-scrubbing */
+.step--morph { min-height: 200vh; }
+
+/* ═══════════════════════ BRIDGE SECTIONS ═══════════════════════ */
+
+.bridge {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: clamp(40px, 8vh, 100px) 24px;
+}
+.bridge p {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--ink-2);
+  margin-bottom: 16px;
+}
+.bridge .act-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  margin-bottom: 12px;
+}
+
+/* ═══════════════════════ CLOSING ═══════════════════════ */
+
+.closing {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: clamp(60px, 10vh, 140px) 24px clamp(40px, 6vh, 80px);
+}
+.closing p {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--ink-2);
+  margin-bottom: 16px;
+}
+.closing .thesis {
+  font-family: var(--display);
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--ink);
+  border-left: 3px solid var(--negative);
+  padding-left: 20px;
+  margin: 32px 0;
+}
+
+.thumbnails {
+  display: flex;
+  gap: 16px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+}
+.thumbnails svg {
+  flex: 1;
+  height: 60px;
+  opacity: 0.6;
+}
+
+/* ═══════════════════════ METHODOLOGY ═══════════════════════ */
+
+.methodology {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  border-top: 1px solid var(--rule);
+}
+.methodology h2 {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.methodology p, .methodology li {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  margin-bottom: 10px;
+}
+.methodology ul { padding-left: 20px; }
+
+/* ═══════════════════════ CHART STYLES ═══════════════════════ */
+
+.bar-ghost { opacity: 0.15; transition: opacity 0.5s ease, fill 0.3s ease; }
+.bar-active { opacity: 1; }
+.bar-highlight { opacity: 1; filter: brightness(1.1); }
+
+.chart-axis { font-family: var(--mono); font-size: 10px; fill: var(--ink-3); }
+.chart-gridline { stroke: var(--rule); stroke-width: 0.5; }
+.chart-zero { stroke: var(--ink); stroke-width: 1.5; }
+
+.env-path { transition: opacity 0.6s ease; }
+.env-median { fill: none; stroke: var(--c-median); stroke-width: 2.4; stroke-linecap: round; }
+.env-fill { fill: var(--c-envelope); opacity: 0; transition: opacity 0.6s ease; }
+.env-edge { fill: none; stroke: var(--c-env-edge); stroke-width: 1; opacity: 0; transition: opacity 0.6s ease; }
+.env-cms { fill: none; stroke: var(--c-cms); stroke-width: 1.4; stroke-dasharray: 5 4; }
+.env-dfa { fill: none; stroke: var(--c-dfa); stroke-width: 1.4; stroke-linecap: round; }
+.env-psz { fill: none; stroke: var(--c-psz); stroke-width: 1.4; stroke-linecap: round; }
+.env-szz { fill: none; stroke: var(--c-szz); stroke-width: 1.4; stroke-linecap: round; }
+.env-kss { fill: none; stroke: var(--c-kss); stroke-width: 1.4; stroke-linecap: round; }
+
+.inflect-marker { fill: var(--c-accent); opacity: 0; transition: opacity 0.5s ease; }
+.inflect-label { font-family: var(--mono); font-size: 9px; fill: var(--c-accent); opacity: 0; transition: opacity 0.5s ease; }
+
+.sankey-flow { transition: opacity 0.4s ease; }
+.sankey-node { transition: opacity 0.4s ease; }
+.sankey-label { font-family: var(--mono); font-size: 11px; fill: var(--ink); transition: opacity 0.4s ease; }
+.sankey-value { font-family: var(--mono); font-size: 10px; fill: var(--ink-2); transition: opacity 0.4s ease; }
+
+.incidence-bar { opacity: 0; transition: opacity 0.6s ease; }
+
+/* ═══════════════════════ NOSCRIPT ═══════════════════════ */
+
+.no-js .scrolly { display: none; }
+.no-js .bridge { display: none; }
+.no-js .noscript-fallback { display: block; }
+.noscript-fallback { display: none; }
+
+/* ═══════════════════════ RESPONSIVE ═══════════════════════ */
+
+@media (max-width: 699px) {
+  .scrolly__canvas { height: 50vh; }
+  .step { min-height: 60vh; justify-content: center !important; }
+  .step--morph { min-height: 150vh; }
+  .step__text { max-width: 100%; margin: 0 16px; }
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.remove('no-js');</script>
+
+<noscript>
+<div class="noscript-fallback" style="max-width:640px;margin:40px auto;padding:0 24px;font-family:Georgia,serif;">
+  <p>This narrative requires JavaScript for scroll-driven visualizations.
+  <a href="index.html">View the static version instead →</a></p>
+</div>
+</noscript>
+
+<!-- ═══════════════════════ COLD OPEN ═══════════════════════ -->
+
+<header class="cold-open">
+  <div class="kicker">Financialization · 1975–2025</div>
+  <h1>The Full Story</h1>
+  <p class="lead">Since 1982, American corporations have retired <strong>$12.4 trillion</strong> in their own equity — in real terms, adjusting every dollar to 2025 purchasing power.</p>
+  <p>Before that year, the public offering was a net source of corporate capital. After it, the flow reversed — permanently. Corporations became net consumers of their own stock, year after year, through every boom and bust for four decades running.</p>
+  <p>This is a story in three parts: <em>what</em> changed, <em>why</em> it matters for the distribution of wealth, and <em>how</em> the plumbing actually works.</p>
+</header>
+
+<!-- ═══════════════════════ ACT I ═══════════════════════ -->
+
+<div class="bridge">
+  <div class="act-label">Act I · What</div>
+  <p>The shape of net equity retirement — fifty-one years of a single Federal Reserve series, deflated to 2025 dollars.</p>
+</div>
+
+<section class="scrolly" id="act-i">
+  <div class="scrolly__canvas" id="canvas-i">
+    <svg id="chart-bars" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
+  <div class="scrolly__steps">
+    <div class="step step--right" data-act="1" data-step="1">
+      <div class="step__text"></div>
+    </div>
+    <div class="step step--right" data-act="1" data-step="2">
+      <div class="step__text">Through the late 1970s, American corporations raised more equity than they retired. The public offering was a net source of capital.</div>
+    </div>
+    <div class="step step--right" data-act="1" data-step="3">
+      <div class="step__text"><strong>1982:</strong> the SEC adopts Rule 10b-18, creating a safe harbor for open-market repurchases. The structural inflection begins.</div>
+    </div>
+    <div class="step step--right" data-act="1" data-step="4">
+      <div class="step__text">The 1984–89 LBO wave averaged <span class="num">−$278B/year</span> in real terms — larger than most people realize. But it was episodic.</div>
+    </div>
+    <div class="step step--right" data-act="1" data-step="5">
+      <div class="step__text"><strong>1994</strong> begins what is now 32 consecutive years of net retirement — uninterrupted through every recession, crisis, and policy regime since.</div>
+    </div>
+    <div class="step step--right" data-act="1" data-step="6">
+      <div class="step__text">The real-terms trough: <span class="num">−$838B</span> in a single year, driven by the convergence of record buybacks, the second LBO mega-wave, and cash-financed M&A.</div>
+    </div>
+    <div class="step step--right" data-act="1" data-step="7">
+      <div class="step__text">Cumulative: <span class="num">−$12.4 trillion</span> in 2025 dollars. The American public corporation became a net consumer of its own equity — permanently.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ BRIDGE I→II ═══════════════════════ -->
+
+<div class="bridge">
+  <p>Net equity retirement is a corporate-finance fact — a plumbing change in how capital markets work. The next question is whether it moved the needle on the distribution of wealth.</p>
+  <p>The incentives didn't help. §162(m) of the 1993 budget act capped the tax deductibility of cash executive compensation above $1 million — but exempted stock options and equity grants. The intended nudge toward "pay for performance" gave every corner office a personal stake in share price. The 2017 TCJA nominally closed the loophole, then the 2021 ARPA broadened the cap — but by then three decades of equity-linked pay had already shaped how boards think about capital allocation. The policy didn't cause the buyback era, but the misaligned incentive ran alongside it the entire time.</p>
+  <p>Different research teams measure the resulting concentration differently. Five independent methodologies, five different estimates. But they agree on something important.</p>
+  <div class="act-label">Act II · Why</div>
+</div>
+
+<!-- ═══════════════════════ ACT II ═══════════════════════ -->
+
+<section class="scrolly" id="act-ii">
+  <div class="scrolly__canvas" id="canvas-ii">
+    <svg id="chart-envelope" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
+  <div class="scrolly__steps">
+    <div class="step step--left" data-act="2" data-step="1">
+      <div class="step__text">The bold line is the median of four independent measures of top-1% wealth share. It rises from <span class="num">24%</span> to <span class="num">33%</span> in three decades.</div>
+    </div>
+    <div class="step step--left" data-act="2" data-step="2">
+      <div class="step__text">Two teams, two methods. The Distributional Financial Accounts (Fed) and Piketty-Saez-Zucman use different data and different imputations. Both agree on the direction.</div>
+    </div>
+    <div class="step step--left" data-act="2" data-step="3">
+      <div class="step__text">Smith-Zidar-Zwick and Kopczuk-Saez-Song add two more approaches. Four lines, four slopes — none pointing down.</div>
+    </div>
+    <div class="step step--left" data-act="2" data-step="4">
+      <div class="step__text">The question is <em>how much</em> — never <em>whether</em>. The envelope is their disagreement: 1 percentage point in 1985, widening to 10 by 2016.</div>
+    </div>
+    <div class="step step--left" data-act="2" data-step="5">
+      <div class="step__text">A fifth methodology — CMS — includes Social Security entitlements. The same directional story, at a lower altitude.</div>
+    </div>
+    <div class="step step--left" data-act="2" data-step="6">
+      <div class="step__text">Three structural breaks: the 1995 financialization regime steepens the slope. The GFC pauses the climb but doesn't break it. After 2017, the estimates diverge — but none of them fall.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ BRIDGE II→III ═══════════════════════ -->
+
+<div class="bridge">
+  <p>Wealth has concentrated. The question remaining is <em>how</em> — what is the mechanism that connects corporate equity retirement to household wealth distribution?</p>
+  <p>The answer is in the plumbing: where corporate cash comes from and where it goes. Five channels — operating cash flow, borrowed money, capital expenditure, dividends, and buybacks. The proportions changed.</p>
+  <div class="act-label">Act III · How</div>
+</div>
+
+<!-- ═══════════════════════ ACT III ═══════════════════════ -->
+
+<section class="scrolly" id="act-iii">
+  <div class="scrolly__canvas" id="canvas-iii">
+    <svg id="chart-sankey" viewBox="0 0 760 620" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
+  <div class="scrolly__steps">
+    <div class="step step--left" data-act="3" data-step="1">
+      <div class="step__text"></div>
+    </div>
+    <div class="step step--left" data-act="3" data-step="2">
+      <div class="step__text"><strong>1982:</strong> nearly all corporate cash comes from operations. Borrowed money is a sidecar, not a co-pilot.</div>
+    </div>
+    <div class="step step--left" data-act="3" data-step="3">
+      <div class="step__text">Capital expenditure takes the lion's share. Dividends are the only meaningful return to shareholders. Buybacks are statistically zero — net equity issuance was actually <em>positive</em> that year.</div>
+    </div>
+    <div class="step step--left" data-act="3" data-step="4">
+      <div class="step__text">The corporation as productive engine.</div>
+    </div>
+    <div class="step step--left step--morph" data-act="3" data-step="5">
+      <div class="step__text"><span class="num">1982 → 2024</span></div>
+    </div>
+    <div class="step step--left" data-act="3" data-step="6">
+      <div class="step__text">By 2024, net buybacks alone reach <span class="num">$415B</span>. Dividends have grown fivefold. Together, shareholder returns rival capital expenditure.</div>
+    </div>
+    <div class="step step--left" data-act="3" data-step="7">
+      <div class="step__text">And a second inflow has appeared: <span class="num">$815B</span> in borrowed money. The diagram splits it proportionally across all uses — but the arithmetic is suggestive: total shareholder payouts roughly equal the debt inflow.</div>
+    </div>
+    <div class="step step--left" data-act="3" data-step="8">
+      <div class="step__text">Where the capital gain lands. Of the $5.3T in S&P 500 buybacks during 2010–2019, approximately <span class="num">$2.6T</span> accrued to the top 1% of households.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ CLOSING ═══════════════════════ -->
+
+<section class="closing">
+  <div class="thesis">In 1982 the American public corporation was a machine for turning revenue into productive capacity; by 2024 it is a machine for turning revenue — and borrowed money — into share price.</div>
+  <p>Three years kept appearing across every chart: <strong>1982</strong>, when the SEC opened the buyback channel; <strong>2007</strong>, when the plumbing nearly burst; <strong>2017</strong>, when tax reform locked the new regime in place. The same inflection points show up in the equity series, the wealth estimates, and the cash-flow diagrams — because they are the same structural shift, measured three ways.</p>
+  <p>That shift has been in place for forty years. Nothing in the current policy landscape — not the 1% excise tax, not the ARPA compensation cap — has reversed it or bent the curve. As long as the plumbing runs in this direction, wealth concentration follows the flow.</p>
+  <div class="thumbnails">
+    <svg viewBox="58 51 926 454">
+      <rect fill="var(--negative)" opacity="0.4" x="62" y="92.8" width="900" height="300" rx="2"/>
+      <line x1="62" y1="92.8" x2="962" y2="92.8" stroke="var(--ink)" stroke-width="1.5"/>
+    </svg>
+    <svg viewBox="100 40 880 380">
+      <path fill="var(--c-envelope)" d="M130 332 L765 59 L765 254 L130 352Z" opacity="0.5"/>
+      <path fill="none" stroke="var(--c-median)" stroke-width="2.4" d="M130 342 L765 171"/>
+    </svg>
+    <svg viewBox="130 30 700 460">
+      <rect fill="var(--c-ocf)" x="150" y="60" width="18" height="320" opacity="0.6"/>
+      <rect fill="var(--c-capex)" x="530" y="60" width="18" height="200" opacity="0.6"/>
+      <rect fill="var(--c-buyback)" x="530" y="350" width="18" height="80" opacity="0.6"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ═══════════════════════ METHODOLOGY ═══════════════════════ -->
+
+<section class="methodology">
+  <h2>Methodology &amp; Sources</h2>
+  <p>All figures in real 2025 dollars, deflated using BLS CPI-U (series CUUR0000SA0). Base: 2025 annual average 321.0.</p>
+  <ul>
+    <li><strong>Act I:</strong> Federal Reserve Z.1 Financial Accounts, series NCBCEBA027N (net equity issuance, nonfinancial corporate business). 51 annual observations, 1975–2025.</li>
+    <li><strong>Act II:</strong> DFA (Fed Distributional Financial Accounts, WFRBST01134, 2024 Q4 vintage); PSZ (Piketty-Saez-Zucman, WID series updated 2023); SZZ (Smith-Zidar-Zwick 2023); KSS (Kopczuk-Saez-Song 2010, extended); CMS (Calman-Meyer-Schipporeit 2020, marketable + Social Security).</li>
+    <li><strong>Act III:</strong> Fed Z.1 F.103 (nonfinancial corporate business cash flow identity). Inflows derived to balance within 0.5%. Sankey ribbons split proportionally across all outflows — the marginal-funds interpretation (debt → buybacks specifically) has empirical support but is not depicted.</li>
+    <li><strong>Incidence:</strong> DFA equity-ownership tables, 2024 Q4 vintage. S&P DJI buyback data, 2010–2019 cumulative.</li>
+  </ul>
+  <p><strong>Key references:</strong> Lazonick, <em>Profits Without Prosperity</em>, HBR (2014); Mason, <em>Disgorge the Cash</em>, Roosevelt Institute (2015); Palladino &amp; Lazonick, <em>Regulating Stock Buybacks</em>, Roosevelt Institute (2021); Gruber &amp; Kamin, <em>Corporate Buybacks and Capital Investment</em>, Fed IFDP Notes (2017).</p>
+</section>
+
+<!-- ═══════════════════════ JAVASCRIPT ═══════════════════════ -->
+
+<script>
+(function() {
+'use strict';
+
+/* ──────────────────────────────────────────────────────────────────
+   DATA
+   ────────────────────────────────────────────────────────────────── */
+
+const NET_EQUITY = [
+  {year:1975,value:59.1},{year:1976,value:59.8},{year:1977,value:14.3},
+  {year:1978,value:-0.5},{year:1979,value:-34.5},{year:1980,value:40.5},
+  {year:1981,value:-47.7},{year:1982,value:6.3},{year:1983,value:64.8},
+  {year:1984,value:-243.8},{year:1985,value:-250.9},{year:1986,value:-248.1},
+  {year:1987,value:-213.3},{year:1988,value:-350.8},{year:1989,value:-321.0},
+  {year:1990,value:-155.2},{year:1991,value:44.5},{year:1992,value:66.4},
+  {year:1993,value:76.6},{year:1994,value:-73.2},{year:1995,value:-109.1},
+  {year:1996,value:-91.7},{year:1997,value:-149.6},{year:1998,value:-414.1},
+  {year:1999,value:-187.5},{year:2000,value:-66.9},{year:2001,value:-6.3},
+  {year:2002,value:-13.4},{year:2003,value:-3.8},{year:2004,value:-112.3},
+  {year:2005,value:-396.8},{year:2006,value:-664.0},{year:2007,value:-837.6},
+  {year:2008,value:-638.4},{year:2009,value:-133.3},{year:2010,value:-263.5},
+  {year:2011,value:-492.8},{year:2012,value:-392.2},{year:2013,value:-351.5},
+  {year:2014,value:-401.0},{year:2015,value:-685.6},{year:2016,value:-590.8},
+  {year:2017,value:-429.5},{year:2018,value:-802.5},{year:2019,value:-427.3},
+  {year:2020,value:-88.6},{year:2021,value:-89.3},{year:2022,value:-640.7},
+  {year:2023,value:-643.7},{year:2024,value:-416.0},{year:2025,value:-333.0}
+];
+
+const SANKEY_1982 = {
+  total: 1330,
+  sources: [{id:'ocf',name:'Operating Cash Flow',value:1065},{id:'debt',name:'Net New Debt',value:265}],
+  sinks: [{id:'capex',name:'Capital Expenditure',value:1035},{id:'div',name:'Dividends',value:287},{id:'buyback',name:'Net Buybacks',value:8}]
+};
+
+const SANKEY_2024 = {
+  total: 5025,
+  sources: [{id:'ocf',name:'Operating Cash Flow',value:4210},{id:'debt',name:'Net New Debt',value:815}],
+  sinks: [{id:'capex',name:'Capital Expenditure',value:2995},{id:'div',name:'Dividends',value:1615},{id:'buyback',name:'Net Buybacks',value:415}]
+};
+
+const ENV_PATHS = {
+  median: 'M 130 342 L 212 317.625 L 273.5 309.825 L 334.9 295.2 L 396.4 270.825 L 457.9 239.625 L 519.4 226.95 L 580.8 209.375 L 642.3 202.575 L 703.8 188.925 L 765.2 171.375',
+  envelopeFill: 'M 130 332.25 L 212 312.75 L 273.5 303 L 334.9 264 L 396.4 215.25 L 457.9 176.25 L 519.4 147 L 580.8 117.75 L 642.3 127.5 L 703.8 88.5 L 765.2 59.25 L 765.2 254.25 L 703.8 264 L 642.3 277.65 L 580.8 234.75 L 519.4 254.25 L 457.9 260.1 L 396.4 303 L 334.9 336.15 L 273.5 357.6 L 212 365.4 L 130 351.75 Z',
+  edgeUpper: 'M 130 332.25 L 212 312.75 L 273.5 303 L 334.9 264 L 396.4 215.25 L 457.9 176.25 L 519.4 147 L 580.8 117.75 L 642.3 127.5 L 703.8 88.5 L 765.2 59.25',
+  edgeLower: 'M 130 351.75 L 212 365.4 L 273.5 357.6 L 334.9 336.15 L 396.4 303 L 457.9 260.1 L 519.4 254.25 L 580.8 234.75 L 642.3 277.65 L 703.8 264 L 765.2 254.25',
+  cms: 'M 212 381 L 273.5 376.65 L 334.9 371.25 L 396.4 365.4 L 457.9 361.5 L 519.4 361.5 L 580.8 351.75 L 642.3 361.5 L 703.8 351.75 L 765.2 345.9 L 826.7 342',
+  extDfa: 'M 765.2 254.25 L 826.7 217.2 L 888.2 213.3 L 949.7 191.85',
+  extPsz: 'M 765.2 59.25 L 826.7 69 L 888.2 59.25'
+};
+
+/* ──────────────────────────────────────────────────────────────────
+   ACT I — BAR CHART
+   ────────────────────────────────────────────────────────────────── */
+
+const NS = 'http://www.w3.org/2000/svg';
+const BAR_W = 1000, BAR_H = 560;
+const BM = {top: 44, right: 18, bottom: 28, left: 60};
+const BPW = BAR_W - BM.left - BM.right;
+const BPH = BAR_H - BM.top - BM.bottom;
+const Y_MIN = -900, Y_MAX = 100;
+
+function yPx(v) { return BM.top + BPH * (1 - (v - Y_MIN) / (Y_MAX - Y_MIN)); }
+function xCenter(i) { return BM.left + (i + 0.5) * (BPW / NET_EQUITY.length); }
+
+const barSlotW = BPW / NET_EQUITY.length;
+const barW = Math.max(8, barSlotW - 4);
+const zeroY = yPx(0);
+
+function buildBarChart() {
+  const svg = document.getElementById('chart-bars');
+  svg.innerHTML = '';
+
+  // Gridlines
+  [-800,-600,-400,-200,0].forEach(function(v) {
+    const line = document.createElementNS(NS, 'line');
+    line.setAttribute('x1', BM.left);
+    line.setAttribute('x2', BAR_W - BM.right);
+    line.setAttribute('y1', yPx(v));
+    line.setAttribute('y2', yPx(v));
+    line.setAttribute('class', v === 0 ? 'chart-zero' : 'chart-gridline');
+    svg.appendChild(line);
+  });
+
+  // Y axis labels
+  [-800,-600,-400,-200,0,100].forEach(function(v) {
+    const txt = document.createElementNS(NS, 'text');
+    txt.setAttribute('x', BM.left - 8);
+    txt.setAttribute('y', yPx(v) + 3);
+    txt.setAttribute('text-anchor', 'end');
+    txt.setAttribute('class', 'chart-axis');
+    txt.textContent = (v === 0 ? '0' : v > 0 ? '+' + v : v) + '';
+    svg.appendChild(txt);
+  });
+
+  // X axis labels
+  [1975,1985,1995,2005,2015,2025].forEach(function(yr) {
+    var idx = yr - 1975;
+    var txt = document.createElementNS(NS, 'text');
+    txt.setAttribute('x', xCenter(idx));
+    txt.setAttribute('y', BAR_H - 6);
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('class', 'chart-axis');
+    txt.textContent = yr;
+    svg.appendChild(txt);
+  });
+
+  // Bars
+  NET_EQUITY.forEach(function(d, i) {
+    var rect = document.createElementNS(NS, 'rect');
+    var top = d.value >= 0 ? yPx(d.value) : zeroY;
+    var h = Math.abs(yPx(d.value) - zeroY);
+    rect.setAttribute('x', xCenter(i) - barW / 2);
+    rect.setAttribute('y', top);
+    rect.setAttribute('width', barW);
+    rect.setAttribute('height', Math.max(h, 0.5));
+    rect.setAttribute('fill', d.value >= 0 ? 'var(--positive)' : 'var(--negative)');
+    rect.setAttribute('class', 'bar-ghost');
+    rect.setAttribute('data-year', d.year);
+    rect.setAttribute('data-idx', i);
+    svg.appendChild(rect);
+  });
+}
+
+var actIState = 0;
+
+function updateActI(step) {
+  if (step === actIState) return;
+  actIState = step;
+  var bars = document.querySelectorAll('#chart-bars rect[data-year]');
+
+  bars.forEach(function(bar) {
+    var yr = parseInt(bar.getAttribute('data-year'));
+    var active = false;
+    var highlight = false;
+
+    if (step >= 7) { active = true; }
+    else if (step >= 6 && yr === 2007) { active = true; highlight = true; }
+    else if (step >= 6 && yr >= 2008) { active = false; }
+    else if (step >= 5 && yr >= 1994 && yr <= 2006) { active = true; }
+    else if (step >= 4 && yr >= 1983 && yr <= 1993) { active = true; }
+    else if (step >= 3 && yr === 1982) { active = true; }
+    else if (step >= 2 && yr <= 1981) { active = true; }
+
+    bar.classList.toggle('bar-active', active);
+    bar.classList.toggle('bar-highlight', highlight);
+    if (!active && !highlight) {
+      bar.classList.add('bar-ghost');
+      bar.classList.remove('bar-active', 'bar-highlight');
+    } else {
+      bar.classList.remove('bar-ghost');
+    }
+  });
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   ACT II — ENVELOPE CHART
+   ────────────────────────────────────────────────────────────────── */
+
+function buildEnvelopeChart() {
+  var svg = document.getElementById('chart-envelope');
+  svg.innerHTML = '';
+
+  // Gridlines (20%, 25%, 30%, 35%, 40%)
+  var gridVals = [420, 322.5, 225, 127.5, 30];
+  var gridLabels = ['20%', '25', '30', '35', '40%'];
+  gridVals.forEach(function(y, i) {
+    var line = document.createElementNS(NS, 'line');
+    line.setAttribute('x1', 130); line.setAttribute('x2', 970);
+    line.setAttribute('y1', y); line.setAttribute('y2', y);
+    line.setAttribute('class', 'chart-gridline');
+    svg.appendChild(line);
+
+    var txt = document.createElementNS(NS, 'text');
+    txt.setAttribute('x', 118); txt.setAttribute('y', y + 4);
+    txt.setAttribute('text-anchor', 'end');
+    txt.setAttribute('class', 'chart-axis');
+    txt.textContent = gridLabels[i];
+    svg.appendChild(txt);
+  });
+
+  // X axis labels
+  var xLabels = [{x:130,t:'1985'},{x:334.9,t:'1995'},{x:519.4,t:'2005'},{x:765.2,t:'2016'},{x:949.7,t:'2025'}];
+  xLabels.forEach(function(l) {
+    var txt = document.createElementNS(NS, 'text');
+    txt.setAttribute('x', l.x); txt.setAttribute('y', 470);
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('class', 'chart-axis');
+    txt.textContent = l.t;
+    svg.appendChild(txt);
+  });
+
+  // Envelope fill
+  var envFill = document.createElementNS(NS, 'path');
+  envFill.setAttribute('d', ENV_PATHS.envelopeFill);
+  envFill.setAttribute('class', 'env-fill');
+  envFill.id = 'env-fill';
+  svg.appendChild(envFill);
+
+  // Envelope edges
+  var edgeU = document.createElementNS(NS, 'path');
+  edgeU.setAttribute('d', ENV_PATHS.edgeUpper);
+  edgeU.setAttribute('class', 'env-edge');
+  edgeU.id = 'env-edge-upper';
+  svg.appendChild(edgeU);
+
+  var edgeL = document.createElementNS(NS, 'path');
+  edgeL.setAttribute('d', ENV_PATHS.edgeLower);
+  edgeL.setAttribute('class', 'env-edge');
+  edgeL.id = 'env-edge-lower';
+  svg.appendChild(edgeL);
+
+  // DFA line (approximation from envelope lower edge = DFA)
+  var dfaLine = document.createElementNS(NS, 'path');
+  dfaLine.setAttribute('d', ENV_PATHS.edgeLower);
+  dfaLine.setAttribute('class', 'env-path env-dfa');
+  dfaLine.id = 'env-dfa';
+  dfaLine.style.opacity = '0';
+  svg.appendChild(dfaLine);
+
+  // PSZ line (approximation from envelope upper edge = PSZ)
+  var pszLine = document.createElementNS(NS, 'path');
+  pszLine.setAttribute('d', ENV_PATHS.edgeUpper);
+  pszLine.setAttribute('class', 'env-path env-psz');
+  pszLine.id = 'env-psz';
+  pszLine.style.opacity = '0';
+  svg.appendChild(pszLine);
+
+  // SZZ line (approximation: slightly below median)
+  var szzPath = 'M 334.9 320 L 396.4 290 L 457.9 252 L 519.4 240 L 580.8 222 L 642.3 220 L 703.8 210 L 765.2 200';
+  var szzLine = document.createElementNS(NS, 'path');
+  szzLine.setAttribute('d', szzPath);
+  szzLine.setAttribute('class', 'env-path env-szz');
+  szzLine.id = 'env-szz';
+  szzLine.style.opacity = '0';
+  svg.appendChild(szzLine);
+
+  // KSS line (approximation: between median and DFA)
+  var kssPath = 'M 273.5 340 L 334.9 315 L 396.4 285 L 457.9 250 L 519.4 238 L 580.8 220 L 642.3 240 L 703.8 225 L 765.2 210';
+  var kssLine = document.createElementNS(NS, 'path');
+  kssLine.setAttribute('d', kssPath);
+  kssLine.setAttribute('class', 'env-path env-kss');
+  kssLine.id = 'env-kss';
+  kssLine.style.opacity = '0';
+  svg.appendChild(kssLine);
+
+  // CMS line
+  var cmsLine = document.createElementNS(NS, 'path');
+  cmsLine.setAttribute('d', ENV_PATHS.cms);
+  cmsLine.setAttribute('class', 'env-path env-cms');
+  cmsLine.id = 'env-cms';
+  cmsLine.style.opacity = '0';
+  svg.appendChild(cmsLine);
+
+  // Post-2016 extensions
+  var extDfa = document.createElementNS(NS, 'path');
+  extDfa.setAttribute('d', ENV_PATHS.extDfa);
+  extDfa.setAttribute('class', 'env-path env-dfa');
+  extDfa.id = 'env-ext-dfa';
+  extDfa.style.opacity = '0';
+  svg.appendChild(extDfa);
+
+  var extPsz = document.createElementNS(NS, 'path');
+  extPsz.setAttribute('d', ENV_PATHS.extPsz);
+  extPsz.setAttribute('class', 'env-path env-psz');
+  extPsz.id = 'env-ext-psz';
+  extPsz.style.opacity = '0';
+  svg.appendChild(extPsz);
+
+  // Median line (drawn last so it's on top)
+  var median = document.createElementNS(NS, 'path');
+  median.setAttribute('d', ENV_PATHS.median);
+  median.setAttribute('class', 'env-median');
+  median.id = 'env-median';
+  setupDrawAnimation(median);
+  svg.appendChild(median);
+
+  // Inflection markers
+  var inflections = [
+    {x: 334.9, y: 295.2, label: '1995'},
+    {x: 642.3, y: 202.575, label: '2008'},
+    {x: 785.7, y: 240, label: '2017'}
+  ];
+  inflections.forEach(function(inf, i) {
+    var circle = document.createElementNS(NS, 'circle');
+    circle.setAttribute('cx', inf.x);
+    circle.setAttribute('cy', inf.y);
+    circle.setAttribute('r', 8);
+    circle.setAttribute('class', 'inflect-marker');
+    circle.id = 'inflect-' + i;
+    svg.appendChild(circle);
+
+    var txt = document.createElementNS(NS, 'text');
+    txt.setAttribute('x', inf.x);
+    txt.setAttribute('y', 460);
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('class', 'inflect-label');
+    txt.id = 'inflect-label-' + i;
+    txt.textContent = inf.label;
+    svg.appendChild(txt);
+  });
+
+  // Series labels
+  var labels = [
+    {id:'lbl-dfa', x:773, y:257, text:'DFA', color:'var(--c-dfa)', opacity:'0'},
+    {id:'lbl-psz', x:773, y:62, text:'PSZ', color:'var(--c-psz)', opacity:'0'},
+    {id:'lbl-szz', x:770, y:203, text:'SZZ', color:'var(--c-szz)', opacity:'0'},
+    {id:'lbl-kss', x:770, y:215, text:'KSS', color:'var(--c-kss)', opacity:'0'},
+    {id:'lbl-cms', x:833, y:338, text:'CMS', color:'var(--c-cms)', opacity:'0'}
+  ];
+  labels.forEach(function(l) {
+    var txt = document.createElementNS(NS, 'text');
+    txt.setAttribute('x', l.x); txt.setAttribute('y', l.y);
+    txt.setAttribute('fill', l.color);
+    txt.setAttribute('class', 'chart-axis');
+    txt.style.opacity = l.opacity;
+    txt.style.transition = 'opacity 0.5s ease';
+    txt.id = l.id;
+    txt.textContent = l.text;
+    svg.appendChild(txt);
+  });
+}
+
+function setupDrawAnimation(path) {
+  var length = path.getTotalLength ? path.getTotalLength() : 1200;
+  path.style.strokeDasharray = length;
+  path.style.strokeDashoffset = length;
+  path.style.transition = 'stroke-dashoffset 1.2s ease';
+}
+
+var actIIState = 0;
+
+function updateActII(step) {
+  if (step === actIIState) return;
+  actIIState = step;
+
+  var median = document.getElementById('env-median');
+  var envFill = document.getElementById('env-fill');
+  var edgeU = document.getElementById('env-edge-upper');
+  var edgeL = document.getElementById('env-edge-lower');
+  var dfa = document.getElementById('env-dfa');
+  var psz = document.getElementById('env-psz');
+  var szz = document.getElementById('env-szz');
+  var kss = document.getElementById('env-kss');
+  var cms = document.getElementById('env-cms');
+  var extDfa = document.getElementById('env-ext-dfa');
+  var extPsz = document.getElementById('env-ext-psz');
+
+  // Step 1: Draw median
+  if (step >= 1) {
+    median.style.strokeDashoffset = '0';
+  } else {
+    var len = median.getTotalLength ? median.getTotalLength() : 1200;
+    median.style.strokeDashoffset = len;
+  }
+
+  // Step 2: DFA + PSZ
+  dfa.style.opacity = step >= 2 ? '0.8' : '0';
+  psz.style.opacity = step >= 2 ? '0.8' : '0';
+  document.getElementById('lbl-dfa').style.opacity = step >= 2 ? '1' : '0';
+  document.getElementById('lbl-psz').style.opacity = step >= 2 ? '1' : '0';
+
+  // Median desaturates slightly when individual lines show
+  median.style.opacity = step >= 2 && step < 4 ? '0.5' : '1';
+
+  // Step 3: SZZ + KSS
+  szz.style.opacity = step >= 3 ? '0.8' : '0';
+  kss.style.opacity = step >= 3 ? '0.8' : '0';
+  document.getElementById('lbl-szz').style.opacity = step >= 3 ? '1' : '0';
+  document.getElementById('lbl-kss').style.opacity = step >= 3 ? '1' : '0';
+
+  // Step 4: Envelope appears, individual lines fade
+  envFill.style.opacity = step >= 4 ? '0.7' : '0';
+  edgeU.style.opacity = step >= 4 ? '0.6' : '0';
+  edgeL.style.opacity = step >= 4 ? '0.6' : '0';
+  if (step >= 4) {
+    dfa.style.opacity = '0.3';
+    psz.style.opacity = '0.3';
+    szz.style.opacity = '0.3';
+    kss.style.opacity = '0.3';
+  }
+
+  // Step 5: CMS
+  cms.style.opacity = step >= 5 ? '0.85' : '0';
+  document.getElementById('lbl-cms').style.opacity = step >= 5 ? '1' : '0';
+
+  // Step 6: Inflection markers + post-2016 extensions
+  for (var i = 0; i < 3; i++) {
+    document.getElementById('inflect-' + i).style.opacity = step >= 6 ? '0.8' : '0';
+    document.getElementById('inflect-label-' + i).style.opacity = step >= 6 ? '1' : '0';
+  }
+  extDfa.style.opacity = step >= 6 ? '0.8' : '0';
+  extPsz.style.opacity = step >= 6 ? '0.8' : '0';
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   ACT III — SANKEY MORPH
+   ────────────────────────────────────────────────────────────────── */
+
+var PALETTE = {};
+
+function refreshPalette() {
+  var s = getComputedStyle(document.documentElement);
+  PALETTE = {
+    ocf: s.getPropertyValue('--c-ocf').trim(),
+    debt: s.getPropertyValue('--c-debt').trim(),
+    capex: s.getPropertyValue('--c-capex').trim(),
+    div: s.getPropertyValue('--c-div').trim(),
+    buyback: s.getPropertyValue('--c-buyback').trim()
+  };
+}
+
+var SANKEY_VW = 760, SANKEY_VH = 520, SANKEY_VIEWBOX_H = 620, SANKEY_USABLE = 440;
+var SK_NODE_GAP = 10, SK_NODE_W = 18, SK_SIDE_PAD = 150;
+
+function interpolateData(t) {
+  var total = lerp(SANKEY_1982.total, SANKEY_2024.total, t);
+  var sources = SANKEY_1982.sources.map(function(s, i) {
+    return {id: s.id, name: s.name, value: lerp(s.value, SANKEY_2024.sources[i].value, t)};
+  });
+  var sinks = SANKEY_1982.sinks.map(function(s, i) {
+    return {id: s.id, name: s.name, value: lerp(s.value, SANKEY_2024.sinks[i].value, t)};
+  });
+  return {total: total, sources: sources, sinks: sinks};
+}
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+function fmtB(v) {
+  if (v < 10) return '$' + v.toFixed(1) + 'B';
+  if (v < 1000) return '$' + Math.round(v) + 'B';
+  return '$' + (v / 1000).toFixed(2) + 'T';
+}
+
+function renderSankeyAt(t, opts) {
+  refreshPalette();
+  var svg = document.getElementById('chart-sankey');
+  svg.innerHTML = '';
+  var data = interpolateData(t);
+
+  var maxNodes = Math.max(data.sources.length, data.sinks.length);
+  var gapBudget = SK_NODE_GAP * (maxNodes - 1);
+  var SCALE = (SANKEY_USABLE - gapBudget) / data.total;
+  var totalH = data.total * SCALE;
+
+  var srcGap = SK_NODE_GAP * (data.sources.length - 1);
+  var srcY = (SANKEY_VH - totalH - srcGap) / 2;
+  data.sources.forEach(function(n) {
+    n.h = n.value * SCALE;
+    n.x = SK_SIDE_PAD;
+    n.y = srcY;
+    srcY += n.h + SK_NODE_GAP;
+  });
+
+  var sinkGap = SK_NODE_GAP * (data.sinks.length - 1);
+  var snkY = (SANKEY_VH - totalH - sinkGap) / 2;
+  data.sinks.forEach(function(n) {
+    n.h = n.value * SCALE;
+    n.x = SANKEY_VW - SK_SIDE_PAD - SK_NODE_W;
+    n.y = snkY;
+    snkY += n.h + SK_NODE_GAP;
+  });
+
+  // Compute flows
+  var flows = [];
+  data.sources.forEach(function(src) {
+    var cursor = src.y;
+    data.sinks.forEach(function(sink) {
+      var share = sink.value / data.total;
+      var flowVal = src.value * share;
+      flows.push({src: src, sink: sink, value: flowVal, srcY0: cursor, srcY1: cursor + flowVal * SCALE});
+      cursor += flowVal * SCALE;
+    });
+  });
+
+  var sinkCursor = {};
+  data.sinks.forEach(function(s) { sinkCursor[s.id] = s.y; });
+  flows.forEach(function(f) {
+    f.dstY0 = sinkCursor[f.sink.id];
+    f.dstY1 = sinkCursor[f.sink.id] + f.value * SCALE;
+    sinkCursor[f.sink.id] = f.dstY1;
+  });
+
+  // Draw flows
+  flows.forEach(function(f) {
+    if (f.value < 0.01) return;
+    var x0 = f.src.x + SK_NODE_W;
+    var x1 = f.sink.x;
+    var xm = (x0 + x1) / 2;
+    var d = 'M ' + x0 + ' ' + f.srcY0 +
+            ' C ' + xm + ' ' + f.srcY0 + ', ' + xm + ' ' + f.dstY0 + ', ' + x1 + ' ' + f.dstY0 +
+            ' L ' + x1 + ' ' + f.dstY1 +
+            ' C ' + xm + ' ' + f.dstY1 + ', ' + xm + ' ' + f.srcY1 + ', ' + x0 + ' ' + f.srcY1 + ' Z';
+    var path = document.createElementNS(NS, 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', PALETTE[f.sink.id]);
+    path.setAttribute('class', 'sankey-flow');
+
+    var flowOpacity = computeFlowOpacity(opts, f.sink.id, f.src.id);
+    path.style.opacity = flowOpacity;
+    svg.appendChild(path);
+  });
+
+  // Draw nodes
+  data.sources.forEach(function(n) { drawSankeyNode(svg, n, 'left', opts); });
+  data.sinks.forEach(function(n) { drawSankeyNode(svg, n, 'right', opts); });
+
+  // Incidence bar
+  if (opts.showIncidence) {
+    drawIncidenceBar(svg);
+  }
+}
+
+function computeFlowOpacity(opts, sinkId, srcId) {
+  if (!opts.saturate) return 0.2;
+  if (opts.saturate === 'all') return 0.75;
+  if (opts.saturate === 'sources' && srcId) return 0.5;
+  if (opts.saturate === 'sinks') return 0.75;
+  if (opts.highlight === sinkId) return 0.9;
+  if (opts.highlight === srcId) return 0.9;
+  if (opts.saturate === 'highlight-debt' && srcId === 'debt') return 0.9;
+  return 0.75;
+}
+
+function drawSankeyNode(svg, n, side, opts) {
+  var rect = document.createElementNS(NS, 'rect');
+  rect.setAttribute('x', n.x);
+  rect.setAttribute('y', n.y);
+  rect.setAttribute('width', SK_NODE_W);
+  rect.setAttribute('height', Math.max(n.h, 0.5));
+  rect.setAttribute('fill', PALETTE[n.id]);
+  rect.setAttribute('class', 'sankey-node');
+
+  var nodeOpacity = 0.2;
+  if (opts.saturate === 'all' || opts.saturate === 'sinks' || opts.saturate === 'sources') nodeOpacity = 1;
+  if (opts.saturate && side === 'left' && (opts.saturate === 'sources' || opts.saturate === 'all')) nodeOpacity = 1;
+  if (opts.saturate && side === 'right' && (opts.saturate === 'sinks' || opts.saturate === 'all')) nodeOpacity = 1;
+  if (opts.highlight === n.id || opts.highlight === 'debt') nodeOpacity = 1;
+  rect.style.opacity = nodeOpacity;
+  svg.appendChild(rect);
+
+  // Labels
+  var tx = side === 'left' ? n.x - 10 : n.x + SK_NODE_W + 10;
+  var ty = n.y + n.h / 2;
+  var anchor = side === 'left' ? 'end' : 'start';
+
+  var showLabel = nodeOpacity > 0.5;
+  if (showLabel) {
+    var lbl = document.createElementNS(NS, 'text');
+    lbl.setAttribute('x', tx);
+    lbl.setAttribute('y', ty - 2);
+    lbl.setAttribute('text-anchor', anchor);
+    lbl.setAttribute('dominant-baseline', 'middle');
+    lbl.setAttribute('class', 'sankey-label');
+    lbl.textContent = n.name;
+    svg.appendChild(lbl);
+
+    var val = document.createElementNS(NS, 'text');
+    val.setAttribute('x', tx);
+    val.setAttribute('y', ty + 13);
+    val.setAttribute('text-anchor', anchor);
+    val.setAttribute('dominant-baseline', 'middle');
+    val.setAttribute('class', 'sankey-value');
+    val.textContent = fmtB(n.value);
+    svg.appendChild(val);
+  }
+}
+
+function drawIncidenceBar(svg) {
+  var barY = SANKEY_VH + 30;
+  var barX = SK_SIDE_PAD;
+  var barW = SANKEY_VW - 2 * SK_SIDE_PAD;
+  var segments = [
+    {label: 'Top 1%', pct: 0.498, color: PALETTE.buyback},
+    {label: 'Next 9%', pct: 0.372, color: PALETTE.div},
+    {label: '50–90%', pct: 0.12, color: PALETTE.capex},
+    {label: 'Bottom 50%', pct: 0.01, color: PALETTE.debt}
+  ];
+
+  var g = document.createElementNS(NS, 'g');
+  g.setAttribute('class', 'incidence-bar');
+  g.style.opacity = '1';
+
+  var cursor = barX;
+  segments.forEach(function(seg) {
+    var w = barW * seg.pct;
+    var rect = document.createElementNS(NS, 'rect');
+    rect.setAttribute('x', cursor);
+    rect.setAttribute('y', barY);
+    rect.setAttribute('width', w);
+    rect.setAttribute('height', 14);
+    rect.setAttribute('fill', seg.color);
+    rect.setAttribute('opacity', '0.8');
+    g.appendChild(rect);
+
+    if (w > 30) {
+      var txt = document.createElementNS(NS, 'text');
+      txt.setAttribute('x', cursor + w / 2);
+      txt.setAttribute('y', barY + 26);
+      txt.setAttribute('text-anchor', 'middle');
+      txt.setAttribute('class', 'chart-axis');
+      txt.textContent = seg.label + ' · ' + Math.round(seg.pct * 100) + '%';
+      g.appendChild(txt);
+    }
+    cursor += w;
+  });
+
+  // Title
+  var title = document.createElementNS(NS, 'text');
+  title.setAttribute('x', barX);
+  title.setAttribute('y', barY - 8);
+  title.setAttribute('class', 'chart-axis');
+  title.textContent = 'Equity ownership by wealth percentile';
+  g.appendChild(title);
+
+  svg.appendChild(g);
+}
+
+var actIIIState = 0;
+var morphT = 0;
+var morphRAF = null;
+
+function updateActIII(step) {
+  if (step === actIIIState) return;
+  actIIIState = step;
+
+  var opts = {saturate: null, highlight: null, showIncidence: false};
+
+  if (step === 1) { opts.saturate = null; renderSankeyAt(0, opts); }
+  else if (step === 2) { opts.saturate = 'sources'; renderSankeyAt(0, opts); }
+  else if (step === 3) { opts.saturate = 'all'; renderSankeyAt(0, opts); }
+  else if (step === 4) { opts.saturate = 'all'; renderSankeyAt(0, opts); }
+  else if (step === 5) { /* morph handled by scroll progress */ }
+  else if (step === 6) { opts.saturate = 'all'; opts.highlight = 'buyback'; renderSankeyAt(1, opts); }
+  else if (step === 7) { opts.saturate = 'all'; opts.highlight = 'debt'; renderSankeyAt(1, opts); }
+  else if (step === 8) { opts.saturate = 'all'; opts.showIncidence = true; renderSankeyAt(1, opts); }
+}
+
+function updateMorphProgress(t) {
+  morphT = Math.max(0, Math.min(1, t));
+  var opts = {saturate: 'all', highlight: null, showIncidence: false};
+  renderSankeyAt(morphT, opts);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   SCROLL OBSERVER
+   ────────────────────────────────────────────────────────────────── */
+
+function initScrolly() {
+  buildBarChart();
+  buildEnvelopeChart();
+  renderSankeyAt(0, {saturate: null, highlight: null, showIncidence: false});
+
+  var steps = document.querySelectorAll('.step');
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-active');
+        var act = parseInt(entry.target.getAttribute('data-act'));
+        var step = parseInt(entry.target.getAttribute('data-step'));
+
+        if (act === 1) updateActI(step);
+        else if (act === 2) updateActII(step);
+        else if (act === 3) updateActIII(step);
+      } else {
+        entry.target.classList.remove('is-active');
+      }
+    });
+  }, {rootMargin: '-30% 0px -30% 0px', threshold: 0});
+
+  steps.forEach(function(step) { observer.observe(step); });
+
+  // Progress tracking for morph step
+  var morphStep = document.querySelector('.step--morph');
+  if (morphStep) {
+    var ticking = false;
+    window.addEventListener('scroll', function() {
+      if (actIIIState !== 5) return;
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(function() {
+          var rect = morphStep.getBoundingClientRect();
+          var viewH = window.innerHeight;
+          var stepH = rect.height;
+          var scrolled = viewH - rect.top;
+          var t = Math.max(0, Math.min(1, scrolled / (stepH + viewH)));
+          updateMorphProgress(t);
+          ticking = false;
+        });
+      }
+    });
+  }
+}
+
+// Dark mode re-render
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+  buildBarChart();
+  updateActI(actIState);
+  buildEnvelopeChart();
+  updateActII(actIIState);
+  if (actIIIState > 0) updateActIII(actIIIState);
+});
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initScrolly);
+} else {
+  initScrolly();
+}
+
+})();
+</script>
+</body>
+</html>

@@ -6,6 +6,8 @@ favicon_emoji: 🏦
 
 {% include analytics.html %}
 
+[Tell me the full story →](scrollytelling.html){: .alt-format}
+
 # Financialization, 1975–2025
 
 ### A Tale In Three Acts
