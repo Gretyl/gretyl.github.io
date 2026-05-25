@@ -76,6 +76,26 @@ For end-to-end verification of features that involve `localStorage` (rehydration
 
 For cross-page persistence (e.g., toggle on `/`, navigate to `/artemis-trail.html`, assert side nav rehydrates) the local mock isn't enough — `file://` URLs use per-path opaque origins, so two mock pages don't share storage. Serve via `cd docs && python3 -m http.server 8765` and drive rodney against `http://localhost:8765/...` so all pages share the same origin.
 
+#### Dark-mode variant screenshots
+
+The sidebar mock respects `prefers-color-scheme`. To capture both light and dark variants with rodney, emulate the media feature between screenshots via Chrome's CDP `Emulation.setEmulatedMedia` method:
+
+```bash
+uvx rodney start
+uvx rodney open "file://$(pwd)/previews/sidebar-mock.html"
+uvx rodney waitload
+uvx rodney sleep 1
+uvx rodney screenshot -w 960 -h 700 previews/sidebar-light.png
+
+# Force dark mode via CDP Emulation domain
+uvx rodney js '(async()=>{const s=await fetch("http://localhost:9222/json");const t=await s.json();const ws=new WebSocket(t[0].webSocketDebuggerUrl);ws.onopen=()=>{ws.send(JSON.stringify({id:1,method:"Emulation.setEmulatedMedia",params:{features:[{name:"prefers-color-scheme",value:"dark"}]}}))};return"ok"})()'
+uvx rodney sleep 1
+uvx rodney screenshot -w 960 -h 700 previews/sidebar-dark.png
+uvx rodney stop
+```
+
+If CDP emulation isn't available, toggle the OS appearance setting between captures instead.
+
 ### 4. Commit the screenshot for PR review
 
 PNGs in `previews/` are gitignored by default to avoid shipping accidental screenshots. To include one for PR review, force-add it:
