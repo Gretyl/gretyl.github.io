@@ -5,8 +5,8 @@
 
 <meta property="og:title" content="Net Equity Issuance, 1975–2025">
 <meta property="og:description" content="Annual US nonfinancial corporate net equity issuance, 1975–2025, in real 2025 dollars — visualizing the structural shift to persistent net retirement after the 1982 adoption of SEC Rule 10b-18.">
-<meta property="og:url" content="https://gretyl.maplecrew.org/entries/net_equity_1975-2025.html">
-<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/net_equity_1975-2025.png">
+<meta property="og:url" content="https://gretyl.maplecrew.org/entries/financialization/net-equity-issuance.html">
+<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/net-equity-issuance.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="672">
 <meta property="og:image:alt" content="Bar chart of US nonfinancial corporate net equity issuance from 1975 to 2025, in real 2025 dollars, showing positive issuance through the late 1970s and persistent net retirement from 1982 onward.">
@@ -24,6 +24,10 @@
 <link rel="alternate" type="application/atom+xml" title="Gretyl (Atom)" href="/feed.xml">
 <link rel="alternate" type="application/feed+json" title="Gretyl (JSON Feed)" href="/feed.json">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&display=swap" rel="stylesheet">
+
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>US Nonfinancial Corporate Net Equity Issuance, 1975–2025</title>
@@ -34,8 +38,8 @@
     --rule: #c9bfae;
     --positive: #2f6f4e;
     --negative: #a8362b;
-    --muted: #555;
-    --muted2: #666;
+    --ink-2: #555;
+    --ink-3: #666;
     --negative-tint: rgba(168, 54, 43, 0.06);
     --body-text: #2a2a2a;
     --callout-text: #333;
@@ -43,6 +47,7 @@
     --indent-text: #555;
     --surface-tint: rgba(26, 26, 26, 0.035);
     --table-border: rgba(0, 0, 0, 0.08);
+    --display: "Fraunces", Georgia, "Times New Roman", serif;
     --serif: Georgia, "Times New Roman", serif;
     --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   }
@@ -73,10 +78,11 @@
     font-size: 10px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--muted2);
+    color: var(--ink-3);
     margin-bottom: 6px;
   }
   h1 {
+    font-family: var(--display);
     font-size: 28px;
     font-weight: 700;
     margin: 0;
@@ -85,7 +91,7 @@
   }
   .subtitle {
     font-size: 14px;
-    color: var(--muted);
+    color: var(--ink-2);
     font-style: italic;
     margin-top: 4px;
   }
@@ -172,7 +178,7 @@
     font-size: 10px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--muted2);
+    color: var(--ink-3);
     margin-bottom: 10px;
   }
   .ak-list {
@@ -243,7 +249,7 @@
     font-size: 10px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--muted2);
+    color: var(--ink-3);
     margin-bottom: 10px;
   }
   .m-q {
@@ -261,7 +267,7 @@
     font-family: var(--mono);
     font-style: normal;
     font-weight: 700;
-    color: var(--muted2);
+    color: var(--ink-3);
     font-size: 12px;
     letter-spacing: 0.04em;
     vertical-align: 2px;
@@ -284,7 +290,7 @@
     font-size: 10px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--muted2);
+    color: var(--ink-3);
     text-align: left;
     padding-bottom: 6px;
   }
@@ -327,8 +333,8 @@
       --ink:           #ece6d5;
       --paper:         #15140f;
       --rule:          #4a443a;
-      --muted:         #b3ac9c;
-      --muted2:        #a8a193;
+      --ink-2:         #b3ac9c;
+      --ink-3:         #a8a193;
       --positive:      #5fb98a;
       --negative:      #e0796c;
       --negative-tint: rgba(224, 121, 108, 0.10);
@@ -354,17 +360,33 @@
     padding-top: 14px;
     border-top: 1px solid var(--rule);
     font-size: 11.5px;
-    color: var(--muted);
+    color: var(--ink-2);
     font-family: var(--serif);
     line-height: 1.6;
   }
   .footer strong { color: var(--ink); }
   .footer p { margin: 0 0 8px 0; }
   .footer p:last-child { margin-bottom: 0; }
+
+  .triptych-nav {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 18px;
+  }
+  .triptych-nav a {
+    color: var(--ink-3);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+  .triptych-nav a:hover { color: var(--ink); }
 </style>
 </head>
 <body>
 <div class="container">
+  <nav class="triptych-nav"><a href="./">Financialization, 1975&ndash;2025</a> &rsaquo; Net Equity Issuance</nav>
   <header class="header">
     <div class="kicker">Fed Z.1 · NCBCEBA027N · Deflated to 2025 USD with BLS CPI-U</div>
     <h1>US Nonfinancial Corporate Net Equity Issuance</h1>
@@ -372,7 +394,7 @@
   </header>
 
   <div class="chart-wrap">
-    <svg class="chart" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet" id="chart" aria-label="Bar chart of US nonfinancial corporate net equity issuance, 1975 to 2025, in real 2025 dollars"></svg>
+    <svg class="chart" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet" id="chart" aria-label="Annual net equity issuance by US nonfinancial corporations, 1975 to 2025, in real 2025 dollars. Corporations were net issuers through the late 1970s and briefly in the early 1990s. From 1994 onward, every year shows net retirement, never interrupted. The deepest year is 2007 at minus 838 billion dollars, just before the financial crisis. Cumulative retirement over the full period totals minus 12.4 trillion in 2025 dollars. Three inflection points are annotated: 1982 when Rule 10b-18 created the buyback safe harbor, 1994 when unbroken retirement began, and 2007 at the real-terms trough."></svg>
     <div class="tooltip" id="tooltip" role="tooltip">
       <div class="yr"></div>
       <div class="val"></div>

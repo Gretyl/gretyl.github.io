@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="58.0 51.4 926.0 454.1">
+<style>
+  .pos { fill: #2f6f4e; }
+  .neg { fill: #a8362b; }
+  .zero { stroke: #1a1a1a; stroke-width: 1.5; }
+  @media (prefers-color-scheme: dark) {
+    .pos { fill: #5fb98a; }
+    .neg { fill: #e0796c; }
+    .zero { stroke: #ece6d5; }
+  }
+</style>
+  <line class="zero" x1="62.0" y1="92.8" x2="980.0" y2="92.8"/>
+  <rect class="pos" x="62.0" y="63.96" width="14.08" height="28.84"/>
+  <rect class="pos" x="80.08" y="63.62" width="14.08" height="29.18"/>
+  <rect class="pos" x="98.16" y="85.82" width="14.08" height="6.98"/>
+  <rect class="neg" x="116.24" y="92.8" width="14.08" height="0.5"/>
+  <rect class="neg" x="134.31" y="92.8" width="14.08" height="16.84"/>
+  <rect class="pos" x="152.39" y="73.04" width="14.08" height="19.76"/>
+  <rect class="neg" x="170.47" y="92.8" width="14.08" height="23.28"/>
+  <rect class="pos" x="188.55" y="89.73" width="14.08" height="3.07"/>
+  <rect class="pos" x="206.63" y="61.18" width="14.08" height="31.62"/>
+  <rect class="neg" x="224.71" y="92.8" width="14.08" height="118.97"/>
+  <rect class="neg" x="242.78" y="92.8" width="14.08" height="122.44"/>
+  <rect class="neg" x="260.86" y="92.8" width="14.08" height="121.07"/>
+  <rect class="neg" x="278.94" y="92.8" width="14.08" height="104.09"/>
+  <rect class="neg" x="297.02" y="92.8" width="14.08" height="171.19"/>
+  <rect class="neg" x="315.1" y="92.8" width="14.08" height="156.65"/>
+  <rect class="neg" x="333.18" y="92.8" width="14.08" height="75.74"/>
+  <rect class="pos" x="351.25" y="71.08" width="14.08" height="21.72"/>
+  <rect class="pos" x="369.33" y="60.4" width="14.08" height="32.4"/>
+  <rect class="pos" x="387.41" y="55.42" width="14.08" height="37.38"/>
+  <rect class="neg" x="405.49" y="92.8" width="14.08" height="35.72"/>
+  <rect class="neg" x="423.57" y="92.8" width="14.08" height="53.24"/>
+  <rect class="neg" x="441.65" y="92.8" width="14.08" height="44.75"/>
+  <rect class="neg" x="459.73" y="92.8" width="14.08" height="73.0"/>
+  <rect class="neg" x="477.8" y="92.8" width="14.08" height="202.08"/>
+  <rect class="neg" x="495.88" y="92.8" width="14.08" height="91.5"/>
+  <rect class="neg" x="513.96" y="92.8" width="14.08" height="32.65"/>
+  <rect class="neg" x="532.04" y="92.8" width="14.08" height="3.07"/>
+  <rect class="neg" x="550.12" y="92.8" width="14.08" height="6.54"/>
+  <rect class="neg" x="568.2" y="92.8" width="14.08" height="1.85"/>
+  <rect class="neg" x="586.27" y="92.8" width="14.08" height="54.8"/>
+  <rect class="neg" x="604.35" y="92.8" width="14.08" height="193.64"/>
+  <rect class="neg" x="622.43" y="92.8" width="14.08" height="324.03"/>
+  <rect class="neg" x="640.51" y="92.8" width="14.08" height="408.75"/>
+  <rect class="neg" x="658.59" y="92.8" width="14.08" height="311.54"/>
+  <rect class="neg" x="676.67" y="92.8" width="14.08" height="65.05"/>
+  <rect class="neg" x="694.75" y="92.8" width="14.08" height="128.59"/>
+  <rect class="neg" x="712.82" y="92.8" width="14.08" height="240.49"/>
+  <rect class="neg" x="730.9" y="92.8" width="14.08" height="191.39"/>
+  <rect class="neg" x="748.98" y="92.8" width="14.08" height="171.53"/>
+  <rect class="neg" x="767.06" y="92.8" width="14.08" height="195.69"/>
+  <rect class="neg" x="785.14" y="92.8" width="14.08" height="334.57"/>
+  <rect class="neg" x="803.22" y="92.8" width="14.08" height="288.31"/>
+  <rect class="neg" x="821.29" y="92.8" width="14.08" height="209.6"/>
+  <rect class="neg" x="839.37" y="92.8" width="14.08" height="391.62"/>
+  <rect class="neg" x="857.45" y="92.8" width="14.08" height="208.52"/>
+  <rect class="neg" x="875.53" y="92.8" width="14.08" height="43.24"/>
+  <rect class="neg" x="893.61" y="92.8" width="14.08" height="43.58"/>
+  <rect class="neg" x="911.69" y="92.8" width="14.08" height="312.66"/>
+  <rect class="neg" x="929.76" y="92.8" width="14.08" height="314.13"/>
+  <rect class="neg" x="947.84" y="92.8" width="14.08" height="203.01"/>
+  <rect class="neg" x="965.92" y="92.8" width="14.08" height="162.5"/>
+</svg>

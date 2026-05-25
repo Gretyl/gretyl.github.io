@@ -5,12 +5,12 @@
 # bullet text on docs/index.html so the feed reads the same as the
 # homepage.
 
-- id: net-equity-1975-2025
-  title: Net Equity Issuance, 1975–2025
-  url: /entries/net_equity_1975-2025.html
+- id: financialization
+  title: "Financialization, 1975–2025"
+  url: /entries/financialization/
   date: 2026-05-20T05:43:00-05:00
-  summary: Annual US nonfinancial corporate net equity issuance from 1975 to 2025, deflated to 2025 dollars — a half-century view of the structural shift from net issuance to persistent net retirement after the 1982 adoption of SEC Rule 10b-18.
-  image: /assets/og/net_equity_1975-2025.png
+  summary: A three-panel examination of American corporate financialization — net equity retirement since 1982, four decades of wealth concentration across five independent methodologies, and the reallocation of corporate cash flow from capital expenditure to shareholder payouts.
+  image: /entries/financialization/svg/thumb-sankey.svg
   type: article
 
 - id: twine-harness

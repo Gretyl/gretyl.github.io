@@ -17,8 +17,8 @@ navigation:
   - name: Entries
     link: /#entries
     sublist:
-      - name: Net Equity Issuance, 1975–2025
-        link: /entries/net_equity_1975-2025.html
+      - name: "Financialization, 1975–2025"
+        link: /entries/financialization/
       - name: Purely Functional Data Structures
         link: /functional-data-structures/
       - name: Resnick Algorithms

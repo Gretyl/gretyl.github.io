@@ -24,7 +24,7 @@ favicon_emoji: 🖋️
 import pathlib, re
 
 entries = [
-    ("entries/net_equity_1975-2025.html", "Net Equity Issuance, 1975–2025", "entries/net_equity_1975-2025_summary.md"),
+    ("entries/financialization/", "Financialization, 1975–2025", "entries/financialization/_summary.md"),
     ("functional-data-structures/", "Purely Functional Data Structures", "functional-data-structures/_summary.md"),
     ("resnick-algorithms/", "Resnick Algorithms", "resnick-algorithms/_summary.md"),
 ]
@@ -41,7 +41,7 @@ for href, title, summary_path in entries:
     blurb = md_to_html(first_sentence)
     cog.outl(f'<p><strong><a href="{href}">{title}</a></strong> - {blurb}</p>')
 ]]]-->
-<p><strong><a href="entries/net_equity_1975-2025.html">Net Equity Issuance, 1975–2025</a></strong> - Annual US nonfinancial corporate net equity issuance from 1975 to 2025, deflated to 2025 dollars — a half-century view of the structural shift from net issuance to persistent net retirement after the 1982 adoption of SEC Rule 10b-18.</p>
+<p><strong><a href="entries/financialization/">Financialization, 1975–2025</a></strong> - A three-panel examination of American corporate financialization &mdash; net equity retirement since 1982, four decades of wealth concentration across five independent methodologies, and the reallocation of corporate cash flow from capital expenditure to shareholder payouts.</p>
 <p><strong><a href="functional-data-structures/">Purely Functional Data Structures</a></strong> - Harnessing Chris Okasaki's <em>Purely Functional Data Structures</em>, this Python module brings immutable, persistent versions of six foundational structures, from the classic ConsList and BankersQueue to advanced heap and tree variants such as LeftistHeap, PairingHeap, and RedBlackTree.</p>
 <p><strong><a href="resnick-algorithms/">Resnick Algorithms</a></strong> - Resnick Algorithms is a collection of interactive, testable simulations that showcase how simple agent rules produce complex emergent behaviors, inspired by Mitchel Resnick’s <em>Turtles, Termites, and Traffic Jams</em>.</p>
 <!--[[[end]]]-->

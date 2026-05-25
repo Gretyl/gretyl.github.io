@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="100 40 880 380">
+<style>
+  .envelope { fill: #E8DCC0; opacity: 0.7; }
+  .median { fill: none; stroke: #1A1D24; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .cms { fill: none; stroke: #9B8147; stroke-width: 1.4; stroke-dasharray: 5 4; opacity: 0.85; }
+  .ext-dfa { fill: none; stroke: #1B3A57; stroke-width: 1.4; stroke-linecap: round; opacity: 0.78; }
+  .ext-psz { fill: none; stroke: #C1473A; stroke-width: 1.4; stroke-linecap: round; opacity: 0.78; }
+  @media (prefers-color-scheme: dark) {
+    .envelope { fill: rgba(232,220,192,0.15); }
+    .median { stroke: #d4cfc3; }
+    .cms { stroke: #c4a86a; }
+    .ext-dfa { stroke: #5a9fd4; }
+    .ext-psz { stroke: #e0756a; }
+  }
+</style>
+<path class="envelope" d="M 130 332.25 L 212 312.75 L 273.5 303 L 334.9 264 L 396.4 215.25 L 457.9 176.25 L 519.4 147 L 580.8 117.75 L 642.3 127.5 L 703.8 88.5 L 765.2 59.25 L 765.2 254.25 L 703.8 264 L 642.3 277.65 L 580.8 234.75 L 519.4 254.25 L 457.9 260.1 L 396.4 303 L 334.9 336.15 L 273.5 357.6 L 212 365.4 L 130 351.75 Z"/>
+<path class="median" d="M 130 342 L 212 317.625 L 273.5 309.825 L 334.9 295.2 L 396.4 270.825 L 457.9 239.625 L 519.4 226.95 L 580.8 209.375 L 642.3 202.575 L 703.8 188.925 L 765.2 171.375"/>
+<path class="cms" d="M 212 381 L 273.5 376.65 L 334.9 371.25 L 396.4 365.4 L 457.9 361.5 L 519.4 361.5 L 580.8 351.75 L 642.3 361.5 L 703.8 351.75 L 765.2 345.9 L 826.7 342"/>
+<path class="ext-dfa" d="M 765.2 254.25 L 826.7 217.2 L 888.2 213.3 L 949.7 191.85"/>
+<path class="ext-psz" d="M 765.2 59.25 L 826.7 69 L 888.2 59.25"/>
+</svg>

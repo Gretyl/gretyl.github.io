@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💸</text></svg>">
+
+<meta property="og:title" content="Where the Money Went — Corporate Cash Allocation, 1982 vs. 2024">
+<meta property="og:description" content="Two Sankey diagrams tracing U.S. nonfinancial corporate cash flow through capex, dividends, buybacks, and debt in 1982 versus 2024, in real 2025 dollars.">
+<meta property="og:url" content="https://gretyl.maplecrew.org/entries/financialization/where-the-money-went.html">
+<meta property="og:image" content="https://gretyl.maplecrew.org/assets/og/where-the-money-went.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="672">
+<meta property="og:image:alt" content="Paired Sankey diagrams of U.S. nonfinancial corporate cash flow allocation in 1982 and 2024 (real 2025 dollars), showing the structural shift from capex-dominated outflows to shareholder-return-dominated outflows.">
+<meta property="og:site_name" content="Gretyl">
+<meta property="og:type" content="article">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-05N3959YM1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-05N3959YM1');
+</script>
+
+<link rel="alternate" type="application/atom+xml" title="Gretyl (Atom)" href="/feed.xml">
+<link rel="alternate" type="application/feed+json" title="Gretyl (JSON Feed)" href="/feed.json">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&display=swap" rel="stylesheet">
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Where the Money Went — U.S. Nonfinancial Corporate Cash Allocation, 1982 vs. 2024</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --paper: #f7f3ec;
+    --rule: #c9bfae;
+    --ink-2: #555;
+    --ink-3: #666;
+    --surface-tint: rgba(26, 26, 26, 0.035);
+    --display: "Fraunces", Georgia, "Times New Roman", serif;
+    --serif: Georgia, "Times New Roman", serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+    /* Sankey flow colors */
+    --c-ocf:      #3F5E48;
+    --c-debt:     #6B4A2B;
+    --c-capex:    #2A4C66;
+    --c-div:      #B08841;
+    --c-buyback:  #9B2A21;
+
+    --gap: clamp(16px, 2vw, 28px);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    line-height: 1.5;
+  }
+
+  body {
+    padding: 32px 24px;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 1040px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* ── HERO ──────────────────────────────────────────────────────── */
+  .hero {
+    padding: clamp(40px, 7vw, 90px) 0 clamp(28px, 4vw, 48px);
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--c-buyback);
+    margin-bottom: 18px;
+    font-weight: 500;
+  }
+  h1 {
+    font-family: var(--display);
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    font-weight: 350;
+    font-size: clamp(44px, 7.2vw, 104px);
+    line-height: .95;
+    letter-spacing: -.025em;
+    margin: 0 0 22px;
+    color: var(--ink);
+  }
+  h1 em {
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 80;
+    color: var(--c-buyback);
+  }
+  .dek {
+    font-family: var(--serif);
+    font-size: clamp(18px, 1.6vw, 22px);
+    line-height: 1.5;
+    color: var(--ink-2);
+    max-width: 62ch;
+    margin: 0;
+    font-weight: 380;
+  }
+  .byline {
+    margin-top: 28px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .byline span { color: var(--ink-2); }
+
+  /* ── LEDE ──────────────────────────────────────────────────────── */
+  .lede {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--gap);
+    padding: clamp(28px, 4vw, 44px) 0 clamp(16px, 3vw, 32px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .lede-label, .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-top: 6px;
+  }
+  .lede-body p {
+    margin: 0 0 14px;
+    font-size: clamp(16px, 1.2vw, 18px);
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .lede-body p:first-child::first-letter {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 4.4em;
+    float: left;
+    line-height: .85;
+    padding: 6px 10px 0 0;
+    color: var(--c-buyback);
+  }
+
+  /* ── SECTION LABELS [01] / [02] etc ─────────────────────────────── */
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+    display: block;
+  }
+  .section-tag .num { color: var(--c-buyback); font-weight: 600; }
+
+  /* ── SANKEY PANELS ─────────────────────────────────────────────── */
+  .sankeys-section { padding: clamp(36px, 5vw, 64px) 0 clamp(24px, 3vw, 40px); }
+  .sankeys {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(24px, 3vw, 48px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #ece6d5;
+      --paper: #15140f;
+      --rule: #4a443a;
+      --ink-2: #b3ac9c;
+      --ink-3: #a8a193;
+      --surface-tint: rgba(255, 250, 235, 0.045);
+      --c-ocf: #6aad7e;
+      --c-debt: #c49068;
+      --c-capex: #5a9fd4;
+      --c-div: #d4b06a;
+      --c-buyback: #e07060;
+    }
+    .ownership-segment.seg-bot50 { background: var(--rule); }
+    .link { mix-blend-mode: screen; opacity: .92; }
+  }
+
+  @media (max-width: 900px) {
+    .sankeys { grid-template-columns: 1fr; }
+  }
+  .panel { position: relative; }
+  .panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1.5px solid var(--ink);
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+  }
+  .panel-year {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+    font-weight: 400;
+    font-size: clamp(40px, 4.8vw, 64px);
+    line-height: 1;
+    letter-spacing: -.02em;
+  }
+  .panel-meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    text-align: right;
+    line-height: 1.6;
+  }
+  .panel-total {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: .04em;
+    margin-bottom: 2px;
+  }
+  .panel-context {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.5;
+    margin: 0 0 16px;
+    max-width: 38ch;
+  }
+  .sankey-frame {
+    background: var(--surface-tint);
+    border: 1px solid var(--rule);
+    padding: 18px 14px 12px;
+    position: relative;
+  }
+  .sankey-frame svg { display: block; width: 100%; height: auto; }
+
+  /* Sankey internal styles */
+  .node rect { stroke: var(--ink); stroke-width: 1.25; shape-rendering: crispEdges; }
+  .node text {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 12.5px;
+    fill: var(--ink);
+  }
+  .node .node-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    fill: var(--ink-2);
+    letter-spacing: .02em;
+  }
+  .link { mix-blend-mode: multiply; opacity: .78; }
+  .link.buyback { opacity: .94; }
+  .annotation {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 12px;
+    fill: var(--c-buyback);
+  }
+
+
+  /* ── INSET TITLES (shared across sections [02]–[04]) ───────────── */
+  .inset-title {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "SOFT" 40;
+    font-weight: 400;
+    font-size: clamp(26px, 3.2vw, 40px);
+    line-height: 1.1;
+    letter-spacing: -.015em;
+    margin: 0 0 4px;
+    max-width: 30ch;
+  }
+  .inset-title em { font-style: italic; color: var(--c-buyback); }
+  .inset-dek {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-2);
+    max-width: 64ch;
+    margin: 0 0 24px;
+    line-height: 1.5;
+  }
+
+  /* ── INFLECTION CARDS [03] ─────────────────────────────────────── */
+  .inflect-section { padding: clamp(36px, 5vw, 56px) 0; border-bottom: 1px solid var(--rule); }
+  .inflect-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-top: 24px;
+  }
+  @media (max-width: 800px) { .inflect-grid { grid-template-columns: 1fr; } }
+  .inflect-card {
+    background: var(--surface-tint);
+    padding: 24px 26px 26px;
+    position: relative;
+  }
+  .inflect-num {
+    display: inline-flex;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--c-buyback);
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    box-shadow: 0 0 0 3px rgba(155,42,33,0.10);
+  }
+  .inflect-year {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--c-buyback);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .inflect-name {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 72, "SOFT" 40;
+    font-size: 22px;
+    line-height: 1.15;
+    color: var(--ink);
+    font-weight: 400;
+    margin-bottom: 12px;
+    letter-spacing: -.01em;
+  }
+  .inflect-desc {
+    font-family: var(--serif);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .inflect-desc em { font-style: italic; color: var(--ink); }
+  .inflect-desc strong { font-weight: 600; color: var(--ink); }
+
+  /* ── INCIDENCE STRIP [04] ──────────────────────────────────────── */
+  .incidence { padding: clamp(36px, 5vw, 56px) 0; border-bottom: 1px solid var(--rule); }
+  .section-title {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "SOFT" 40;
+    font-weight: 400;
+    font-size: clamp(28px, 3.4vw, 44px);
+    line-height: 1.1;
+    letter-spacing: -.015em;
+    margin: 0 0 8px;
+    max-width: 24ch;
+  }
+  .section-title em { font-style: italic; color: var(--c-buyback); }
+  .section-dek {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-2);
+    max-width: 56ch;
+    margin: 0 0 28px;
+    line-height: 1.5;
+  }
+  .ownership-bar {
+    width: 100%;
+    height: 56px;
+    display: flex;
+    border: 1.25px solid var(--ink);
+    background: var(--surface-tint);
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .ownership-segment {
+    height: 100%;
+    border-right: 1px solid var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: .04em;
+    position: relative;
+  }
+  .ownership-segment:last-child { border-right: none; }
+  .seg-top1   { background: #2A1815; flex: 0 0 49.8%; }
+  .seg-top10  { background: #6B3A2F; flex: 0 0 37.2%; }
+  .seg-mid40  { background: #B08841; flex: 0 0 12%; color: #1B1612; }
+  .seg-bot50  { background: #E8DFCE; flex: 0 0 1%; color: var(--ink); font-size: 0; }
+  .ownership-key {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    font-family: var(--serif);
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .ownership-key div { line-height: 1.4; }
+  .ownership-key strong {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .incidence-math {
+    margin-top: 32px;
+    padding: 22px 26px;
+    border-left: 3px solid var(--c-buyback);
+    background: var(--surface-tint);
+    font-family: var(--serif);
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--ink);
+    max-width: 75ch;
+  }
+  .incidence-math strong { color: var(--c-buyback); font-weight: 600; }
+  .incidence-math .mono { font-family: var(--mono); font-size: 14px; }
+
+  /* ── METHODOLOGY Q&A [05] ──────────────────────────────────────── */
+  .method-section { padding: clamp(36px, 5vw, 56px) 0; border-bottom: 1px solid var(--rule); }
+  .method-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-top: 22px;
+  }
+  @media (max-width: 800px) { .method-grid { grid-template-columns: 1fr; gap: 28px; } }
+  .method-q {
+    font-family: var(--serif);
+    font-style: italic;
+    font-variation-settings: "opsz" 36, "SOFT" 30;
+    font-weight: 400;
+    font-size: 19px;
+    line-height: 1.22;
+    color: var(--ink);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rule);
+    letter-spacing: -.005em;
+  }
+  .method-q::before {
+    content: "Q. ";
+    font-family: var(--mono);
+    font-style: normal;
+    font-weight: 600;
+    color: var(--ink-3);
+    font-size: 13px;
+    letter-spacing: .04em;
+    vertical-align: 2px;
+    margin-right: 2px;
+  }
+  .method-a {
+    font-family: var(--serif);
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .method-a p { margin: 0 0 10px; }
+  .method-a p:last-child { margin-bottom: 0; }
+  .method-a em { font-style: italic; color: var(--ink); }
+  .method-a strong { font-weight: 600; color: var(--ink); }
+  .method-a .ds, .tk {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink);
+    background: var(--surface-tint);
+    border: 1px solid var(--rule);
+    padding: 1px 6px;
+    border-radius: 2px;
+    letter-spacing: .02em;
+    white-space: nowrap;
+  }
+
+  /* ── SOURCES [06] ──────────────────────────────────────────────── */
+  .sources {
+    margin-top: 28px;
+    padding: 24px 28px 22px;
+    background: var(--surface-tint);
+    border: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--ink-2);
+    letter-spacing: .02em;
+  }
+  .sources cite {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink);
+    font-size: 12.5px;
+    letter-spacing: 0;
+  }
+  .sources p { margin: 0 0 6px; }
+  .sources .vintage {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dotted var(--rule);
+    color: var(--ink-3);
+    font-size: 10.5px;
+    line-height: 1.65;
+  }
+  .sources strong { color: var(--ink); font-weight: 600; }
+
+  /* ── MOBILE ────────────────────────────────────────────────────── */
+  @media (max-width: 700px) {
+    .lede { grid-template-columns: 1fr; }
+    .ownership-key { grid-template-columns: 1fr 1fr; gap: 14px; }
+    .lede-label { padding-top: 0; }
+  }
+
+  .triptych-nav {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 18px;
+  }
+  .triptych-nav a {
+    color: var(--ink-3);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+  .triptych-nav a:hover { color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="page">
+  <nav class="triptych-nav"><a href="./">Financialization, 1975&ndash;2025</a> &rsaquo; Where The Money Went</nav>
+
+  <!-- ── HEADER ──────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="kicker">Where the Money Went</div>
+    <h1>The plumbing of <em>shareholder primacy</em>.</h1>
+  </section>
+
+  <!-- ── LEDE ───────────────────────────────────────────────────── -->
+  <section class="lede">
+    <div class="lede-label">Reading key</div>
+    <div class="lede-body">
+      <p>Drawn at proportional scale to each other: the 2024 corporate sector handles roughly <strong>3.8 times</strong> the inflation‑adjusted dollar volume of 1982. The morphology of the diagram is the story. The capex channel shrinks as a share of the whole. The shareholder‑return channels — dividends and, especially, buybacks — engorge. And a second inflow appears: borrowed money, large enough to fund most of what flows out to shareholders.</p>
+    </div>
+  </section>
+
+  <!-- ── [01] PAIRED SANKEYS ────────────────────────────────────── -->
+  <section class="sankeys-section">
+    <div class="section-tag"><span class="num">[01]</span> &nbsp; Two Snapshots · 42 Years Apart</div>
+    <div class="sankeys">
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-year">1982</div>
+          <div class="panel-meta">
+            <div class="panel-total">$1,330 BN TOTAL (REAL)</div>
+            <div>Rule 10b‑18 adopted</div>
+            <div>Nov 17, 1982</div>
+          </div>
+        </div>
+        <p class="panel-context">The corporation as productive engine. Internal cash flow funds capex; dividends are the only meaningful return to shareholders; buybacks are statistically zero — net equity flow was, in fact, slightly <em>positive</em> (+$6.3B real, per Panel I).</p>
+        <div class="sankey-frame"><svg id="sankey-1982" viewBox="0 0 760 520" preserveAspectRatio="xMidYMid meet" aria-label="Cash flow allocation for US nonfinancial corporations in 1982, in real 2025 dollars. Total flow is 1.33 trillion. Operating cash flow of 1.07 trillion and net new debt of 265 billion feed into capital expenditure of 1.04 trillion, dividends of 287 billion, and net buybacks of effectively zero. Nearly all cash goes to productive investment; shareholder returns are limited to dividends."></svg></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-year">2024</div>
+          <div class="panel-meta">
+            <div class="panel-total">$5,025 BN TOTAL (REAL)</div>
+            <div>3.8× larger than 1982</div>
+            <div>S&amp;P 500 buybacks alone: $943 BN</div>
+          </div>
+        </div>
+        <p class="panel-context">The corporation as a vehicle for shareholder return. Borrowed money becomes a parallel inflow; net buybacks emerge as a major channel; dividends rise alongside.</p>
+        <div class="sankey-frame"><svg id="sankey-2024" viewBox="0 0 760 520" preserveAspectRatio="xMidYMid meet" aria-label="Cash flow allocation for US nonfinancial corporations in 2024, in real 2025 dollars. Total flow is 5.03 trillion, 3.8 times the 1982 level. Operating cash flow of 4.21 trillion and net new debt of 815 billion feed into capital expenditure of 3.00 trillion, dividends of 1.61 trillion, and net buybacks of 415 billion. Shareholder returns now claim a far larger share than in 1982, and borrowed money has become a significant parallel inflow."></svg></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── [02] INFLECTION POINTS ──────────────────────────────────── -->
+  <section class="inflect-section">
+    <div class="section-tag"><span class="num">[02]</span> &nbsp; Inflection Points</div>
+
+    <div class="inflect-grid">
+
+      <div class="inflect-card">
+        <div class="inflect-num">1</div>
+        <div class="inflect-year">1982 · Nov 17</div>
+        <div class="inflect-name">Rule 10b‑18 adopted</div>
+        <div class="inflect-desc">
+          SEC safe harbor for open‑market repurchases. The 1982 Sankey shows the pre‑change morphology: capex dominant, dividends modest, buybacks <strong>functionally zero</strong>.
+        </div>
+      </div>
+
+      <div class="inflect-card">
+        <div class="inflect-num">2</div>
+        <div class="inflect-year">2007</div>
+        <div class="inflect-name">Real‑terms trough</div>
+        <div class="inflect-desc">
+          Net equity retirement hits <strong>−$838B (real)</strong> — the deepest single year in the 51‑year series. Cash‑flow morphology resembles 2024: payouts rivaling capex, leverage rising.
+        </div>
+      </div>
+
+      <div class="inflect-card">
+        <div class="inflect-num">3</div>
+        <div class="inflect-year">2017 →</div>
+        <div class="inflect-name">TCJA &amp; the new normal</div>
+        <div class="inflect-desc">
+          S&amp;P 500 buybacks hit <strong>$806B</strong> (2018), then <strong>$942.5B</strong> (2024). The 2024 Sankey is the steady state of this regime. The 1% excise tax (2023) has not bent the curve.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── [04] INCIDENCE ─────────────────────────────────────────── -->
+  <section class="incidence">
+    <div class="section-tag"><span class="num">[03]</span> &nbsp; The Incidence</div>
+    <h2 class="section-title">Where the <em>capital gain</em> lands.</h2>
+    <p class="section-dek">A dollar spent on a buyback raises the value of every remaining share. The bar below shows who owns those shares, per the Federal Reserve's Distributional Financial Accounts (2024–25):</p>
+
+    <div class="ownership-bar" role="img" aria-label="Distribution of US household equity wealth by net-worth percentile per the Federal Reserve Distributional Financial Accounts. The top 1 percent holds 49.8 percent of all household equity, the next 9 percent holds 37.2 percent, the 50th to 90th percentile holds 12 percent, and the bottom 50 percent holds roughly 1 percent. A dollar of buyback-driven share appreciation accrues in these proportions.">
+      <div class="ownership-segment seg-top1" style="flex-basis:49.8%">TOP 1% · 49.8%</div>
+      <div class="ownership-segment seg-top10" style="flex-basis:37.2%">NEXT 9% · 37.2%</div>
+      <div class="ownership-segment seg-mid40" style="flex-basis:12%">50–90% · 12%</div>
+      <div class="ownership-segment seg-bot50" style="flex-basis:1%" title="Bottom 50% · 1%"></div>
+    </div>
+    <div class="ownership-key">
+      <div><strong>Top 1%</strong>Holds ~half of all U.S. household equity wealth, directly and indirectly.</div>
+      <div><strong>Next 9%</strong>Top decile combined holds ~87% on DFA; up to 93% on Fed measures.</div>
+      <div><strong>50–90%</strong>Mostly via 401(k)s and IRAs; meaningful but a small slice.</div>
+      <div><strong>Bottom 50%</strong>Roughly 1% of household equity wealth. The thin sliver on the right.</div>
+    </div>
+
+    <div class="incidence-math">
+      Across the <span class="mono">$5.3 trillion</span> in S&amp;P 500 buybacks during 2010–2019, the implied incidence — assuming buybacks raise share value and shares are owned in the distribution above — is approximately <strong>$2.6 trillion of wealth gain to the top 1%</strong>, <span class="mono">$4.6–4.9 trillion</span> to the top 10%, and roughly <span class="mono">$50 billion</span> to the bottom 50%.
+    </div>
+  </section>
+
+  <!-- ── [05] METHODOLOGY Q&A ───────────────────────────────────── -->
+  <section class="method-section">
+    <div class="section-tag"><span class="num">[04]</span> &nbsp; What's in the Sankey, and What Isn't</div>
+    <h2 class="inset-title" style="margin-bottom: 4px;">Three questions worth asking.</h2>
+    <p class="inset-dek">The diagrams above make analytical choices that a careful reader would want defended.</p>
+
+    <div class="method-grid">
+
+      <div>
+        <div class="method-q">Why split each inflow proportionally across all outflows — wasn't the borrowed money used <em>specifically</em> for buybacks?</div>
+        <div class="method-a">
+          <p>Money is fungible. Z.1 doesn't track which dollar funded which use, and within a firm's treasury, sources and uses are pooled before allocation. The <em>proportional</em> split shown above is the neutral default — it shows each inflow's share of total funds and each outflow's share of total uses, without claiming a one‑to‑one routing.</p>
+          <p>The <em>marginal</em> view — that incremental borrowing funded incremental shareholder payouts — has empirical support. <span class="ds">JPMorgan Chase</span> estimated that <strong>~30%</strong> of buybacks were funded by corporate bonds in 2016–17 (cited in Lazonick, HBR Jan 2020). Mason's 2015 Roosevelt paper documents a structural break in the post‑1985 correlation between borrowing and payouts. Both views are defensible; the proportional split shown above is the more conservative one.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="method-q">How are operating cash flow and net new debt derived if they aren't direct F.103 line items?</div>
+        <div class="method-a">
+          <p>Operating cash flow is approximated as <em>total internal funds</em> from F.103 = after‑tax profits + capital consumption adjustment − inventory valuation adjustment. Net new debt is the year‑on‑year change in total nonfinancial corporate credit market liabilities (<span class="tk">BCNSDODNS</span>, the L.103 stock series, differenced).</p>
+          <p>Both are derivable from Z.1 but not single published rows. The figures shown above balance the cash‑flow identity (sources = uses) <strong>to within 0.5%</strong>; that's the integrity check. Outflow figures — capex, dividends, net equity retirement — are taken directly from F.103.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="method-q">Why 1982 and 2024 as the snapshot pair — and not some other pair?</div>
+        <div class="method-a">
+          <p><strong>1982</strong> is the policy inflection: Rule 10b‑18 was adopted Nov 17 of that year. It is also the inflection year annotated on Panel I. <strong>2024</strong> is the most recent full calendar year with finalized Z.1 data at the time of writing.</p>
+          <p>Panel I's continuous time series demonstrates that these are <em>samples of a continuous trend</em> rather than a chosen extremity. The morphology shift is monotonic on a multi‑decade horizon, episodic on a yearly one, and qualitatively visible across any pair of pre‑1984 / post‑1990 reference years.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── [06] SOURCES & SERIES ──────────────────────────────────── -->
+  <div class="section-tag" style="margin-top: 32px;"><span class="num">[05]</span> &nbsp; Sources &amp; Series</div>
+  <div class="sources">
+    <p><span class="tk">F.103</span> · Fed Z.1, Table F.103, Nonfinancial Corporate Business. Series: <span class="tk">BOGZ1FA105050005</span> (capex), <span class="tk">BOGZ1FU106121005</span> (dividends), <span class="tk">NCBCEBA027N</span> (net equity; shared with Panel I), <span class="tk">BOGZ1FA106000105</span> (total internal funds), <span class="tk">BCNSDODNS</span> (debt outstanding, differenced). Retrieved from FRED on 2026‑05‑19.</p>
+    <p><span class="tk">CPI‑U</span> · Matches Panel I's deflator (2025 annual avg est. 321.0).</p>
+    <p><span class="tk">S&amp;P DJI</span> · S&amp;P 500 Buybacks Series, Q4 2024 release: full‑year 2024 = $942.5B nominal.</p>
+    <p><span class="tk">DFA</span> · Fed Distributional Financial Accounts, <span class="tk">WFRBST01134</span> and equity‑ownership tables, 2024 Q4 vintage. Shared with Panel II.</p>
+    <p><strong>Key references:</strong> Lazonick, <cite>Profits Without Prosperity</cite>, HBR (2014); Mason, <cite>Disgorge the Cash</cite>, Roosevelt Institute (2015); Palladino &amp; Lazonick, <cite>Regulating Stock Buybacks</cite>, Roosevelt Institute (2021); Gruber &amp; Kamin, <cite>Corporate Buybacks and Capital Investment</cite>, Fed IFDP Notes (2017) — dissenting view.</p>
+
+    <div class="vintage">
+      Outflows (capex, dividends, net equity) from F.103 directly; inflows (operating cash flow, net new debt) derived to balance the cash‑flow identity within 0.5%. Sankey ribbons split proportionally — the marginal‑funds interpretation (debt → buybacks specifically) has empirical support but is not depicted; see <span class="tk">[04]</span>. <strong>The accounting identity is airtight; the behavioral causal chain is partially supported (firm‑level: Almeida, Fos &amp; Kronlund 2016) and partially not (macro: Gruber &amp; Kamin 2017). This panel rests on the incidence identity, not the disputed causal link.</strong>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════
+   SECTION I · PAIRED SANKEY RENDERER
+   Real 2025 USD throughout. 1982 buyback wedge is ~0 (1982 was
+   actually a slight net-issuance year per Panel I; the wedge is
+   shown as a tiny outflow for visual symmetry).
+   ──────────────────────────────────────────────────────────────────── */
+
+function getPalette() {
+  var s = getComputedStyle(document.documentElement);
+  return {
+    ocf:     s.getPropertyValue('--c-ocf').trim(),
+    debt:    s.getPropertyValue('--c-debt').trim(),
+    capex:   s.getPropertyValue('--c-capex').trim(),
+    div:     s.getPropertyValue('--c-div').trim(),
+    buyback: s.getPropertyValue('--c-buyback').trim(),
+  };
+}
+var PALETTE = getPalette();
+
+/* All figures in $B, real 2025 USD (CPI-U deflated).
+   1982 nominal × 3.327 = 1982 real (1982 CPI 96.5 → 2025 CPI 321.0)
+   2024 nominal × 1.023 = 2024 real (2024 CPI 313.7 → 2025 CPI 321.0) */
+
+const DATA_1982 = {
+  total: 1330,
+  sources: [
+    {id:"ocf",  name:"Operating Cash Flow",       value:1065, color:PALETTE.ocf},
+    {id:"debt", name:"Net New Debt Issuance",     value: 265, color:PALETTE.debt},
+  ],
+  sinks: [
+    {id:"capex",   name:"Capital Expenditure",     value:1035, color:PALETTE.capex,    highlight:false},
+    {id:"div",     name:"Dividends",               value: 287, color:PALETTE.div,      highlight:false},
+    {id:"buyback", name:"Net Buybacks",            value:   8, color:PALETTE.buyback,  highlight:true},
+  ],
+};
+
+const DATA_2024 = {
+  total: 5025,
+  sources: [
+    {id:"ocf",  name:"Operating Cash Flow",       value:4210, color:PALETTE.ocf},
+    {id:"debt", name:"Net New Debt Issuance",     value: 815, color:PALETTE.debt},
+  ],
+  sinks: [
+    {id:"capex",   name:"Capital Expenditure",     value:2995, color:PALETTE.capex,    highlight:false},
+    {id:"div",     name:"Dividends",               value:1615, color:PALETTE.div,      highlight:false},
+    {id:"buyback", name:"Net Buybacks",            value: 415, color:PALETTE.buyback,  highlight:true},
+  ],
+};
+
+const VIEWBOX_W = 760;
+const VIEWBOX_H = 520;
+const USABLE_H  = 440;
+const NODE_GAP  = 10;
+const NODE_W    = 18;
+const SIDE_PAD  = 150;
+const LABEL_PAD = 10;
+
+function renderSankey(svgId, data, isBig){
+  const svg = document.getElementById(svgId);
+  const sinksVisible = data.sinks.filter(s => s.value > 0);
+  const srcVisible   = data.sources.filter(s => s.value > 0);
+
+  const maxNodes = Math.max(srcVisible.length, sinksVisible.length);
+  const gapBudget = NODE_GAP * (maxNodes - 1);
+  const SCALE = (USABLE_H - gapBudget) / data.total;
+  const totalH = data.total * SCALE;
+
+  const srcGapBudget = NODE_GAP * (srcVisible.length - 1);
+  let srcY = (VIEWBOX_H - totalH - srcGapBudget) / 2;
+  srcVisible.forEach(n => {
+    n.h = n.value * SCALE;
+    n.x = SIDE_PAD;
+    n.y = srcY;
+    srcY += n.h + NODE_GAP;
+  });
+
+  const sinkGapBudget = NODE_GAP * (sinksVisible.length - 1);
+  let snkY = (VIEWBOX_H - totalH - sinkGapBudget) / 2;
+  sinksVisible.forEach(n => {
+    n.h = n.value * SCALE;
+    n.x = VIEWBOX_W - SIDE_PAD - NODE_W;
+    n.y = snkY;
+    snkY += n.h + NODE_GAP;
+  });
+
+  const flows = [];
+  srcVisible.forEach(src => {
+    let srcCursor = src.y;
+    sinksVisible.forEach(sink => {
+      const shareOfTotal = sink.value / data.total;
+      const flowVal = src.value * shareOfTotal;
+      flows.push({
+        src, sink, value: flowVal,
+        srcY0: srcCursor,
+        srcY1: srcCursor + flowVal * SCALE,
+      });
+      srcCursor += flowVal * SCALE;
+    });
+  });
+
+  const sinkCursor = {};
+  sinksVisible.forEach(s => sinkCursor[s.id] = s.y);
+  flows.forEach(f => {
+    f.dstY0 = sinkCursor[f.sink.id];
+    f.dstY1 = sinkCursor[f.sink.id] + f.value * SCALE;
+    sinkCursor[f.sink.id] = f.dstY1;
+  });
+
+  const ns = "http://www.w3.org/2000/svg";
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+  flows.forEach(f => {
+    if (f.value < 0.01) return;
+    const x0 = f.src.x + NODE_W;
+    const x1 = f.sink.x;
+    const xm = (x0 + x1) / 2;
+    const d = `
+      M ${x0} ${f.srcY0}
+      C ${xm} ${f.srcY0}, ${xm} ${f.dstY0}, ${x1} ${f.dstY0}
+      L ${x1} ${f.dstY1}
+      C ${xm} ${f.dstY1}, ${xm} ${f.srcY1}, ${x0} ${f.srcY1}
+      Z`;
+    const path = document.createElementNS(ns, "path");
+    path.setAttribute("d", d);
+    path.setAttribute("fill", f.sink.color);
+    path.setAttribute("class", "link" + (f.sink.highlight ? " buyback" : ""));
+    svg.appendChild(path);
+  });
+
+  const drawNode = (n, side) => {
+    const rect = document.createElementNS(ns, "rect");
+    rect.setAttribute("x", n.x);
+    rect.setAttribute("y", n.y);
+    rect.setAttribute("width", NODE_W);
+    rect.setAttribute("height", Math.max(n.h, 0.5));
+    rect.setAttribute("fill", n.color);
+    rect.setAttribute("stroke", "#1B1612");
+    rect.setAttribute("stroke-width", 1);
+    svg.appendChild(rect);
+
+    const g = document.createElementNS(ns, "g");
+    g.setAttribute("class", "node");
+    const tx = side === "left" ? n.x - LABEL_PAD : n.x + NODE_W + LABEL_PAD;
+    const ty = n.y + n.h / 2;
+
+    const text = document.createElementNS(ns, "text");
+    text.setAttribute("x", tx);
+    text.setAttribute("y", ty - 2);
+    text.setAttribute("text-anchor", side === "left" ? "end" : "start");
+    text.setAttribute("dominant-baseline", "middle");
+    text.textContent = n.name;
+    if (n.highlight) {
+      text.setAttribute("fill", PALETTE.buyback);
+      text.setAttribute("font-weight", "600");
+    }
+    g.appendChild(text);
+
+    const sub = document.createElementNS(ns, "text");
+    sub.setAttribute("x", tx);
+    sub.setAttribute("y", ty + 12);
+    sub.setAttribute("text-anchor", side === "left" ? "end" : "start");
+    sub.setAttribute("class", "node-sub");
+    sub.setAttribute("dominant-baseline", "middle");
+    sub.textContent = fmt(n.value);
+    g.appendChild(sub);
+
+    svg.appendChild(g);
+  };
+
+  srcVisible.forEach(n => drawNode(n, "left"));
+  sinksVisible.forEach(n => drawNode(n, "right"));
+
+  if (isBig) {
+    const bb = sinksVisible.find(s => s.id === "buyback");
+    if (bb) {
+      const labelX = bb.x + NODE_W + LABEL_PAD;
+      const noteY  = bb.y - 14;
+      const note = document.createElementNS(ns, "text");
+      note.setAttribute("x", labelX);
+      note.setAttribute("y", noteY);
+      note.setAttribute("class", "annotation");
+      note.setAttribute("text-anchor", "start");
+      note.textContent = "the new channel ↓";
+      svg.appendChild(note);
+    }
+  }
+}
+
+function fmt(v){
+  if (v === 0) return "$0";
+  if (v < 10) return "$" + v.toFixed(1) + " bn (real)";
+  if (v < 1000) return "$" + Math.round(v) + " bn (real)";
+  return "$" + (v/1000).toFixed(2) + " tn (real)";
+}
+
+function renderAll() {
+  PALETTE = getPalette();
+  DATA_1982.sources.forEach(function(s){ s.color = PALETTE[s.id]; });
+  DATA_1982.sinks.forEach(function(s){ s.color = PALETTE[s.id]; });
+  DATA_2024.sources.forEach(function(s){ s.color = PALETTE[s.id]; });
+  DATA_2024.sinks.forEach(function(s){ s.color = PALETTE[s.id]; });
+  document.getElementById("sankey-1982").innerHTML = "";
+  document.getElementById("sankey-2024").innerHTML = "";
+  renderSankey("sankey-1982", DATA_1982, false);
+  renderSankey("sankey-2024", DATA_2024, true);
+}
+renderAll();
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderAll);
+</script>
+</body>
+</html>
