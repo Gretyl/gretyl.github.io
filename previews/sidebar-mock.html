@@ -7,13 +7,26 @@
   <style>
     :root {
       --clr-bg: #fff;
-      --clr-text: #606c71;
-      --clr-h1-and-bold: #333;
-      --clr-h2: #586069;
-      --clr-h-3-6: #586069;
-      --clr-a-text: #1e6bb8;
-      --clr-a-text-hvr: #159957;
-      --clr-splitter-blockquote-and-section: #ddd;
+      --clr-text: #737373;
+      --clr-h1-and-bold: #212121;
+      --clr-h2: #383838;
+      --clr-h-3-6: #4a4a4a;
+      --clr-a-text: hsl(200, 100%, 35%);
+      --clr-a-text-hvr: hsl(200, 100%, 28%);
+      --clr-splitter-blockquote-and-section: #e6e6e6;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --clr-bg: #1a1a1a;
+        --clr-text: #b3b3b3;
+        --clr-h1-and-bold: #e6e6e6;
+        --clr-h2: #d4d4d4;
+        --clr-h-3-6: #c2c2c2;
+        --clr-a-text: hsl(200, 100%, 60%);
+        --clr-a-text-hvr: hsl(200, 100%, 48%);
+        --clr-splitter-blockquote-and-section: #262626;
+      }
     }
 
     html { scroll-behavior: smooth; }

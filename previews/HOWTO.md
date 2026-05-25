@@ -76,6 +76,29 @@ For end-to-end verification of features that involve `localStorage` (rehydration
 
 For cross-page persistence (e.g., toggle on `/`, navigate to `/artemis-trail.html`, assert side nav rehydrates) the local mock isn't enough — `file://` URLs use per-path opaque origins, so two mock pages don't share storage. Serve via `cd docs && python3 -m http.server 8765` and drive rodney against `http://localhost:8765/...` so all pages share the same origin.
 
+#### Dark-mode variant screenshots
+
+The sidebar mock respects `prefers-color-scheme`. Rodney doesn't expose Chrome's media-emulation API, but you can fake it: walk the inline stylesheet's `@media (prefers-color-scheme: dark)` block and stamp every declaration onto `:root` as an inline style. This overrides the light-mode custom properties without touching the `@media` rule itself.
+
+```bash
+uvx rodney start
+uvx rodney open "file://$(pwd)/previews/sidebar-mock.html"
+uvx rodney waitload
+uvx rodney js 'localStorage.clear()'
+uvx rodney reload
+uvx rodney waitload
+uvx rodney sleep 1
+uvx rodney screenshot -w 960 -h 700 previews/sidebar-light.png
+
+# Apply dark-mode overrides by extracting @media rules from the stylesheet
+uvx rodney js '(()=>{for(const sheet of document.styleSheets){let rules;try{rules=sheet.cssRules}catch(e){continue}for(const rule of rules)if(rule instanceof CSSMediaRule&&rule.conditionText.includes("prefers-color-scheme: dark"))for(const r of rule.cssRules)for(const p of r.style)document.documentElement.style.setProperty(p,r.style.getPropertyValue(p))}return"dark"})()'
+uvx rodney sleep 1
+uvx rodney screenshot -w 960 -h 700 previews/sidebar-dark.png
+uvx rodney stop
+```
+
+The `try/catch` around `sheet.cssRules` skips cross-origin stylesheets (e.g. the FontAwesome CDN) that block `cssRules` access. To revert to light mode without reloading, remove the inline overrides: `uvx rodney js 'document.documentElement.removeAttribute("style")'`.
+
 ### 4. Commit the screenshot for PR review
 
 PNGs in `previews/` are gitignored by default to avoid shipping accidental screenshots. To include one for PR review, force-add it:
