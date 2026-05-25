@@ -1,16 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="130 30 1150 460">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="130 30 1280 460">
 <style>
   .ocf { fill: #3F5E48; }
   .debt { fill: #6B4A2B; }
   .capex { fill: #2A4C66; }
   .div { fill: #B08841; }
   .buyback { fill: #9B2A21; }
+  .arrow { fill: none; stroke: #1a1a1a; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
   @media (prefers-color-scheme: dark) {
     .ocf { fill: #6aad7e; }
     .debt { fill: #c49068; }
     .capex { fill: #5a9fd4; }
     .div { fill: #d4b06a; }
     .buyback { fill: #e07060; }
+    .arrow { stroke: #ece6d5; }
   }
 </style>
 <g>
@@ -26,7 +28,8 @@
   <rect class="div" x="592" y="376.84" width="18" height="90.63"/>
   <rect class="buyback" x="592" y="477.47" width="18" height="2.53"/>
 </g>
-<g transform="translate(520, 0)">
+<path class="arrow" d="M 640 260 L 700 260 M 685 240 L 700 260 L 685 280"/>
+<g transform="translate(600, 0)">
   <path class="capex" d="M 168 45 C 380 45, 380 40, 592 40 L 592 249.73 C 380 249.73, 380 254.73, 168 254.73 Z"/>
   <path class="div" d="M 168 254.73 C 380 254.73, 380 300.33, 592 300.33 L 592 413.42 C 380 413.42, 380 367.82, 168 367.82 Z"/>
   <path class="buyback" d="M 168 367.82 C 380 367.82, 380 445.31, 592 445.31 L 592 474.37 C 380 474.37, 380 396.88, 168 396.88 Z"/>
