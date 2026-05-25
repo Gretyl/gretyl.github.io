@@ -6,7 +6,7 @@ favicon_emoji: 🏦
 
 {% include analytics.html %}
 
-These **three** panels started by diving into stock buybacks at market
+These three panels started by diving into stock buybacks at market
 scale: where they came from as a corporate practice and how broadly they
 occur in US equities today. Since the SEC adopted Rule 10b-18 in 1982,
 American nonfinancial corporations have retired a cumulative $12.4
