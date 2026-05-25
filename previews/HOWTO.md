@@ -118,7 +118,7 @@ python3 -c "
 import asyncio, json, base64, websockets
 
 async def go():
-    ws_url = json.load(open('$HOME/.rodney/state.json'))['ws_url']
+    ws_url = json.load(open('$HOME/.rodney/state.json'))['debug_url']
     async with websockets.connect(ws_url, max_size=50<<20) as ws:
         await ws.send(json.dumps({'id':1,'method':'Target.getTargets'}))
         r = json.loads(await ws.recv())
