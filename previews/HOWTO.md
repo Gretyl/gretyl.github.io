@@ -7,7 +7,7 @@ How to generate preview screenshots of Jekyll-themed pages without running Jekyl
 This directory lives at the repo root, outside `docs/`, so its contents are not served by GitHub Pages. It holds:
 
 - **`sidebar-mock.html`** — a standalone HTML template that replicates the remote theme's sidebar layout with inlined CSS. Edit this file to reflect content changes, then screenshot it. If the upstream theme changes, re-fetch the source files (step 1 below) and update the mock.
-- **Page-specific mocks** (e.g., `financialization-heading-preview.html`) — standalone mocks for previewing individual entry pages rather than the homepage. These copy the sidebar/section layout from `sidebar-mock.html` but replace `<section>` content with the entry's rendered Markdown. Use a `-dark.html` suffix for the dark mode variant (see [Dark mode previews](#dark-mode-previews) below).
+- **Page-specific mocks** (e.g., `financialization-heading-preview.html`) — standalone mocks for previewing individual entry pages. These copy the sidebar/section layout from `sidebar-mock.html` but replace `<section>` content with the entry's rendered Markdown. SVG thumbnails should be **inlined** (not loaded via `<img>`) so they respond to dark-mode switching — see [Dark-mode variant screenshots](#dark-mode-variant-screenshots).
 - **`*.png`** — screenshot artifacts committed to feature branches for PR review. These let reviewers see how a change will look with the Jekyll theme applied, without requiring deployment.
 - **`HOWTO.md`** — this file.
 
@@ -51,25 +51,6 @@ uvx rodney screenshot -w 960 -h 700 previews/hero-headshot-preview.png
 
 The `-w` and `-h` flags set the viewport size. Use `960` width to see the desktop sidebar layout; use `720` or below to test the mobile-responsive collapsed view. For pages with inline images (e.g., SVG thumbnails), increase `-h` to avoid clipping — `1400` works well for the three-panel financialization page.
 
-#### Dark mode previews
-
-The theme doesn't ship dark mode, but mocks can simulate one to preview contrast and readability. Copy the light mock to a `*-dark.html` file and override the CSS custom properties in `:root`:
-
-```css
-:root {
-  --clr-bg: #1a1a2e;
-  --clr-text: #b0b8c4;
-  --clr-h1-and-bold: #e0e0e0;
-  --clr-h2: #a8b2c0;
-  --clr-h-3-6: #a8b2c0;
-  --clr-a-text: #58a6ff;
-  --clr-a-text-hvr: #7ee787;
-  --clr-splitter-blockquote-and-section: #444;
-}
-```
-
-SVGs with baked-in fill colors won't auto-invert — this is faithful to how they'd render on the live site with a hypothetical dark theme.
-
 #### Pages that use `localStorage`
 
 If the page being screenshotted reads or writes `localStorage` (e.g., the disclosure-sync feature persists open/closed state under the `disclosure-state` key), Chromium's headless profile **persists that storage across `rodney start`/`stop` cycles** for the same `file://` path. State written by an earlier session (manual exploration, a verification script, an aborted test) leaks into the next session and can flip the canonical screenshot away from markup defaults — silently.
@@ -100,7 +81,9 @@ For cross-page persistence (e.g., toggle on `/`, navigate to `/artemis-trail.htm
 
 #### Dark-mode variant screenshots
 
-The sidebar mock respects `prefers-color-scheme`. Rodney doesn't expose Chrome's media-emulation API, but you can fake it: walk the inline stylesheet's `@media (prefers-color-scheme: dark)` block and stamp every declaration onto `:root` as an inline style. This overrides the light-mode custom properties without touching the `@media` rule itself.
+Both mock types (`sidebar-mock.html` and page-specific mocks) use `@media (prefers-color-scheme: dark)` blocks matching the live site's palette. There are two ways to trigger dark mode for screenshots, depending on whether the mock contains inline SVGs.
+
+**Technique 1: JS stylesheet walk** — for mocks that only use CSS custom properties (e.g., `sidebar-mock.html`). Walk the inline stylesheet's `@media` block and stamp every declaration onto `:root` as an inline style:
 
 ```bash
 uvx rodney start
@@ -120,6 +103,53 @@ uvx rodney stop
 ```
 
 The `try/catch` around `sheet.cssRules` skips cross-origin stylesheets (e.g. the FontAwesome CDN) that block `cssRules` access. To revert to light mode without reloading, remove the inline overrides: `uvx rodney js 'document.documentElement.removeAttribute("style")'`.
+
+**Technique 2: CDP media emulation** — required for page-specific mocks with inline SVGs. The JS walk only stamps CSS custom properties onto `:root`, but SVGs use direct `fill`/`stroke` values inside their own `@media (prefers-color-scheme: dark)` rules. CDP's `Emulation.setEmulatedMedia` triggers the actual media query in the browser, so both page CSS and inline SVG `@media` blocks switch simultaneously. Connect to rodney's debug WebSocket (`pip install websockets` first):
+
+```bash
+uvx rodney start
+uvx rodney open "file://$(pwd)/previews/financialization-heading-preview.html"
+uvx rodney waitload
+uvx rodney sleep 1
+uvx rodney screenshot -w 960 -h 1400 previews/financialization-heading-light.png
+
+# Dark screenshot via CDP emulation (Python)
+python3 -c "
+import asyncio, json, base64, websockets
+
+async def go():
+    ws_url = json.load(open('$HOME/.rodney/state.json'))['ws_url']
+    async with websockets.connect(ws_url, max_size=50<<20) as ws:
+        await ws.send(json.dumps({'id':1,'method':'Target.getTargets'}))
+        r = json.loads(await ws.recv())
+        tid = next(t for t in r['result']['targetInfos'] if t['type']=='page')['targetId']
+        await ws.send(json.dumps({'id':2,'method':'Target.attachToTarget','params':{'targetId':tid,'flatten':True}}))
+        r = json.loads(await ws.recv())
+        while 'sessionId' not in r.get('result',{}): r = json.loads(await ws.recv())
+        s = r['result']['sessionId']
+        for i,(m,p) in enumerate([
+            ('Emulation.setDeviceMetricsOverride',{'width':960,'height':1400,'deviceScaleFactor':1,'mobile':False}),
+            ('Emulation.setEmulatedMedia',{'features':[{'name':'prefers-color-scheme','value':'dark'}]}),
+            ('Page.reload',{}),
+        ],3):
+            await ws.send(json.dumps({'id':i,'method':m,'params':p,'sessionId':s}))
+            while True:
+                r = json.loads(await ws.recv())
+                if r.get('id')==i: break
+        await asyncio.sleep(2)
+        await ws.send(json.dumps({'id':99,'method':'Page.captureScreenshot','params':{'format':'png'},'sessionId':s}))
+        while True:
+            r = json.loads(await ws.recv())
+            if r.get('id')==99:
+                open('previews/financialization-heading-dark.png','wb').write(base64.b64decode(r['result']['data']))
+                break
+
+asyncio.run(go())
+"
+uvx rodney stop
+```
+
+**Why inline SVGs?** SVGs loaded via `<img>` render in an isolated document context — they only respond to the OS-level color scheme preference, not to CSS overrides or CDP emulation on the host page. Inlining the SVGs in the mock makes them part of the page document, so their internal `@media` blocks fire when the scheme switches.
 
 ### 4. Commit the screenshot for PR review
 
