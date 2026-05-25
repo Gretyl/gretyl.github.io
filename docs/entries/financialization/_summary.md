@@ -1,0 +1,1 @@
+A three-panel examination of American corporate financialization — net equity retirement since 1982, four decades of wealth concentration across five independent methodologies, and the reallocation of corporate cash flow from capital expenditure to shareholder payouts. All figures in real 2025 dollars, drawn from the Federal Reserve's Z.1 Financial Accounts.
