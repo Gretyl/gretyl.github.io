@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --clr-bg: hsl(0, 0%, 100%);
+      --clr-text: hsl(0, 0%, 45%);
+      --clr-h1-and-bold: hsl(0, 0%, 13%);
+      --clr-h2: hsl(0, 0%, 22%);
+      --clr-h-3-6: hsl(0, 0%, 29%);
+      --clr-a-text: hsl(200, 100%, 35%);
+      --clr-a-text-hvr: hsl(200, 100%, 28%);
+      --clr-splitter-blockquote-and-section: hsl(0, 0%, 90%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        color-scheme: dark;
+        --clr-bg: hsl(0, 0%, 10%);
+        --clr-text: hsl(0, 0%, 70%);
+        --clr-h1-and-bold: hsl(0, 0%, 90%);
+        --clr-h2: hsl(0, 0%, 83%);
+        --clr-h-3-6: hsl(0, 0%, 76%);
+        --clr-a-text: hsl(200, 100%, 60%);
+        --clr-a-text-hvr: hsl(200, 100%, 48%);
+        --clr-splitter-blockquote-and-section: hsl(0, 0%, 15%);
+      }
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--clr-bg);
+      padding: 50px;
+      font: 15px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: var(--clr-text);
+      font-weight: 400;
+    }
+
+    img { max-width: 100%; }
+
+    .logo {
+      border-radius: 100%;
+      margin-bottom: 10px;
+      max-width: 90%;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--clr-h1-and-bold);
+      margin: 0 0 20px;
+    }
+    h1 { font-size: 32px; }
+    h2 { color: var(--clr-h2); }
+    h3 { color: var(--clr-h-3-6); }
+    h1, h2, h3 { line-height: 1.3; }
+
+    p, ul, ol, table, pre, dl { margin: 0 0 20px; }
+
+    a { color: var(--clr-a-text); text-decoration: none; }
+    a:hover, a:focus { color: var(--clr-a-text-hvr); }
+
+    ul.link { list-style-type: none; padding: 0.4px; }
+    ul.link li + li { margin-top: 6px; }
+    ul.link:last-child { margin-bottom: 6px; }
+    ul.link a { color: var(--clr-h1-and-bold); }
+    p.link { margin: 0 0 4px; }
+    ul.content { margin-left: -1.4em; }
+    .sublist { margin: 0 0 0; }
+    ul.sublist { margin-left: -1.5em; }
+    .sidebar-h3 { margin: 0 0 0.25em; }
+    ul.content > li:has(.nav-group) { list-style: none; }
+    .nav-group > summary { cursor: pointer; display: list-item; }
+    .nav-group > summary > a { color: inherit; }
+
+    strong { color: var(--clr-h1-and-bold); font-weight: 700; }
+
+    .wrapper { width: 860px; margin: 0 auto; }
+
+    .sidebar {
+      width: 250px;
+      float: left;
+      position: fixed;
+      top: 0;
+      padding: 58px 0 50px 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: calc(100vh - 108px);
+      overflow-x: hidden;
+      overflow-y: scroll;
+      -ms-overflow-style: -ms-autohiding-scrollbar;
+    }
+    .sidebar::-webkit-scrollbar { display: none; }
+
+    section {
+      width: 550px;
+      float: right;
+      padding-bottom: 30px;
+    }
+
+    section svg { width: 100%; height: auto; }
+
+    .sidebar-footer {
+      width: 250px;
+      float: left;
+      flex-basis: content;
+    }
+    .sidebar-footer small { font-size: 11px; }
+
+    .mode-label {
+      position: fixed;
+      top: 12px;
+      right: 20px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--clr-h-3-6);
+      opacity: 0.6;
+    }
+    .mode-label::after { content: "Light"; }
+    @media (prefers-color-scheme: dark) {
+      .mode-label::after { content: "Dark"; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mode-label"></div>
+  <div class="wrapper">
+    <div class="sidebar">
+      <header>
+        <div class="header-title">
+          <a href="/"><img class="logo" src="../docs/assets/avatar.png" alt="Logo"></a>
+          <h1>Gretyl</h1>
+        </div>
+        <p><a href="/phrase-a-day.html">🗓️ Motivate me!</a></p>
+        <p class="view"><a href="https://github.com/Gretyl">📊 GitHub Profile</a></p>
+        <div class="link-wrapper">
+          <h3 class="sidebar-h3">Contents:</h3>
+          <ul class="content">
+            <li>
+              <details class="nav-group" data-group="arcade">
+                <summary><a href="/#arcade">Arcade</a></summary>
+                <ul class="sublist">
+                  <li><a href="#">Artemis Trail</a></li>
+                  <li><a href="#">Implode</a></li>
+                </ul>
+              </details>
+            </li>
+            <li>
+              <details class="nav-group" data-group="entries" open>
+                <summary><a href="/#entries">Entries</a></summary>
+                <ul class="sublist">
+                  <li><a href="#"><strong>Financialization, 1975–2025</strong></a></li>
+                  <li><a href="#">Purely Functional Data Structures</a></li>
+                  <li><a href="#">Resnick Algorithms</a></li>
+                </ul>
+              </details>
+            </li>
+            <li>
+              <details class="nav-group" data-group="tools">
+                <summary><a href="/#tools">Tools</a></summary>
+                <ul class="sublist">
+                  <li><a href="#">Local DuckDB</a></li>
+                  <li><a href="#">Shadertoy Harness</a></li>
+                </ul>
+              </details>
+            </li>
+          </ul>
+        </div>
+      </header>
+      <div class="sidebar-footer">
+        <p><small><a href="https://github.com/vaibhavvikas/jekyll-theme-minimalistic">Minimalistic</a> &mdash; Theme by <a href="https://github.com/vaibhavvikas/">vaibhavvikas</a></small></p>
+      </div>
+    </div>
+    <section>
+      <h1>Financialization, 1975&ndash;2025</h1>
+      <h3>A Tale In Three Acts</h3>
+
+      <p>These three panels started by diving into stock buybacks at market
+      scale: where they came from as a corporate practice and how broadly they
+      occur in US equities today. Since the SEC adopted Rule 10b-18 in 1982,
+      American nonfinancial corporations have retired a cumulative $12.4
+      trillion in equity (2025 dollars) &mdash; <a href="#">a half-century structural shift
+      from net issuance to persistent net retirement</a>.</p>
+
+      <a href="#">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="58.0 51.4 926.0 454.1">
+<style>
+  .pos { fill: #2f6f4e; }
+  .neg { fill: #a8362b; }
+  .zero { stroke: #1a1a1a; stroke-width: 1.5; }
+  @media (prefers-color-scheme: dark) {
+    .pos { fill: #5fb98a; }
+    .neg { fill: #e0796c; }
+    .zero { stroke: #ece6d5; }
+  }
+</style>
+  <line class="zero" x1="62.0" y1="92.8" x2="980.0" y2="92.8"/>
+  <rect class="pos" x="62.0" y="63.96" width="14.08" height="28.84"/>
+  <rect class="pos" x="80.08" y="63.62" width="14.08" height="29.18"/>
+  <rect class="pos" x="98.16" y="85.82" width="14.08" height="6.98"/>
+  <rect class="neg" x="116.24" y="92.8" width="14.08" height="0.5"/>
+  <rect class="neg" x="134.31" y="92.8" width="14.08" height="16.84"/>
+  <rect class="pos" x="152.39" y="73.04" width="14.08" height="19.76"/>
+  <rect class="neg" x="170.47" y="92.8" width="14.08" height="23.28"/>
+  <rect class="pos" x="188.55" y="89.73" width="14.08" height="3.07"/>
+  <rect class="pos" x="206.63" y="61.18" width="14.08" height="31.62"/>
+  <rect class="neg" x="224.71" y="92.8" width="14.08" height="118.97"/>
+  <rect class="neg" x="242.78" y="92.8" width="14.08" height="122.44"/>
+  <rect class="neg" x="260.86" y="92.8" width="14.08" height="121.07"/>
+  <rect class="neg" x="278.94" y="92.8" width="14.08" height="104.09"/>
+  <rect class="neg" x="297.02" y="92.8" width="14.08" height="171.19"/>
+  <rect class="neg" x="315.1" y="92.8" width="14.08" height="156.65"/>
+  <rect class="neg" x="333.18" y="92.8" width="14.08" height="75.74"/>
+  <rect class="pos" x="351.25" y="71.08" width="14.08" height="21.72"/>
+  <rect class="pos" x="369.33" y="60.4" width="14.08" height="32.4"/>
+  <rect class="pos" x="387.41" y="55.42" width="14.08" height="37.38"/>
+  <rect class="neg" x="405.49" y="92.8" width="14.08" height="35.72"/>
+  <rect class="neg" x="423.57" y="92.8" width="14.08" height="53.24"/>
+  <rect class="neg" x="441.65" y="92.8" width="14.08" height="44.75"/>
+  <rect class="neg" x="459.73" y="92.8" width="14.08" height="73.0"/>
+  <rect class="neg" x="477.8" y="92.8" width="14.08" height="202.08"/>
+  <rect class="neg" x="495.88" y="92.8" width="14.08" height="91.5"/>
+  <rect class="neg" x="513.96" y="92.8" width="14.08" height="32.65"/>
+  <rect class="neg" x="532.04" y="92.8" width="14.08" height="3.07"/>
+  <rect class="neg" x="550.12" y="92.8" width="14.08" height="6.54"/>
+  <rect class="neg" x="568.2" y="92.8" width="14.08" height="1.85"/>
+  <rect class="neg" x="586.27" y="92.8" width="14.08" height="54.8"/>
+  <rect class="neg" x="604.35" y="92.8" width="14.08" height="193.64"/>
+  <rect class="neg" x="622.43" y="92.8" width="14.08" height="324.03"/>
+  <rect class="neg" x="640.51" y="92.8" width="14.08" height="408.75"/>
+  <rect class="neg" x="658.59" y="92.8" width="14.08" height="311.54"/>
+  <rect class="neg" x="676.67" y="92.8" width="14.08" height="65.05"/>
+  <rect class="neg" x="694.75" y="92.8" width="14.08" height="128.59"/>
+  <rect class="neg" x="712.82" y="92.8" width="14.08" height="240.49"/>
+  <rect class="neg" x="730.9" y="92.8" width="14.08" height="191.39"/>
+  <rect class="neg" x="748.98" y="92.8" width="14.08" height="171.53"/>
+  <rect class="neg" x="767.06" y="92.8" width="14.08" height="195.69"/>
+  <rect class="neg" x="785.14" y="92.8" width="14.08" height="334.57"/>
+  <rect class="neg" x="803.22" y="92.8" width="14.08" height="288.31"/>
+  <rect class="neg" x="821.29" y="92.8" width="14.08" height="209.6"/>
+  <rect class="neg" x="839.37" y="92.8" width="14.08" height="391.62"/>
+  <rect class="neg" x="857.45" y="92.8" width="14.08" height="208.52"/>
+  <rect class="neg" x="875.53" y="92.8" width="14.08" height="43.24"/>
+  <rect class="neg" x="893.61" y="92.8" width="14.08" height="43.58"/>
+  <rect class="neg" x="911.69" y="92.8" width="14.08" height="312.66"/>
+  <rect class="neg" x="929.76" y="92.8" width="14.08" height="314.13"/>
+  <rect class="neg" x="947.84" y="92.8" width="14.08" height="203.01"/>
+  <rect class="neg" x="965.92" y="92.8" width="14.08" height="162.5"/>
+</svg>
+      </a>
+
+      <p>Panel II zooms out to contextualize the empirical basis of wealth
+      concentration. Five independent methodologies disagree on the magnitude,
+      but not the direction: the top-1% share of U.S. household wealth has
+      risen from roughly 24% in 1985 to 30&ndash;38% by the mid-2020s, depending on
+      whose estimates you trust. <a href="#">The question is <em>how much</em> &mdash; never
+      <em>whether</em></a>.</p>
+
+      <a href="#">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="100 40 880 380">
+<style>
+  .envelope { fill: #E8DCC0; opacity: 0.7; }
+  .median { fill: none; stroke: #1A1D24; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .cms { fill: none; stroke: #9B8147; stroke-width: 1.4; stroke-dasharray: 5 4; opacity: 0.85; }
+  .ext-dfa { fill: none; stroke: #1B3A57; stroke-width: 1.4; stroke-linecap: round; opacity: 0.78; }
+  .ext-psz { fill: none; stroke: #C1473A; stroke-width: 1.4; stroke-linecap: round; opacity: 0.78; }
+  @media (prefers-color-scheme: dark) {
+    .envelope { fill: rgba(232,220,192,0.15); }
+    .median { stroke: #d4cfc3; }
+    .cms { stroke: #c4a86a; }
+    .ext-dfa { stroke: #5a9fd4; }
+    .ext-psz { stroke: #e0756a; }
+  }
+</style>
+<path class="envelope" d="M 130 332.25 L 212 312.75 L 273.5 303 L 334.9 264 L 396.4 215.25 L 457.9 176.25 L 519.4 147 L 580.8 117.75 L 642.3 127.5 L 703.8 88.5 L 765.2 59.25 L 765.2 254.25 L 703.8 264 L 642.3 277.65 L 580.8 234.75 L 519.4 254.25 L 457.9 260.1 L 396.4 303 L 334.9 336.15 L 273.5 357.6 L 212 365.4 L 130 351.75 Z"/>
+<path class="median" d="M 130 342 L 212 317.625 L 273.5 309.825 L 334.9 295.2 L 396.4 270.825 L 457.9 239.625 L 519.4 226.95 L 580.8 209.375 L 642.3 202.575 L 703.8 188.925 L 765.2 171.375"/>
+<path class="cms" d="M 212 381 L 273.5 376.65 L 334.9 371.25 L 396.4 365.4 L 457.9 361.5 L 519.4 361.5 L 580.8 351.75 L 642.3 361.5 L 703.8 351.75 L 765.2 345.9 L 826.7 342"/>
+<path class="ext-dfa" d="M 765.2 254.25 L 826.7 217.2 L 888.2 213.3 L 949.7 191.85"/>
+<path class="ext-psz" d="M 765.2 59.25 L 826.7 69 L 888.2 59.25"/>
+</svg>
+      </a>
+
+      <p>Panel III connects these observations by exploring how stock buybacks
+      have reshaped corporate cash flows and, through the incidence of share
+      ownership, drive wealth concentration over the same period. In 1982 the
+      American public corporation was a machine for turning revenue into
+      productive capacity; by 2024 it is a machine for turning revenue &mdash; and
+      borrowed money &mdash; <a href="#">into share price</a>.</p>
+
+      <a href="#">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="130 30 1280 460">
+<style>
+  .ocf { fill: #3F5E48; }
+  .debt { fill: #6B4A2B; }
+  .capex { fill: #2A4C66; }
+  .div { fill: #B08841; }
+  .buyback { fill: #9B2A21; }
+  .arrow { fill: none; stroke: #1a1a1a; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+  @media (prefers-color-scheme: dark) {
+    .ocf { fill: #6aad7e; }
+    .debt { fill: #c49068; }
+    .capex { fill: #5a9fd4; }
+    .div { fill: #d4b06a; }
+    .buyback { fill: #e07060; }
+    .arrow { stroke: #ece6d5; }
+  }
+</style>
+<g>
+  <path class="capex" d="M 168 45 C 380 45, 380 40, 592 40 L 592 301.72 C 380 301.72, 380 306.72, 168 306.72 Z"/>
+  <path class="div" d="M 168 306.72 C 380 306.72, 380 376.84, 592 376.84 L 592 449.42 C 380 449.42, 380 379.29, 168 379.29 Z"/>
+  <path class="buyback" d="M 168 379.29 C 380 379.29, 380 477.47, 592 477.47 L 592 479.50 C 380 479.50, 380 381.32, 168 381.32 Z"/>
+  <path class="capex" d="M 168 391.32 C 380 391.32, 380 301.72, 592 301.72 L 592 366.84 C 380 366.84, 380 456.44, 168 456.44 Z"/>
+  <path class="div" d="M 168 456.44 C 380 456.44, 380 449.42, 592 449.42 L 592 467.47 C 380 467.47, 380 474.50, 168 474.50 Z"/>
+  <path class="buyback" d="M 168 474.50 C 380 474.50, 380 479.50, 592 479.50 L 592 480.00 C 380 480.00, 380 475.00, 168 475.00 Z"/>
+  <rect class="ocf" x="150" y="45" width="18" height="336.32"/>
+  <rect class="debt" x="150" y="391.32" width="18" height="83.68"/>
+  <rect class="capex" x="592" y="40" width="18" height="326.84"/>
+  <rect class="div" x="592" y="376.84" width="18" height="90.63"/>
+  <rect class="buyback" x="592" y="477.47" width="18" height="2.53"/>
+</g>
+<path class="arrow" d="M 640 260 L 700 260 M 685 240 L 700 260 L 685 280"/>
+<g transform="translate(600, 0)">
+  <path class="capex" d="M 168 45 C 380 45, 380 40, 592 40 L 592 249.73 C 380 249.73, 380 254.73, 168 254.73 Z"/>
+  <path class="div" d="M 168 254.73 C 380 254.73, 380 300.33, 592 300.33 L 592 413.42 C 380 413.42, 380 367.82, 168 367.82 Z"/>
+  <path class="buyback" d="M 168 367.82 C 380 367.82, 380 445.31, 592 445.31 L 592 474.37 C 380 474.37, 380 396.88, 168 396.88 Z"/>
+  <path class="capex" d="M 168 406.88 C 380 406.88, 380 249.73, 592 249.73 L 592 290.33 C 380 290.33, 380 447.48, 168 447.48 Z"/>
+  <path class="div" d="M 168 447.48 C 380 447.48, 380 413.42, 592 413.42 L 592 435.31 C 380 435.31, 380 469.37, 168 469.37 Z"/>
+  <path class="buyback" d="M 168 469.37 C 380 469.37, 380 474.37, 592 474.37 L 592 480 C 380 480, 380 475, 168 475 Z"/>
+  <rect class="ocf" x="150" y="45" width="18" height="351.88"/>
+  <rect class="debt" x="150" y="406.88" width="18" height="68.12"/>
+  <rect class="capex" x="592" y="40" width="18" height="250.33"/>
+  <rect class="div" x="592" y="300.33" width="18" height="134.99"/>
+  <rect class="buyback" x="592" y="445.31" width="18" height="34.69"/>
+</g>
+</svg>
+      </a>
+    </section>
+  </div>
+</body>
+</html>
