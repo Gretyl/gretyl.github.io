@@ -7,6 +7,7 @@ How to generate preview screenshots of Jekyll-themed pages without running Jekyl
 This directory lives at the repo root, outside `docs/`, so its contents are not served by GitHub Pages. It holds:
 
 - **`sidebar-mock.html`** — a standalone HTML template that replicates the remote theme's sidebar layout with inlined CSS. Edit this file to reflect content changes, then screenshot it. If the upstream theme changes, re-fetch the source files (step 1 below) and update the mock.
+- **Page-specific mocks** (e.g., `financialization-heading-preview.html`) — standalone mocks for previewing individual entry pages rather than the homepage. These copy the sidebar/section layout from `sidebar-mock.html` but replace `<section>` content with the entry's rendered Markdown. Use a `-dark.html` suffix for the dark mode variant (see [Dark mode previews](#dark-mode-previews) below).
 - **`*.png`** — screenshot artifacts committed to feature branches for PR review. These let reviewers see how a change will look with the Jekyll theme applied, without requiring deployment.
 - **`HOWTO.md`** — this file.
 
@@ -34,6 +35,8 @@ Then update `sidebar-mock.html` to match.
 
 Edit `previews/sidebar-mock.html` to reflect the change being previewed (e.g., new navigation items, updated content, new assets). The mock already has the theme's CSS inlined and the correct HTML structure — most changes only require editing the `<section>` content or sidebar navigation.
 
+For previewing a specific entry page, create a separate mock (e.g., `financialization-heading-preview.html`) rather than temporarily editing `sidebar-mock.html`. Copy the sidebar layout and replace `<section>` content with the entry's body — render the Markdown to HTML yourself, since Jekyll won't process it. Reference entry-specific assets via relative paths from `previews/` (e.g., `../docs/entries/financialization/svg/thumb-net-equity.svg`).
+
 For asset references, use relative paths from `previews/` (e.g., `../docs/assets/avatar.png`). Avoid hardcoded absolute paths — they break when the repo is cloned to a different location.
 
 ### 3. Screenshot with rodney
@@ -46,7 +49,26 @@ uvx rodney sleep 1
 uvx rodney screenshot -w 960 -h 700 previews/hero-headshot-preview.png
 ```
 
-The `-w` and `-h` flags set the viewport size. Use `960` width to see the desktop sidebar layout; use `720` or below to test the mobile-responsive collapsed view.
+The `-w` and `-h` flags set the viewport size. Use `960` width to see the desktop sidebar layout; use `720` or below to test the mobile-responsive collapsed view. For pages with inline images (e.g., SVG thumbnails), increase `-h` to avoid clipping — `1400` works well for the three-panel financialization page.
+
+#### Dark mode previews
+
+The theme doesn't ship dark mode, but mocks can simulate one to preview contrast and readability. Copy the light mock to a `*-dark.html` file and override the CSS custom properties in `:root`:
+
+```css
+:root {
+  --clr-bg: #1a1a2e;
+  --clr-text: #b0b8c4;
+  --clr-h1-and-bold: #e0e0e0;
+  --clr-h2: #a8b2c0;
+  --clr-h-3-6: #a8b2c0;
+  --clr-a-text: #58a6ff;
+  --clr-a-text-hvr: #7ee787;
+  --clr-splitter-blockquote-and-section: #444;
+}
+```
+
+SVGs with baked-in fill colors won't auto-invert — this is faithful to how they'd render on the live site with a hypothetical dark theme.
 
 #### Pages that use `localStorage`
 
