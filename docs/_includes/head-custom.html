@@ -10,6 +10,12 @@ ul.content > li:has(.nav-group) { list-style: none; }
 .nav-group > summary > a { color: inherit; }
 .section-group > summary { cursor: pointer; list-style-position: outside; }
 .section-group > summary > h2 { display: inline-block; margin: 0; }
+.mobile-nav-disclosure > summary { cursor: pointer; list-style: none; text-align: center; font-weight: 700; }
+.mobile-nav-disclosure > summary::-webkit-details-marker { display: none; }
+.mobile-nav-disclosure .when-closed { display: inline; }
+.mobile-nav-disclosure .when-open { display: none; }
+.mobile-nav-disclosure[open] .when-closed { display: none; }
+.mobile-nav-disclosure[open] .when-open { display: inline; }
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
