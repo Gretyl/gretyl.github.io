@@ -10,6 +10,11 @@ ul.content > li:has(.nav-group) { list-style: none; }
 .nav-group > summary > a { color: inherit; }
 .section-group > summary { cursor: pointer; list-style-position: outside; }
 .section-group > summary > h2 { display: inline-block; margin: 0; }
+.mobile-nav-disclosure > summary { cursor: pointer; list-style: none; }
+.mobile-nav-disclosure > summary::-webkit-details-marker { display: none; }
+.mobile-nav-disclosure > summary > .sidebar-h3 { display: inline-block; margin: 0; }
+.mobile-nav-disclosure > summary > .sidebar-h3::after { content: " ▸"; font-size: 0.8em; }
+.mobile-nav-disclosure[open] > summary > .sidebar-h3::after { content: " ▾"; }
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', () => {

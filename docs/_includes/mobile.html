@@ -1,0 +1,39 @@
+<div class="link-wrapper-mobile">
+    {% if site.platforms %}
+    <ul class="link">
+    {%- for platform in site.platforms %}
+    <nobr><a href="{{ platform.link }}" rel="me">{{ platform.icon }}&nbsp;{{ platform.name }}</a>
+    {%- unless forloop.last %}<span style="margin-left: 6px;"></span>{% endunless %}</nobr>
+    {%- endfor %}
+    </ul>
+    {% endif %}
+
+    {% if site.navigation %}
+    <details class="mobile-nav-disclosure" data-group="mobile-nav">
+        <summary><h3 class="sidebar-h3">Contents:</h3></summary>
+        <ul class="content">
+        {%- for item in site.navigation %}
+          <li>
+              {% if item.sublist %}
+              <details class="nav-group" data-group="{{ item.link | replace: '/#', '' }}"{% if item.expanded %} open{% endif %}>
+                  <summary><a href="{{ item.link }}">{{ item.name }}</a></summary>
+                  <ul class="sublist">
+                      {%- for subitem in item.sublist %}
+                      <li><a href="{{ subitem.link }}">{{ subitem.name }}</a></li>
+                      {%- endfor %}
+                  </ul>
+              </details>
+              {% else %}
+              <a href="{{ item.link }}">{{ item.name }}</a>
+              {% endif %}
+          </li>
+        {%- endfor %}
+        </ul>
+    </details>
+    {% endif %}
+
+    <div class="feeds-row">
+      <a class="feed-link" href="/feed.xml"><i class="fa-solid fa-square-rss"></i><span>Atom</span></a>
+      <a class="feed-link" href="/feed.json"><i class="fa-solid fa-square-rss"></i><span>JSON</span></a>
+    </div>
+</div>
