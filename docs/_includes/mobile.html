@@ -9,8 +9,8 @@
     {% endif %}
 
     {% if site.navigation %}
-    <details class="mobile-nav-disclosure" data-group="mobile-nav">
-        <summary><h3 class="sidebar-h3">Contents:</h3></summary>
+    <details class="mobile-nav-disclosure" data-group="mobile-nav" open>
+        <summary><span class="when-open">⌃ Menu ⌃</span><span class="when-closed">⌄ Menu ⌄</span></summary>
         <ul class="content">
         {%- for item in site.navigation %}
           <li>

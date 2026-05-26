@@ -77,11 +77,12 @@
     .nav-group > summary > a { color: inherit; }
     .section-group > summary { cursor: pointer; list-style-position: outside; }
     .section-group > summary > h2 { display: inline-block; margin: 0; }
-    .mobile-nav-disclosure > summary { cursor: pointer; list-style: none; }
+    .mobile-nav-disclosure > summary { cursor: pointer; list-style: none; text-align: center; font-weight: 700; }
     .mobile-nav-disclosure > summary::-webkit-details-marker { display: none; }
-    .mobile-nav-disclosure > summary > .sidebar-h3 { display: inline-block; margin: 0; }
-    .mobile-nav-disclosure > summary > .sidebar-h3::after { content: " ▸"; font-size: 0.8em; }
-    .mobile-nav-disclosure[open] > summary > .sidebar-h3::after { content: " ▾"; }
+    .mobile-nav-disclosure .when-closed { display: inline; }
+    .mobile-nav-disclosure .when-open { display: none; }
+    .mobile-nav-disclosure[open] .when-closed { display: none; }
+    .mobile-nav-disclosure[open] .when-open { display: inline; }
 
     strong { color: var(--clr-h1-and-bold); font-weight: 700; }
 
@@ -249,8 +250,8 @@
         </div>
       </header>
       <div class="link-wrapper-mobile">
-        <details class="mobile-nav-disclosure" data-group="mobile-nav">
-          <summary><h3 class="sidebar-h3">Contents:</h3></summary>
+        <details class="mobile-nav-disclosure" data-group="mobile-nav" open>
+          <summary><span class="when-open">⌃ Menu ⌃</span><span class="when-closed">⌄ Menu ⌄</span></summary>
           <ul class="content">
             <li>
               <details class="nav-group" data-group="arcade" open>
