@@ -1,8 +1,10 @@
-# PWA.md — Making Pages Home Screen-Ready & Offline-Capable
+> Part of gretyl.github.io's [AGENTS.md](../AGENTS.md) — situational guidance for PWA and offline support.
+
+# Making Pages Home Screen-Ready & Offline-Capable
 
 How to turn a standalone HTML page into an installable, offline-capable web app that launches full-screen from the Home Screen.
 
-See also [FAVICONS.md](FAVICONS.md) and [EMBEDDING.md](EMBEDDING.md) — all three docs govern `<head>` content and should be applied together when adding new pages.
+See also [favicons.md](favicons.md) and [embedding.md](embedding.md) — all three docs govern `<head>` content and should be applied together when adding new pages.
 
 ## When to use this
 

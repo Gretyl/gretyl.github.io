@@ -1,8 +1,10 @@
-# EMBEDDING.md — Adding Social Preview Cards
+> Part of gretyl.github.io's [AGENTS.md](../AGENTS.md) — situational guidance for social preview cards.
+
+# Adding Social Preview Cards
 
 How to add OpenGraph meta tags to standalone HTML pages so they render rich previews on Mastodon, Discord, Slack, etc.
 
-See also [FAVICONS.md](FAVICONS.md) — both docs govern `<head>` content and should be applied together when adding new pages.
+See also [favicons.md](favicons.md) — both docs govern `<head>` content and should be applied together when adding new pages.
 
 ## When to use this
 
@@ -66,7 +68,7 @@ The tool shows a live Mastodon-style card preview. Once you're happy with the la
 
 ### 3. Embed in the HTML file
 
-Paste the tags after the favicon `<link>` (see [FAVICONS.md](FAVICONS.md)), **before** the GA4 script and `<meta charset="UTF-8">`. The standard `<head>` ordering is favicon → OG → GA4 → rest:
+Paste the tags after the favicon `<link>` (see [favicons.md](favicons.md)), **before** the GA4 script and `<meta charset="UTF-8">`. The standard `<head>` ordering is favicon → OG → GA4 → rest:
 
 ```html
 <!DOCTYPE html>

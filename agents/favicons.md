@@ -1,8 +1,10 @@
-# FAVICONS.md — Adding Emoji Favicons
+> Part of gretyl.github.io's [AGENTS.md](../AGENTS.md) — situational guidance for emoji favicons.
+
+# Adding Emoji Favicons
 
 How to add an emoji favicon to any page so browsers show it in the tab.
 
-See also [EMBEDDING.md](EMBEDDING.md) — both docs govern `<head>` content and should be applied together when adding new pages.
+See also [embedding.md](embedding.md) — both docs govern `<head>` content and should be applied together when adding new pages.
 
 ## The approach
 
@@ -51,4 +53,4 @@ If `favicon_emoji` is omitted, no favicon is rendered.
 
 ## Going further — Home Screen apps
 
-The SVG emoji favicon covers browser tabs, but iOS requires a separate **180×180 PNG** for the Home Screen icon. If you're making a page installable as a standalone app, see [PWA.md](PWA.md) for the full checklist — icon, manifest, service worker, and offline support.
+The SVG emoji favicon covers browser tabs, but iOS requires a separate **180×180 PNG** for the Home Screen icon. If you're making a page installable as a standalone app, see [pwa.md](pwa.md) for the full checklist — icon, manifest, service worker, and offline support.

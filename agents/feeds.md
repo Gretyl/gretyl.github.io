@@ -1,9 +1,11 @@
-# FEEDS.md — Adding artifacts to the site feeds
+> Part of gretyl.github.io's [AGENTS.md](../AGENTS.md) — situational guidance for site feeds.
+
+# Adding Artifacts to the Site Feeds
 
 How to add a new artifact to the Atom and JSON feeds at `/feed.xml` and
 `/feed.json`.
 
-See also [EMBEDDING.md](EMBEDDING.md) and [FAVICONS.md](FAVICONS.md) — all
+See also [embedding.md](embedding.md) and [favicons.md](favicons.md) — all
 three docs govern `<head>` content and per-artifact metadata, and should
 be applied together when adding a new page.
 
@@ -58,7 +60,7 @@ entry), append a YAML block to `docs/_data/artifacts.yml`:
 | `date` | yes | ISO 8601 with offset — see "Picking the date" below |
 | `summary` | yes | Match the descriptor on `docs/index.html` so the feed reads the same as the homepage |
 | `image` | no | Site-relative path to the OG image, or `/assets/avatar.png` as fallback |
-| `type` | yes | `website` (games, tools, entries) or `article` (tutorials), matching the EMBEDDING.md convention |
+| `type` | yes | `website` (games, tools, entries) or `article` (tutorials), matching the [embedding.md](embedding.md) convention |
 
 The `summary` may contain inline HTML (`<em>`, `<code>`); both feeds
 escape it correctly. Keep it to one or two sentences.
@@ -91,7 +93,7 @@ widest interoperability.
 ## Verifying
 
 1. **Local Jekyll preview** (or the previews flow in
-   [previews/HOWTO.md](previews/HOWTO.md)): open `/feed.xml` and
+   [previews/HOWTO.md](../previews/HOWTO.md)): open `/feed.xml` and
    `/feed.json` and confirm both render without Liquid errors.
 2. **Atom validation:** paste the body of `/feed.xml` into the
    [W3C Feed Validator](https://validator.w3.org/feed/) — expect a
