@@ -12,8 +12,11 @@ considerations (§"Key considerations") guard the zero-dependency
 boundary; patterns (§"Patterns in use") keep pages self-contained;
 workflow (§"Branching workflow", §"Commits") protects the only deploy
 gate — the merge to `main`. Situational guidance (§"Situational
-guidance") at the end forwards to `agents/` for concerns that don't
+guidance") at the end forwards to `guides/` for concerns that don't
 apply to every change.
+
+The `guides/` directory holds situational guidance subdocuments — it
+is not part of the published site.
 
 ## Repository
 
@@ -59,7 +62,7 @@ Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, 
 ## Debugging
 
 - **Local HTTP server for `fetch()`-dependent pages.** Standalone HTML pages that use `fetch()` for local assets (e.g., `phrase-a-day.html` loading `assets/phrases.md`) will fail under `file://` URLs due to browser security restrictions. Serve them via a local HTTP server instead: `cd docs && python3 -m http.server 8765`, then open `http://localhost:8765/<page>.html` in the browser or with `uvx rodney open`.
-- **Service worker cache versioning.** When modifying HTML or assets cached by a service worker, bump the `CACHE_NAME` version string in the corresponding `sw-{app}.js` file so stale offline copies are evicted. See the cache versioning section in [`agents/pwa.md`](agents/pwa.md) for details.
+- **Service worker cache versioning.** When modifying HTML or assets cached by a service worker, bump the `CACHE_NAME` version string in the corresponding `sw-{app}.js` file so stale offline copies are evicted. See the cache versioning section in [`guides/pwa.md`](guides/pwa.md) for details.
 
 ## Before pushing
 
@@ -69,16 +72,16 @@ Static GitHub Pages site — plain HTML and vanilla JavaScript. No build tools, 
 
 ## Situational guidance
 
-The documents in `agents/` apply only when a task intersects them.
+The documents in `guides/` apply only when a task intersects them.
 **If your task touches one of these areas, read the linked file first:**
 
 - Emoji favicons for browser tabs →
-  [`agents/favicons.md`](agents/favicons.md)
+  [`guides/favicons.md`](guides/favicons.md)
 - OpenGraph social preview cards →
-  [`agents/embedding.md`](agents/embedding.md)
+  [`guides/embedding.md`](guides/embedding.md)
 - Adding artifacts to the Atom / JSON feeds →
-  [`agents/feeds.md`](agents/feeds.md)
+  [`guides/feeds.md`](guides/feeds.md)
 - PWA offline support and Home Screen install →
-  [`agents/pwa.md`](agents/pwa.md)
+  [`guides/pwa.md`](guides/pwa.md)
 - Previewing Jekyll-themed pages without running Jekyll →
   [`previews/HOWTO.md`](previews/HOWTO.md)

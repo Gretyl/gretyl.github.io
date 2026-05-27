@@ -1,5 +1,5 @@
 # Atom + JSON Feed manifest. One entry per artifact under /docs/.
-# See agents/feeds.md for the conventions: dates come from the first commit
+# See guides/feeds.md for the conventions: dates come from the first commit
 # that introduced the artifact's OG card (or, for entries without an
 # OG card, the first commit of the directory). Summaries match the
 # bullet text on docs/index.html so the feed reads the same as the
