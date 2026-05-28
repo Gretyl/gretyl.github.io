@@ -1,8 +1,6 @@
 # gretyl.github.io
 
-A portfolio of curated software — experiments in hosting and iterating on
-interactive artifacts with JavaScript-enabled interactivity, some with embedded
-metadata for social media previews.
+Experiments in hosting and iterating on interactive artifacts with JavaScript-enabled interactivity, some with embedded metadata for social media previews.
 
 ## Navigation
 
@@ -12,6 +10,4 @@ metadata for social media previews.
 
 ## Development
 
-Static HTML and vanilla JS — no build step, no dependencies. All publishable
-content lives in `docs/`. Push to `main` and GitHub Pages deploys automatically
-via Jekyll.
+Static HTML and vanilla JS — no build step, no dependencies. All publishable content lives in `docs/`. Push to `main` and GitHub Pages deploys automatically via Jekyll.
