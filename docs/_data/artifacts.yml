@@ -5,6 +5,14 @@
 # bullet text on docs/index.html so the feed reads the same as the
 # homepage.
 
+- id: regicide
+  title: Regicide — Learn the Court
+  url: /tutorials/regicide.html
+  date: 2026-06-05T17:00:00-05:00
+  summary: A guided, co-operative walk through the card game — twelve crowned enemies, one beat at a time. 👑
+  image: /assets/og/regicide.svg
+  type: article
+
 - id: financialization
   title: "Financialization, 1975–2025"
   url: /entries/financialization/
