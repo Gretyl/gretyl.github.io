@@ -155,7 +155,7 @@
   .card.sm .rank,.card.sm .corner-br{font-size:.8rem}
   .card.clickable{cursor:pointer}
   .card.clickable:hover{transform:translateY(-7px) rotate(-1deg);box-shadow:0 14px 26px rgba(0,0,0,.5)}
-  .card.sel{transform:translateY(-12px);box-shadow:0 0 0 3px var(--gold),0 14px 26px rgba(0,0,0,.5)}
+  .card.sel,.card.clickable.sel:hover{transform:translateY(-12px);box-shadow:0 0 0 3px var(--gold),0 14px 26px rgba(0,0,0,.5)}
   .card.spent{opacity:.32;filter:grayscale(.6)}
   .card-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
 
@@ -477,7 +477,7 @@
 
     <div class="arena">
       <div class="enemy">
-        <div class="card lg" id="enemyCard"><div class="rank">J<span class="s">♦</span></div><div class="pip">♦</div><div class="corner-br">J<span class="s">♦</span></div></div>
+        <div class="card lg red" id="enemyCard"><div class="rank">J<span class="s">♦</span></div><div class="pip">♦</div><div class="corner-br">J<span class="s">♦</span></div></div>
         <div class="stats">
           <div class="name">Jack of Diamonds <span class="badge atk" style="margin-left:6px">⚔ ATK <b id="atkVal">10</b></span></div>
           <div class="barlabels"><span>HEALTH</span><span id="hpText">20 / 20</span></div>
@@ -545,7 +545,7 @@
 
       <div class="tile">
         <div class="vis">
-          <div class="card lg"><div class="rank">Q<span class="s">♦</span></div><div class="pip">♦</div><div class="corner-br">Q<span class="s">♦</span></div></div>
+          <div class="card lg red"><div class="rank">Q<span class="s">♦</span></div><div class="pip">♦</div><div class="corner-br">Q<span class="s">♦</span></div></div>
         </div>
         <div class="txt">
           <h3>Enemy immunity — they ignore their own suit</h3>
@@ -711,7 +711,7 @@
 
     <div class="gambit">
       <div class="gh"><span class="gn">II</span><h3>The Club Combo Nuke</h3></div>
-      <p>Stack matching clubs into a combo and the doubling applies to the <em>whole</em> total. A pair of 5♣ is a single 10-point strike, doubled to <strong>20 damage in one blow</strong> — enough to behead a Jack outright, or gut a King.</p>
+      <p>A combo is matching <em>numbers</em> across <em>different</em> suits — so it never holds two of the same card. But slip a single club into one and its doubling applies to the <em>whole</em> total. Pair the <strong>5♣ with the 5♠</strong>: a single 10-point strike, doubled to <strong>20 damage in one blow</strong> — enough to behead a Jack outright, or gut a King.</p>
     </div>
 
     <div class="gambit">
