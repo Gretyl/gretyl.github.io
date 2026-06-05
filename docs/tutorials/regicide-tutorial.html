@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Regicide — Learn the Court</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#13111c;
+    --ink-2:#1c1930;
+    --panel:#211d34;
+    --parch:#f4ecd6;
+    --parch-2:#e7dcbe;
+    --gold:#d4af37;
+    --gold-dim:#a8893a;
+    --crimson:#c1303c;
+    --crimson-text:#e2636c;
+    --crimson-deep:#8d1f2b;
+    --black-suit:#14131c;
+    --text:#e9e2cf;
+    --text-dim:#a89e84;
+    --line:rgba(212,175,55,.28);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #2a2440 0%, transparent 60%),
+      radial-gradient(900px 700px at 100% 100%, #241c33 0%, transparent 55%),
+      var(--ink);
+    color:var(--text);
+    font-family:'Spectral',Georgia,serif;
+    font-size:18px;
+    line-height:1.7;
+    letter-spacing:.005em;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.04;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:0 22px;position:relative;z-index:2}
+
+  /* ---------- type ---------- */
+  h1,h2,h3,.eyebrow,.crown{font-family:'Cinzel',serif}
+  .eyebrow{
+    font-size:.72rem;letter-spacing:.42em;text-transform:uppercase;
+    color:var(--gold);font-weight:600;margin-bottom:.9rem;
+  }
+  h2{
+    font-size:clamp(1.7rem,4.6vw,2.7rem);font-weight:700;line-height:1.1;
+    color:var(--parch);margin-bottom:.5rem;letter-spacing:.01em;
+  }
+  h3{font-size:1.15rem;color:var(--gold);font-weight:600;letter-spacing:.05em;margin-bottom:.4rem}
+  p{margin-bottom:1rem}
+  p .lead{font-size:1.15rem}
+  strong{color:var(--parch);font-weight:600}
+  em{color:var(--gold)}
+  .muted{color:var(--text-dim)}
+
+  /* ---------- hero ---------- */
+  header{padding:78px 0 38px;text-align:center;position:relative}
+  .crown{font-size:2.4rem;color:var(--gold);filter:drop-shadow(0 0 18px rgba(212,175,55,.5));animation:flicker 5s ease-in-out infinite}
+  @keyframes flicker{0%,100%{opacity:1}45%{opacity:.78}}
+  h1{
+    font-size:clamp(2.8rem,11vw,6rem);font-weight:900;line-height:.95;
+    margin:.3rem 0 .2rem;color:var(--parch);
+    text-shadow:0 2px 30px rgba(193,48,60,.25);
+    letter-spacing:.04em;
+  }
+  .h1-rule{display:flex;align-items:center;justify-content:center;gap:14px;color:var(--gold-dim);font-size:.9rem;letter-spacing:.4em;text-transform:uppercase}
+  .h1-rule::before,.h1-rule::after{content:"";height:1px;width:54px;background:linear-gradient(90deg,transparent,var(--gold-dim))}
+  .h1-rule::after{background:linear-gradient(90deg,var(--gold-dim),transparent)}
+  .tag{margin:26px auto 0;max-width:640px;font-size:1.22rem;color:var(--text)}
+  .reveal{opacity:0;transform:translateY(20px);animation:rise .9s cubic-bezier(.2,.7,.2,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  /* stakes ribbon */
+  .stakes{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin:34px auto 0;max-width:680px}
+  .stake{
+    flex:1 1 250px;border:1px solid var(--line);border-radius:14px;padding:18px 20px;text-align:left;
+    background:linear-gradient(180deg,rgba(255,255,255,.025),transparent);
+  }
+  .stake .k{font-family:'Cinzel';letter-spacing:.2em;font-size:.7rem;text-transform:uppercase;margin-bottom:6px}
+  .stake.win .k{color:var(--gold)}
+  .stake.lose .k{color:var(--crimson-text)}
+  .stake p{margin:0;font-size:.98rem;color:var(--text-dim)}
+
+  .meta{margin:16px auto 0;font-family:'Cinzel';font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-dim)}
+
+  /* ---------- court ladder ---------- */
+  .ladder{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+  .rung{
+    display:flex;align-items:center;gap:18px;border:1px solid var(--line);border-radius:14px;padding:14px 20px;
+    background:linear-gradient(90deg,var(--panel),rgba(33,29,52,.4));position:relative;overflow:hidden;
+  }
+  .rung::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px}
+  .rung.j::before{background:var(--gold-dim)}
+  .rung.q::before{background:var(--crimson)}
+  .rung.k::before{background:var(--gold)}
+  .rung .who{display:flex;align-items:center;gap:14px;flex:1 1 auto}
+  .rung .who .nm{font-family:'Cinzel';color:var(--parch);font-size:1.02rem;letter-spacing:.04em}
+  .rung .who .ct{font-size:.82rem;color:var(--text-dim)}
+  .rung .rstats{display:flex;gap:8px;flex:0 0 auto}
+  .ladder-note{font-size:.9rem;color:var(--text-dim);margin-top:14px}
+  .scale-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.9rem}
+  .scale-table th,.scale-table td{border:1px solid var(--line);padding:8px 12px;text-align:center}
+  .scale-table th{font-family:'Cinzel';font-size:.72rem;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+  .scale-table td{color:var(--text-dim)}
+
+  /* ---------- sections ---------- */
+  section{padding:62px 0;border-top:1px solid rgba(212,175,55,.12)}
+  .sec-head{margin-bottom:30px}
+
+  /* ---------- cards (playing cards) ---------- */
+  .card{
+    --c:var(--black-suit);
+    position:relative;width:74px;height:104px;border-radius:9px;flex:0 0 auto;
+    background:linear-gradient(160deg,#fbf6e7,#ece0c1);
+    border:1px solid #d8c89a;
+    box-shadow:0 6px 16px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.5);
+    color:var(--c);font-family:'Cinzel',serif;cursor:default;user-select:none;
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .card.red{--c:var(--crimson-deep)}
+  .card .rank{position:absolute;top:5px;left:7px;font-size:1rem;font-weight:700;line-height:1}
+  .card .rank .s{display:block;font-size:.78rem;margin-top:-1px}
+  .card .pip{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.1rem}
+  .card .corner-br{position:absolute;bottom:5px;right:7px;font-size:1rem;font-weight:700;transform:rotate(180deg);line-height:1}
+  .card .corner-br .s{display:block;font-size:.78rem;margin-top:-1px}
+  .card.lg{width:96px;height:134px}
+  .card.lg .pip{font-size:2.8rem}
+  .card.sm{width:56px;height:80px}
+  .card.sm .pip{font-size:1.5rem}
+  .card.sm .rank,.card.sm .corner-br{font-size:.8rem}
+  .card.clickable{cursor:pointer}
+  .card.clickable:hover{transform:translateY(-7px) rotate(-1deg);box-shadow:0 14px 26px rgba(0,0,0,.5)}
+  .card.sel{transform:translateY(-12px);box-shadow:0 0 0 3px var(--gold),0 14px 26px rgba(0,0,0,.5)}
+  .card.spent{opacity:.32;filter:grayscale(.6)}
+  .card-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+
+  /* ---------- mnemonic loop ---------- */
+  .loop{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px}
+  .step{
+    position:relative;border:1px solid var(--line);border-radius:14px;padding:20px 16px;text-align:center;cursor:pointer;
+    background:var(--panel);transition:.3s;overflow:hidden;
+  }
+  .step::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 0,rgba(212,175,55,.18),transparent 70%);opacity:0;transition:.3s}
+  .step:hover,.step.active{border-color:var(--gold);transform:translateY(-4px)}
+  .step:hover::after,.step.active::after{opacity:1}
+  .step .n{font-family:'Cinzel';color:var(--gold);font-size:.7rem;letter-spacing:.2em}
+  .step .big{font-family:'Cinzel';font-size:1.5rem;font-weight:700;color:var(--parch);margin:6px 0 2px}
+  .step .sub{font-size:.82rem;color:var(--text-dim)}
+  .step-detail{
+    margin-top:18px;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;
+    padding:18px 22px;background:rgba(212,175,55,.05);min-height:54px;
+  }
+  .step-detail h3{margin-bottom:.3rem}
+  .loop-cue{animation:cue 8s linear infinite}
+  @keyframes cue{0%,100%{}}
+
+  /* ---------- suit flip ---------- */
+  .suits{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:8px}
+  .suit-card{
+    position:relative;border-radius:14px;padding:20px;cursor:pointer;min-height:128px;
+    border:1px solid var(--line);background:var(--panel);transition:.3s;
+    display:flex;align-items:center;gap:18px;
+  }
+  .suit-card:hover{transform:translateY(-4px);border-color:var(--gold)}
+  .suit-card.red-suit{box-shadow:inset 4px 0 0 var(--crimson)}
+  .suit-card.black-suit{box-shadow:inset 4px 0 0 var(--parch-2)}
+  .suit-glyph{font-size:2.6rem;line-height:1}
+  .suit-card.red-suit .suit-glyph{color:var(--crimson-text)}
+  .suit-card.black-suit .suit-glyph{color:var(--parch)}
+  .suit-body .nm{font-family:'Cinzel';font-size:1.05rem;color:var(--parch);letter-spacing:.05em}
+  .suit-body .pw{font-size:.92rem;color:var(--text-dim);margin-top:2px}
+  .suit-card .reveal-pw{max-height:0;overflow:hidden;transition:max-height .35s ease,margin .35s ease;color:var(--gold);font-size:.92rem}
+  .suit-card.open .reveal-pw{max-height:120px;margin-top:8px}
+  .tap-hint{position:absolute;top:14px;right:16px;font-size:.62rem;letter-spacing:.18em;color:var(--gold-dim);text-transform:uppercase;font-family:'Cinzel'}
+
+  /* ---------- skeptic ---------- */
+  .skeptic{
+    display:flex;gap:16px;border:1px solid rgba(193,48,60,.4);border-radius:14px;padding:18px 20px;margin:26px 0;
+    background:linear-gradient(180deg,rgba(193,48,60,.08),rgba(193,48,60,.02));
+  }
+  .skeptic .face{flex:0 0 auto;font-size:1.9rem;line-height:1;filter:grayscale(.1)}
+  .skeptic .q{font-style:italic;color:var(--parch);font-size:1.04rem;margin-bottom:.5rem}
+  .skeptic .q::before{content:"“The Doubting Squire asks — ";font-style:normal;font-family:'Cinzel';font-size:.68rem;letter-spacing:.16em;color:var(--crimson-text);text-transform:uppercase;display:block;margin-bottom:4px}
+  .skeptic .q::after{content:"”"}
+  .skeptic .a{font-size:.96rem;color:var(--text-dim)}
+  .skeptic .a strong{color:var(--gold)}
+
+  /* ---------- enemy + sim ---------- */
+  .arena{border:1px solid var(--line);border-radius:18px;padding:24px;background:linear-gradient(180deg,rgba(255,255,255,.022),transparent);margin-top:8px}
+  .enemy{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+  .enemy .stats{flex:1 1 200px;min-width:200px}
+  .enemy .name{font-family:'Cinzel';font-size:1.1rem;color:var(--parch);letter-spacing:.05em;margin-bottom:8px}
+  .bar{height:14px;border-radius:8px;background:rgba(0,0,0,.4);overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+  .bar > i{display:block;height:100%;width:100%;border-radius:8px;transition:width .6s cubic-bezier(.2,.7,.2,1)}
+  .bar.hp > i{background:linear-gradient(90deg,var(--crimson-deep),var(--crimson))}
+  .barlabels{display:flex;justify-content:space-between;font-family:'Cinzel';font-size:.72rem;letter-spacing:.1em;margin:8px 0 2px;color:var(--text-dim)}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-family:'Cinzel';font-size:.72rem;letter-spacing:.12em;border:1px solid var(--line);border-radius:20px;padding:4px 11px;color:var(--gold)}
+  .badge.atk{color:var(--crimson-text);border-color:rgba(193,48,60,.45)}
+  .prompt{border-left:3px solid var(--gold);background:rgba(212,175,55,.06);padding:12px 16px;border-radius:8px;margin:14px 0;font-size:1rem;min-height:24px}
+  .prompt b{color:var(--gold);font-family:'Cinzel';font-weight:600}
+  .log{font-size:.9rem;color:var(--text-dim);margin-top:10px;min-height:22px}
+  .log span{color:var(--parch)}
+  .btn{
+    font-family:'Cinzel';font-weight:600;letter-spacing:.08em;font-size:.82rem;
+    background:linear-gradient(180deg,var(--gold),var(--gold-dim));color:#1a1505;border:none;
+    padding:11px 20px;border-radius:9px;cursor:pointer;transition:.2s;text-transform:uppercase;
+  }
+  .btn:hover{filter:brightness(1.12);transform:translateY(-2px)}
+  .btn:disabled{opacity:.35;cursor:not-allowed;transform:none;filter:none}
+  .btn.ghost{background:transparent;color:var(--gold);border:1px solid var(--line)}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .tally{font-family:'Cinzel';color:var(--gold);font-size:.9rem;margin-top:8px;min-height:20px}
+
+  /* decision tree */
+  .opt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
+  .opt{border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;background:var(--panel);transition:.25s;text-align:center}
+  .opt:hover{border-color:var(--gold);transform:translateY(-3px)}
+  .opt.chosen{border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,175,55,.3)}
+  .opt .ot{font-family:'Cinzel';font-size:.92rem;color:var(--parch);margin-top:8px}
+  .opt .od{font-size:.78rem;color:var(--text-dim);margin-top:3px}
+  .verdict{margin-top:16px;border-radius:10px;padding:14px 18px;font-size:.96rem;min-height:24px;border:1px solid var(--line);background:rgba(0,0,0,.18)}
+  .verdict.good{border-color:rgba(212,175,55,.5)}
+  .verdict.bad{border-color:rgba(193,48,60,.5)}
+  .verdict .v-tag{font-family:'Cinzel';letter-spacing:.14em;font-size:.7rem;text-transform:uppercase;display:block;margin-bottom:4px}
+  .verdict.good .v-tag{color:var(--gold)}
+  .verdict.bad .v-tag{color:var(--crimson-text)}
+
+  /* mechanic tiles */
+  .mech{display:grid;grid-template-columns:1fr;gap:14px;margin-top:8px}
+  .tile{border:1px solid var(--line);border-radius:14px;padding:20px 22px;background:var(--panel);display:flex;gap:20px;align-items:flex-start}
+  .tile .vis{flex:0 0 auto}
+  .tile .txt h3{margin-bottom:.35rem}
+  .tile .txt p{margin:0;font-size:.96rem;color:var(--text-dim)}
+  .tile .txt p strong{color:var(--parch)}
+
+  /* combo widget */
+  .combo-pool{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .combo-out{margin-top:14px;font-size:.95rem;color:var(--text-dim)}
+  .combo-out b{color:var(--gold);font-family:'Cinzel'}
+
+  /* communication feature */
+  .rule-feature{
+    border:1px solid rgba(193,48,60,.45);border-radius:18px;padding:30px;text-align:center;
+    background:radial-gradient(600px 300px at 50% 0,rgba(193,48,60,.12),transparent 70%);
+  }
+  .rule-feature .big-no{font-family:'Cinzel';font-size:clamp(1.5rem,5vw,2.3rem);font-weight:900;color:var(--crimson);letter-spacing:.05em}
+  .allow-deny{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;text-align:left}
+  .allow-deny > div{border-radius:12px;padding:16px 18px;font-size:.94rem}
+  .allow{border:1px solid rgba(212,175,55,.4);background:rgba(212,175,55,.05)}
+  .deny{border:1px solid rgba(193,48,60,.4);background:rgba(193,48,60,.05)}
+  .allow .h,.deny .h{font-family:'Cinzel';letter-spacing:.1em;font-size:.72rem;text-transform:uppercase;display:block;margin-bottom:8px}
+  .allow .h{color:var(--gold)} .deny .h{color:var(--crimson-text)}
+  .allow-deny ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .allow-deny li{color:var(--text-dim);font-size:.92rem;padding-left:20px;position:relative}
+  .allow li::before{content:"✓";position:absolute;left:0;color:var(--gold)}
+  .deny li::before{content:"✕";position:absolute;left:0;color:var(--crimson-text)}
+
+  /* gambits */
+  .gambit{border:1px solid var(--line);border-radius:14px;padding:22px;background:var(--panel);margin-bottom:14px}
+  .gambit .gh{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+  .gambit .gn{font-family:'Cinzel';color:var(--gold);font-size:.72rem;letter-spacing:.2em}
+  .gambit h3{margin:0}
+  .gambit p{margin:.4rem 0 0;font-size:.96rem;color:var(--text-dim)}
+  .gambit p strong{color:var(--parch)}
+
+  /* review */
+  .arc{border-left:2px solid var(--line);padding-left:24px;margin-top:10px;display:flex;flex-direction:column;gap:22px}
+  .arc .beat{position:relative}
+  .arc .beat::before{content:"";position:absolute;left:-31px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+  .arc .beat h3{font-size:1rem;margin-bottom:.2rem}
+  .arc .beat p{margin:0;font-size:.95rem;color:var(--text-dim)}
+
+  /* faq */
+  .faq{margin-top:8px}
+  .faq details{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:var(--panel);overflow:hidden}
+  .faq summary{padding:16px 20px;cursor:pointer;font-family:'Spectral';font-style:italic;color:var(--parch);font-size:1.02rem;list-style:none;position:relative}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::before{content:"⚜";color:var(--gold);margin-right:10px}
+  .faq summary::after{content:"+";position:absolute;right:20px;color:var(--gold);font-family:'Cinzel'}
+  .faq details[open] summary::after{content:"–"}
+  .faq .ans{padding:0 20px 18px;color:var(--text-dim);font-size:.96rem}
+  .faq .ans strong{color:var(--gold)}
+
+  footer{text-align:center;padding:54px 0 70px;border-top:1px solid rgba(212,175,55,.12);color:var(--text-dim);font-size:.85rem}
+  footer .crest{font-size:1.6rem;color:var(--gold);margin-bottom:10px}
+
+  @media(max-width:680px){
+    body{font-size:17px}
+    .loop{grid-template-columns:repeat(2,1fr)}
+    .suits{grid-template-columns:1fr}
+    .opt-grid{grid-template-columns:1fr}
+    .allow-deny{grid-template-columns:1fr}
+    .tile{flex-direction:column;gap:14px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="crown reveal">♛</div>
+    <h1 class="reveal" style="animation-delay:.08s">REGICIDE</h1>
+    <div class="h1-rule reveal" style="animation-delay:.16s">A Co-operative Regicide</div>
+    <p class="tag reveal" style="animation-delay:.24s">Twelve crowned enemies stand between you and victory. You all win together — or you all fall together. This is a guided walk through the court, one beat at a time.</p>
+    <div class="meta reveal" style="animation-delay:.3s">1–4 players · ~20 minutes · one 52-card deck + 2 Jesters</div>
+
+    <div class="stakes reveal" style="animation-delay:.34s">
+      <div class="stake win">
+        <div class="k">★ To Win</div>
+        <p>Slay all twelve royals in order — four Jacks, then four Queens, then four Kings. The damage you deal <em>sticks</em> to an enemy across turns, so chip away as a team. Drop the final King and the whole table wins.</p>
+      </div>
+      <div class="stake lose">
+        <div class="k">☠ To Lose</div>
+        <p>Every turn the enemy strikes back, and you must discard cards to pay. The moment <em>anyone</em> can't cover the damage — or can't even play a card or yield — everyone loses.</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== 0. THE COURT (setup / ramp) ===================== -->
+<section id="court">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Beat One · Who You're Fighting</div>
+      <h2>The court, stacked against you</h2>
+      <p class="muted">Twelve royals wait in the Castle deck — Jacks on top, Kings buried at the bottom — so the climb only gets steeper. Each has a fixed attack and a pool of health you whittle down together.</p>
+    </div>
+
+    <div class="ladder">
+      <div class="rung j">
+        <div class="who">
+          <div class="card sm" style="margin:0"><div class="rank">J<span class="s">♠</span></div><div class="pip">♠</div></div>
+          <div><div class="nm">Four Jacks</div><div class="ct">the on-ramp · faced first</div></div>
+        </div>
+        <div class="rstats"><span class="badge atk">⚔ 10</span><span class="badge">♥ 20 HP</span></div>
+      </div>
+      <div class="rung q">
+        <div class="who">
+          <div class="card sm red" style="margin:0"><div class="rank">Q<span class="s">♥</span></div><div class="pip">♥</div></div>
+          <div><div class="nm">Four Queens</div><div class="ct">immunities start to bite</div></div>
+        </div>
+        <div class="rstats"><span class="badge atk">⚔ 15</span><span class="badge">♥ 30 HP</span></div>
+      </div>
+      <div class="rung k">
+        <div class="who">
+          <div class="card sm" style="margin:0;border-color:var(--gold)"><div class="rank" style="color:var(--gold)">K<span class="s">♣</span></div><div class="pip" style="color:var(--gold)">♣</div></div>
+          <div><div class="nm">Four Kings</div><div class="ct">the gauntlet · beat the last to win</div></div>
+        </div>
+        <div class="rstats"><span class="badge atk">⚔ 20</span><span class="badge">♥ 40 HP</span></div>
+      </div>
+    </div>
+    <p class="ladder-note">Your hand and your Jesters scale with the table — fewer players, bigger hands:</p>
+    <table class="scale-table">
+      <tr><th>Players</th><th>Jesters in deck</th><th>Max hand size</th></tr>
+      <tr><td>1</td><td>0 (set aside)</td><td>8</td></tr>
+      <tr><td>2</td><td>0</td><td>7</td></tr>
+      <tr><td>3</td><td>1</td><td>6</td></tr>
+      <tr><td>4</td><td>2</td><td>5</td></tr>
+    </table>
+    <p class="ladder-note">By tradition, the player who <em>most recently committed regicide</em> takes the first turn. Make of that what you will.</p>
+  </div>
+</section>
+
+<!-- ===================== 1. MNEMONIC FRAMING ===================== -->
+<section id="loop">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Step One · The Map</div>
+      <h2>Hold the loop in your head</h2>
+      <p class="muted">Before any detail, learn the shape of a turn. It never changes: <strong>four steps, same order, every time.</strong> Remember them as the four P's — then everything else has a place to land.</p>
+    </div>
+
+    <div class="loop" id="loopRow">
+      <div class="step" data-i="0"><div class="n">I</div><div class="big">Play</div><div class="sub">a card — its number is the damage</div></div>
+      <div class="step" data-i="1"><div class="n">II</div><div class="big">Power</div><div class="sub">trigger the card's suit effect</div></div>
+      <div class="step" data-i="2"><div class="n">III</div><div class="big">Pound</div><div class="sub">deal the damage · did it die?</div></div>
+      <div class="step" data-i="3"><div class="n">IV</div><div class="big">Pay</div><div class="sub">discard cards to cover the counterattack</div></div>
+    </div>
+    <div class="step-detail" id="loopDetail">
+      <h3>Tap a step to expand it</h3>
+      <p class="muted">The loop is your compass for the rest of this tutorial. When a new rule appears, you'll always be told <em>which P it lives in</em>.</p>
+    </div>
+
+    <div class="skeptic">
+      <div class="face">🛡️</div>
+      <div>
+        <div class="q">Four steps every single turn? Won't that get tedious?</div>
+        <div class="a">Fair worry — but most steps resolve in seconds. The reason it's drilled as a fixed loop is that the <strong>order matters</strong>: powers resolve <em>before</em> damage, and the counterattack comes <em>after</em>. Internalise the sequence now and you'll never freeze mid-turn asking "wait, what do I do next?"</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 2. THE FOUR SUITS ===================== -->
+<section id="suits">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">The Engine · Step II</div>
+      <h2>Four suits, one simple hook</h2>
+      <p class="muted">Every card carries a power tied to its suit, and the card's <em>number</em> sets how big that power is. There's one trick to remembering all four: <strong>Red = stuff for us, now. Black = stuff against them, later.</strong> Powers are <em>mandatory</em> — you always fire them, even when the timing stings. Tap each card.</p>
+    </div>
+
+    <div class="suits" id="suitGrid">
+      <div class="suit-card red-suit open" data-open="1">
+        <span class="tap-hint">Red · Now</span>
+        <div class="card red"><div class="rank">4<span class="s">♥</span></div><div class="pip">♥</div><div class="corner-br">4<span class="s">♥</span></div></div>
+        <div class="suit-body">
+          <div class="nm">Hearts — Heal</div>
+          <div class="pw">Restore resources right away</div>
+          <div class="reveal-pw">Shuffle the discard pile and return cards equal to the heart's value to the <em>bottom</em> of the draw deck. Fuel for later turns.</div>
+        </div>
+      </div>
+      <div class="suit-card red-suit open" data-open="1">
+        <span class="tap-hint">Red · Now</span>
+        <div class="card red"><div class="rank">6<span class="s">♦</span></div><div class="pip">♦</div><div class="corner-br">6<span class="s">♦</span></div></div>
+        <div class="suit-body">
+          <div class="nm">Diamonds — Draw</div>
+          <div class="pw">Everyone refills their hand</div>
+          <div class="reveal-pw">Players draw cards one at a time, going around the table, until cards equal to the diamond's value have been drawn (up to each player's hand limit).</div>
+        </div>
+      </div>
+      <div class="suit-card black-suit open" data-open="1">
+        <span class="tap-hint">Black · Later</span>
+        <div class="card"><div class="rank">8<span class="s">♣</span></div><div class="pip">♣</div><div class="corner-br">8<span class="s">♣</span></div></div>
+        <div class="suit-body">
+          <div class="nm">Clubs — Double</div>
+          <div class="pw">Hit twice as hard (Step III)</div>
+          <div class="reveal-pw">The damage dealt by this attack is doubled. An 8♣ strikes for 16. Your single biggest source of burst damage.</div>
+        </div>
+      </div>
+      <div class="suit-card black-suit open" data-open="1">
+        <span class="tap-hint">Black · Later</span>
+        <div class="card"><div class="rank">7<span class="s">♠</span></div><div class="pip">♠</div><div class="corner-br">7<span class="s">♠</span></div></div>
+        <div class="suit-body">
+          <div class="nm">Spades — Shield</div>
+          <div class="pw">Soften the counterattack (Step IV)</div>
+          <div class="reveal-pw">Reduce the enemy's attack by the spade's value — and it <em>stays</em> reduced for the rest of this fight. Spades stack across turns.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 3. GUIDED PLAY-THROUGH ===================== -->
+<section id="play">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Step Two · Just Start Playing</div>
+      <h2>Your first turn against a Jack</h2>
+      <p class="muted">Don't front-load the rules — play. The first enemy is a <strong>Jack: 20 health, 10 attack</strong>. Walk one full loop and the four P's stop being words and become muscle memory. Follow the prompts.</p>
+    </div>
+
+    <div class="arena">
+      <div class="enemy">
+        <div class="card lg" id="enemyCard"><div class="rank">J<span class="s">♦</span></div><div class="pip">♦</div><div class="corner-br">J<span class="s">♦</span></div></div>
+        <div class="stats">
+          <div class="name">Jack of Diamonds <span class="badge atk" style="margin-left:6px">⚔ ATK <b id="atkVal">10</b></span></div>
+          <div class="barlabels"><span>HEALTH</span><span id="hpText">20 / 20</span></div>
+          <div class="bar hp"><i id="hpBar"></i></div>
+        </div>
+      </div>
+
+      <div class="prompt" id="prompt"><b>Step I — Play.</b> Clubs double your damage. Tap the <b>6♣</b> to strike the Jack.</div>
+
+      <div class="card-row" id="hand"></div>
+
+      <div class="tally" id="tally"></div>
+      <div class="btn-row">
+        <button class="btn" id="actBtn" disabled>Take the hit ▸</button>
+        <button class="btn ghost" id="resetBtn">Reset turn</button>
+      </div>
+      <div class="log" id="log"></div>
+    </div>
+
+    <div class="skeptic">
+      <div class="face">🛡️</div>
+      <div>
+        <div class="q">What actually pays for the counterattack — do I lose good cards?</div>
+        <div class="a"><strong>Any cards from your hand.</strong> You discard until their face values cover the enemy's attack. So yes, paying a 10-damage hit might cost you a 10, or a 7 and a 4. That tension — spend a card now to attack, or save it to survive the counter — is the whole game in miniature.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 4. MECHANICS AS THEY SURFACE ===================== -->
+<section id="mechanics">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Explained In Context</div>
+      <h2>The rules you learn mid-fight</h2>
+      <p class="muted">These never get a lecture — they're taught the instant they come up at the table. Here's the moment each one surfaces.</p>
+    </div>
+
+    <div class="mech">
+      <div class="tile">
+        <div class="vis">
+          <div class="card-row">
+            <div class="card sm"><div class="rank">3<span class="s">♣</span></div><div class="pip">♣</div></div>
+            <div class="card sm red"><div class="rank">3<span class="s">♥</span></div><div class="pip">♥</div></div>
+          </div>
+        </div>
+        <div class="txt">
+          <h3>Combos — when you hold matching numbers</h3>
+          <p>Play two, three, or four cards of the <strong>same number together</strong>, as long as they total <strong>≤ 10</strong>. They strike as one attack and <em>every</em> suit power fires at the combined value — a 3♦ + 3♠ + 3♣ draws 9, shields 9, and deals 18. Aces can't join a combo, and whenever Hearts and Diamonds resolve together you always <strong>heal before drawing</strong>.</p>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="vis">
+          <div class="card-row">
+            <div class="card sm"><div class="rank">A<span class="s">♠</span></div><div class="pip">♠</div></div>
+            <div class="card sm red"><div class="rank">9<span class="s">♦</span></div><div class="pip">♦</div></div>
+          </div>
+        </div>
+        <div class="txt">
+          <h3>Animal Companions — the Aces</h3>
+          <p>An <strong>Ace is worth 1</strong> and can stand alone or pair with <em>one</em> other card — even another Ace, but never a Jester. Both suit powers fire at the combined value: A♣ + 8♦ is 9 damage, doubled to 18, with 9 cards drawn. Pair two of the <em>same</em> suit and that power fires only once. And as a 1 in the discard, it's handy when you're scraping to pay a counter.</p>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="vis">
+          <div class="card lg"><div class="rank">Q<span class="s">♦</span></div><div class="pip">♦</div><div class="corner-br">Q<span class="s">♦</span></div></div>
+        </div>
+        <div class="txt">
+          <h3>Enemy immunity — they ignore their own suit</h3>
+          <p>Each royal <strong>ignores the power of its own suit</strong>. Against the Queen of Diamonds, diamond cards deal damage but trigger <em>no draw</em>. The number still counts as damage — only the power is switched off.</p>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="vis">
+          <div class="card lg" style="background:linear-gradient(160deg,#2a2440,#191527);border-color:var(--gold)">
+            <div class="rank" style="color:var(--gold)">★<span class="s" style="color:var(--gold)">J</span></div>
+            <div class="pip" style="color:var(--gold)">🃏</div>
+            <div class="corner-br" style="color:var(--gold)">★<span class="s" style="color:var(--gold)">J</span></div>
+          </div>
+        </div>
+        <div class="txt">
+          <h3>The Jester — your immunity-breaker</h3>
+          <p>Worth <strong>0</strong> and played alone, the Jester <strong>cancels the enemy's immunity</strong> — and then skips both the damage step <em>and</em> the counterattack, so you suffer nothing. Best of all, you <strong>hand the next turn to any player you like</strong>. While it resolves, the table may even hint, in general terms, who'd like to go next.</p>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="vis">
+          <div class="card-row">
+            <div class="card sm" style="border-color:var(--gold)"><div class="rank" style="color:var(--gold)">K<span class="s">♠</span></div><div class="pip" style="color:var(--gold)">♠</div></div>
+          </div>
+        </div>
+        <div class="txt">
+          <h3>Royals become cards — once you beat them</h3>
+          <p>Reduce a royal's health to zero <em>or below</em> and it's defeated, joining the discard to return to a hand later. As a card it's powerful: <strong>Jack = 10, Queen = 15, King = 20</strong>, each carrying its own suit power — and those values count whether you <em>attack</em> with it or <em>discard</em> it to pay a counter. (Notice the symmetry — a royal's card value equals its attack.)</p>
+        </div>
+      </div>
+      <div class="tile">
+        <div class="vis">
+          <div class="card lg" style="background:linear-gradient(160deg,#2a2440,#1c1733);border-color:var(--gold)">
+            <div class="rank" style="color:var(--gold)">=<span class="s" style="color:var(--gold)">0</span></div>
+            <div class="pip" style="color:var(--gold);font-size:2rem">⊙</div>
+            <div class="corner-br" style="color:var(--gold)">=<span class="s" style="color:var(--gold)">0</span></div>
+          </div>
+        </div>
+        <div class="txt">
+          <h3>Exact kills — the dead come back to you</h3>
+          <p>Land the killing blow on <em>exactly</em> the enemy's remaining health and it doesn't hit the discard — it slides facedown onto <strong>top of the draw deck</strong>, so that defeated royal returns to a hand within a turn or two. Overkill still wins, it just discards. And whoever lands any kill <strong>skips their counterattack and immediately attacks the next enemy</strong> — a free continued turn.</p>
+        </div>
+      </div>
+    </div>
+    <div class="arena" style="margin-top:24px">
+      <h3 style="margin-bottom:6px">Try it · build a combo</h3>
+      <p class="muted" style="font-size:.95rem;margin-bottom:6px">Tap cards of the <em>same number</em> (total must stay ≤ 10) and watch the combined attack form.</p>
+      <div class="combo-pool" id="comboPool"></div>
+      <div class="combo-out" id="comboOut">Select matching cards to see the combined strike…</div>
+      <div class="btn-row"><button class="btn ghost" id="comboReset">Clear</button></div>
+    </div>
+
+    <div class="skeptic">
+      <div class="face">🛡️</div>
+      <div>
+        <div class="q">A power got blocked and I had no idea why. What happened?</div>
+        <div class="a">You hit an <strong>immunity</strong> — the enemy shares that suit, so its power simply doesn't fire. That's exactly the moment a <strong>Jester</strong> earns its keep: drop it to switch the immunity off for the rest of the fight, and suddenly those blocked cards roar back to life.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 5. THE COMMUNICATION RULE ===================== -->
+<section id="rule">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Flag This Before Turn One</div>
+      <h2>The one rule everyone breaks</h2>
+    </div>
+    <div class="rule-feature">
+      <div class="big-no">Never hint at what's in your hand.</div>
+      <p class="muted" style="max-width:560px;margin:14px auto 0">Figuring out the right play together — <em>silently</em> — is the entire heart of Regicide. The instant someone says "play a heart so I can…", the puzzle solves itself and the magic drains out.</p>
+      <div class="allow-deny">
+        <div class="allow">
+          <span class="h">✓ You may say</span>
+          <ul>
+            <li>"I have three cards left."</li>
+            <li>"The draw deck's nearly empty."</li>
+            <li>Public facts anyone can see or count.</li>
+          </ul>
+        </div>
+        <div class="deny">
+          <span class="h">✕ You may never</span>
+          <ul>
+            <li>"Play a heart so I can heal."</li>
+            <li>"Save that King for me."</li>
+            <li>Hint at the specific cards you hold.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <p class="muted" style="margin-top:18px;font-size:.96rem">One narrow exception: right after a <strong>Jester</strong> is played, until the next turn begins, players may speak in <em>general</em> terms about who should go next — "I've got a strong play," or "I'd rather not." Even then, you still never name a card.</p>
+
+    <div class="skeptic">
+      <div class="face">🛡️</div>
+      <div>
+        <div class="q">If we can't coordinate, isn't every decision just a guess?</div>
+        <div class="a">Not a guess — a <strong>read</strong>. You infer from public information: how many cards people hold, what's already been discarded, who's clearly stuck. The constraint is the fun. It turns a solvable maths problem into a tense, shared act of deduction.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 6. DECISION-TREE WALKTHROUGH ===================== -->
+<section id="decision">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Step Three · The Why Behind The Move</div>
+      <h2>A real fork in the road</h2>
+      <p class="muted">Here's the heart of skilled play: not <em>how</em> to act, but <em>why</em> one move beats another. The enemy is the <strong>Queen of Hearts — 30 health, 15 attack — and she's immune to Hearts.</strong> You hold three tempting plays. Try each.</p>
+    </div>
+
+    <div class="arena">
+      <div class="enemy">
+        <div class="card lg red"><div class="rank">Q<span class="s">♥</span></div><div class="pip">♥</div><div class="corner-br">Q<span class="s">♥</span></div></div>
+        <div class="stats">
+          <div class="name">Queen of Hearts <span class="badge atk" style="margin-left:6px">⚔ ATK 15</span> <span class="badge" style="border-color:rgba(193,48,60,.4);color:var(--crimson-text)">♥ immune</span></div>
+          <div class="barlabels"><span>HEALTH</span><span id="qHpText">30 / 30</span></div>
+          <div class="bar hp"><i id="qHpBar"></i></div>
+        </div>
+      </div>
+
+      <div class="opt-grid" id="optGrid">
+        <div class="opt" data-o="0">
+          <div class="card sm" style="margin:0 auto"><div class="rank">9<span class="s">♣</span></div><div class="pip">♣</div></div>
+          <div class="ot">Big Club</div>
+          <div class="od">9♣ — double damage</div>
+        </div>
+        <div class="opt" data-o="1">
+          <div class="card sm red" style="margin:0 auto"><div class="rank">8<span class="s">♥</span></div><div class="pip">♥</div></div>
+          <div class="ot">Heal Up</div>
+          <div class="od">8♥ — restore the deck</div>
+        </div>
+        <div class="opt" data-o="2">
+          <div class="card sm" style="margin:0 auto"><div class="rank">9<span class="s">♠</span></div><div class="pip">♠</div></div>
+          <div class="ot">Raise Shield</div>
+          <div class="od">9♠ — soften her blow</div>
+        </div>
+      </div>
+
+      <div class="verdict" id="verdict"><span class="v-tag">Choose a branch</span>Tap a card above to see where the move leads — and reset the Queen between attempts.</div>
+      <div class="btn-row"><button class="btn ghost" id="qReset">Reset the Queen</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 7. CLEVER GAMBITS ===================== -->
+<section id="gambits">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">The Plays You'll Remember</div>
+      <h2>Gambits that win games</h2>
+      <p class="muted">Once the loop is second nature, these are the moves that turn a losing board into a triumphant one — and the ones you'll be retelling afterward.</p>
+    </div>
+
+    <div class="gambit">
+      <div class="gh"><span class="gn">I</span><h3>The Spade Wall</h3></div>
+      <p>Spade shields <strong>stack and persist</strong> for the whole fight. Chip a King's 20-attack down with spades across a few turns and his counterstrikes shrink to nothing — you out-last him while barely paying a card. Slow, patient, and devastating against the big crowns.</p>
+    </div>
+
+    <div class="gambit">
+      <div class="gh"><span class="gn">II</span><h3>The Club Combo Nuke</h3></div>
+      <p>Stack matching clubs into a combo and the doubling applies to the <em>whole</em> total. A pair of 5♣ is a single 10-point strike, doubled to <strong>20 damage in one blow</strong> — enough to behead a Jack outright, or gut a King.</p>
+    </div>
+
+    <div class="gambit">
+      <div class="gh"><span class="gn">III</span><h3>Jester, Then Pounce</h3></div>
+      <p>Hold the Jester until an immunity is choking you. Play it to <strong>kill the immunity</strong>, then use its <strong>choose-the-next-player</strong> power to hand the turn to whoever's sitting on the perfect follow-up. A one-two punch that bends the turn order to your will.</p>
+    </div>
+
+    <div class="gambit">
+      <div class="gh"><span class="gn">IV</span><h3>Diamond Refuel Before the Storm</h3></div>
+      <p>A high diamond refills <em>everyone's</em> hands. Time it just before a tough King and the whole table walks into the fight loaded — fresh clubs to strike, fresh spades to soak. Generosity that pays the group dividends.</p>
+    </div>
+
+    <div class="gambit">
+      <div class="gh"><span class="gn">V</span><h3>The Surgeon's Strike</h3></div>
+      <p>Defeating a royal on <strong>exactly</strong> its health drops it onto <em>top</em> of the draw deck — so it returns to your hands within a turn. Read the running damage total and thread the final blow to the number, and you don't just win the fight, you <strong>recruit</strong> the corpse.</p>
+    </div>
+
+    <div class="gambit">
+      <div class="gh"><span class="gn">VI</span><h3>Recycle the Fallen Crown</h3></div>
+      <p>A defeated King is a <strong>20-value card</strong> with a suit power — lethal as an attack, and a 20-point cushion when discarded to pay. A Hearts heal can also fish a fallen royal out of the discard and back into the deck. Either way, the court turns on itself: a dead King fighting his own heir.</p>
+    </div>
+
+    <div class="skeptic">
+      <div class="face">🛡️</div>
+      <div>
+        <div class="q">Honestly — how hard is this? Are we going to win our first night?</div>
+        <div class="a"><strong>Probably not — and that's normal.</strong> Expect to lose the first game or two while the loop sinks in. Regicide is a beautiful difficulty curve: brutal at first, then suddenly you're reading the table, stacking spades, and timing Jesters like a court strategist.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 8. POST-GAME REVIEW + FAQ ===================== -->
+<section id="review">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Step Four · After The Dust Settles</div>
+      <h2>Reading the game you just played</h2>
+      <p class="muted">The richest learning comes <em>after</em> the final card. Replay the arc in your head against the loop — most losses trace to one identifiable phase. Here's a typical first game.</p>
+    </div>
+
+    <div class="arc">
+      <div class="beat"><h3>The Jacks felt easy</h3><p>You bulldozed the four Jacks with raw club damage and barely thought about the counters. Good — that's the on-ramp doing its job.</p></div>
+      <div class="beat"><h3>A Queen's immunity caught you out</h3><p>Hearts fizzled against the Queen of Hearts and the table stalled, bleeding cards to pay attacks for nothing. <em>Lesson: the Jester was sitting unused — that was the moment.</em></p></div>
+      <div class="beat"><h3>The deck thinned faster than you healed</h3><p>You spent hearts on damage instead of recycling them. By the Kings, hands were empty and the <strong>Pay</strong> step — Step IV — is where the game finally took you.</p></div>
+      <div class="beat"><h3>Next time</h3><p>Shield earlier, hoard the Jester for immunities, and treat every Hearts card as deck fuel, not a throwaway. The loss lived in one phase — name it, and you've already improved.</p></div>
+    </div>
+
+    <h3 style="margin:38px 0 4px">The Squire's quick-answer bank</h3>
+    <p class="muted" style="font-size:.95rem">The questions every table asks — answered.</p>
+    <div class="faq">
+      <details>
+        <summary>Can I just… not play a card?</summary>
+        <div class="ans">Yes — that's <strong>yielding</strong>: skip straight to taking the counterattack. The catch: you can't yield if <em>everyone else</em> already yielded on the previous turn. Someone has to keep the pressure on the enemy.</div>
+      </details>
+      <details>
+        <summary>What exactly can I use to pay for damage?</summary>
+        <div class="ans">Any cards in hand. Discard them one by one until their values cover the enemy's attack. <strong>Aces count as 1, Jesters as 0.</strong> Overpaying is fine; you just can't underpay.</div>
+      </details>
+      <details>
+        <summary>Do spade shields really stack?</summary>
+        <div class="ans">They do. <strong>Every spade played against the current enemy</strong> keeps lowering its attack, and the reduction holds until that enemy dies. Layer them and the counterattacks dwindle to nothing.</div>
+      </details>
+      <details>
+        <summary>What happens if the draw deck runs out?</summary>
+        <div class="ans">Nothing punishing — there's <strong>no penalty for failing to draw</strong>. The deck emptying isn't the loss condition. Running out of cards to <em>pay damage</em> is what ends the game.</div>
+      </details>
+      <details>
+        <summary>What happens the moment an enemy dies?</summary>
+        <div class="ans">All cards played against it go to the discard, and the next royal flips face-up. The player who landed the kill <strong>skips their Step 4</strong> (no counterattack) and starts a fresh turn against the new enemy. If the kill was for <em>exactly</em> its remaining health, the defeated royal goes on <strong>top of the draw deck</strong> instead of the discard.</div>
+      </details>
+      <details>
+        <summary>Does the game change with player count?</summary>
+        <div class="ans">Yes — fewer players means bigger hands and fewer Jesters. <strong>1 player:</strong> 8 cards, 0 Jesters. <strong>2:</strong> 7 / 0. <strong>3:</strong> 6 / 1. <strong>4:</strong> 5 / 2. The royals' stats never change, so smaller groups lean harder on each card.</div>
+      </details>
+      <details>
+        <summary>How do we actually win again?</summary>
+        <div class="ans">Defeat all twelve royals in sequence — the four Jacks, then the Queens, then the Kings. Land the killing blow on the <strong>last King</strong> and the entire table wins together.</div>
+      </details>
+      <details>
+        <summary>Is there a way to "score" a win?</summary>
+        <div class="ans">In <strong>solo play</strong>, yes — medals by how few Jesters you spent: <strong>Gold</strong> with 0 used, <strong>Silver</strong> with 1, <strong>Bronze</strong> with 2. (Solo Jesters work differently: flip one to discard your hand and redraw to 8.) A neat way to keep pushing once you start winning.</div>
+      </details>
+    </div>
+
+    <div class="skeptic" style="margin-top:30px">
+      <div class="face">🛡️</div>
+      <div>
+        <div class="q">So what's the single thing I should hold onto from all this?</div>
+        <div class="a">The loop: <strong>Play · Power · Pound · Pay.</strong> Everything else — suits, combos, Jesters, gambits — hangs off those four pegs. Keep them in your head and you're already playing.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="crest">⚜</div>
+    <p>An interactive teaching walk for <strong style="color:var(--gold)">Regicide</strong>.<br>
+    Built on the Core-4 pipeline · Mnemonic → Guided Play → Decision Trees → Post-Game Review.</p>
+  </div>
+</footer>
+
+<script>
+/* ---------- helpers ---------- */
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const isRed = s => s==='♥'||s==='♦';
+function cardHTML(rank,suit,extra=''){
+  const red = isRed(suit)?'red':'';
+  return `<div class="card sm clickable ${red} ${extra}"><div class="rank">${rank}<span class="s">${suit}</span></div><div class="pip">${suit}</div></div>`;
+}
+
+/* ---------- 1. mnemonic loop ---------- */
+const loopData = [
+  {h:'I · Play', b:'Play one card from your hand (or a combo). Its number is the base damage you\'ll deal. This is the only mandatory commitment of the turn.'},
+  {h:'II · Power', b:'Resolve the played card\'s suit power immediately. Red helps you now (heal / draw); black shapes the fight (double / shield). The number scales the effect.'},
+  {h:'III · Pound', b:'Add your damage to the running total all players have dealt this enemy — health is a shared pool chipped across turns, not reset each turn. Meet or beat it and the royal falls. Land it on <em>exactly</em> zero and the defeated enemy slides onto the draw deck to be reclaimed; overkill just discards it. Defeat one and you skip the counterattack and swing straight into the next enemy.'},
+  {h:'IV · Pay', b:'The enemy strikes back for its attack value (minus any spade shields). Discard cards from your hand until you\'ve covered it — Aces count as 1, Jesters as 0, and a captured royal soaks 10/15/20. Can\'t cover it? Everyone loses. This is where games are won and lost.'}
+];
+const steps = $$('#loopRow .step');
+function showStep(i){
+  steps.forEach(s=>s.classList.toggle('active', +s.dataset.i===i));
+  $('#loopDetail').innerHTML = `<h3>${loopData[i].h}</h3><p>${loopData[i].b}</p>`;
+}
+steps.forEach(s=>s.addEventListener('click',()=>showStep(+s.dataset.i)));
+/* gentle auto-cycle until first interaction */
+let loopAuto=0, loopTimer=setInterval(()=>{showStep(loopAuto%4);loopAuto++;},2200);
+$('#loopRow').addEventListener('click',()=>clearInterval(loopTimer),{once:true});
+showStep(0);
+
+/* ---------- 2. suit flip ---------- */
+$$('#suitGrid .suit-card').forEach(c=>{
+  c.addEventListener('click',()=>c.classList.toggle('open'));
+});
+
+/* ---------- 3. guided turn ---------- */
+const sim = {
+  maxHp:20, hp:20, atk:10, phase:'play', payTotal:0,
+  hand:[{r:'6',s:'♣',v:6},{r:'4',s:'♥',v:4},{r:'7',s:'♠',v:7},{r:'9',s:'♦',v:9},{r:'2',s:'♣',v:2}]
+};
+const handEl=$('#hand'), promptEl=$('#prompt'), logEl=$('#log'), tallyEl=$('#tally'), actBtn=$('#actBtn');
+function renderSim(){
+  handEl.innerHTML='';
+  sim.hand.forEach((c,idx)=>{
+    const el=document.createElement('div');
+    el.className=`card sm clickable ${isRed(c.s)?'red':''}${c.spent?' spent':''}${c.sel?' sel':''}`;
+    el.innerHTML=`<div class="rank">${c.r}<span class="s">${c.s}</span></div><div class="pip">${c.s}</div>`;
+    el.addEventListener('click',()=>onSimCard(idx));
+    handEl.appendChild(el);
+  });
+  const pct=Math.max(0,sim.hp)/sim.maxHp*100;
+  $('#hpBar').style.width=pct+'%';
+  $('#hpText').textContent=`${Math.max(0,sim.hp)} / ${sim.maxHp}`;
+}
+function onSimCard(idx){
+  const c=sim.hand[idx];
+  if(sim.phase==='play'){
+    if(c.r!=='6'||c.s!=='♣'){ flashPrompt('Stay on script for now — tap the <b>6♣</b> to see clubs in action.'); return; }
+    c.spent=true;
+    const dmg=c.v*2;
+    sim.hp-=dmg;
+    logEl.innerHTML=`<span>Played 6♣.</span> Step II — Clubs <span>double</span> the hit: 6 → <span>${dmg} damage</span>. Step III — Jack drops to <span>${sim.hp}</span>.`;
+    promptEl.innerHTML=`<b>Step IV — Pay.</b> The Jack strikes back for <b>10</b>. Discard cards totalling at least 10 to survive, then take the hit.`;
+    sim.phase='pay';
+    renderSim();
+  } else if(sim.phase==='pay'){
+    if(c.spent) return;
+    c.sel=!c.sel;
+    sim.payTotal=sim.hand.filter(x=>x.sel&&!x.spent).reduce((a,x)=>a+x.v,0);
+    tallyEl.textContent=`Discarding to pay: ${sim.payTotal} / 10`;
+    actBtn.disabled = sim.payTotal<10;
+    renderSim();
+  }
+}
+function flashPrompt(msg){
+  const old=promptEl.innerHTML;
+  promptEl.innerHTML=msg;
+  promptEl.style.borderColor='var(--crimson)';
+  setTimeout(()=>{promptEl.innerHTML=old;promptEl.style.borderColor='';},1700);
+}
+actBtn.addEventListener('click',()=>{
+  if(sim.phase!=='pay'||sim.payTotal<10) return;
+  sim.hand.forEach(x=>{if(x.sel)x.spent=true;});
+  promptEl.innerHTML=`<b>Loop complete.</b> You dealt the blow, fired the power, and paid the counter — <b>Play · Power · Pound · Pay.</b> The Jack lives with ${sim.hp} health, so play passes on. (Had that hit finished him, you'd skip the counter entirely and leap straight into the next enemy.)`;
+  logEl.innerHTML+=` <span>Counter paid (${sim.payTotal}). Turn ends.</span>`;
+  tallyEl.textContent='';
+  sim.phase='done'; actBtn.disabled=true;
+  renderSim();
+});
+$('#resetBtn').addEventListener('click',()=>{
+  sim.hp=20;sim.phase='play';sim.payTotal=0;
+  sim.hand.forEach(c=>{c.spent=false;c.sel=false;});
+  promptEl.innerHTML=`<b>Step I — Play.</b> Clubs double your damage. Tap the <b>6♣</b> to strike the Jack.`;
+  logEl.innerHTML='';tallyEl.textContent='';actBtn.disabled=true;
+  renderSim();
+});
+renderSim();
+
+/* ---------- 4. combo widget ---------- */
+const comboCards=[
+  {r:'3',s:'♣',v:3},{r:'3',s:'♥',v:3},{r:'3',s:'♠',v:3},
+  {r:'5',s:'♦',v:5},{r:'5',s:'♣',v:5},{r:'4',s:'♠',v:4}
+];
+let comboSel=[];
+const powerName={'♥':'heal','♦':'draw','♣':'double','♠':'shield'};
+function renderCombo(){
+  const pool=$('#comboPool'); pool.innerHTML='';
+  comboCards.forEach((c,i)=>{
+    const sel=comboSel.includes(i);
+    const el=document.createElement('div');
+    el.className=`card sm clickable ${isRed(c.s)?'red':''}${sel?' sel':''}`;
+    el.innerHTML=`<div class="rank">${c.r}<span class="s">${c.s}</span></div><div class="pip">${c.s}</div>`;
+    el.addEventListener('click',()=>toggleCombo(i));
+    pool.appendChild(el);
+  });
+}
+function toggleCombo(i){
+  const c=comboCards[i];
+  if(comboSel.includes(i)){ comboSel=comboSel.filter(x=>x!==i); }
+  else{
+    const cur=comboSel.map(x=>comboCards[x]);
+    if(cur.length && cur[0].r!==c.r){ $('#comboOut').innerHTML='⚠ Combos must be the <b>same number</b>. Clear and pick matching cards.'; return; }
+    const total=cur.reduce((a,x)=>a+x.v,0)+c.v;
+    if(total>10){ $('#comboOut').innerHTML='⚠ That combo would total over <b>10</b> — not allowed.'; return; }
+    comboSel.push(i);
+  }
+  describeCombo(); renderCombo();
+}
+function describeCombo(){
+  if(comboSel.length===0){ $('#comboOut').textContent='Select matching cards to see the combined strike…'; return; }
+  const cards=comboSel.map(x=>comboCards[x]);
+  const total=cards.reduce((a,x)=>a+x.v,0);
+  const suits=[...new Set(cards.map(c=>c.s))];
+  let dmg=total;
+  if(suits.includes('♣')) dmg=total*2;
+  const powers=suits.map(s=>powerName[s]).join(' + ');
+  $('#comboOut').innerHTML=`Combined value <b>${total}</b>${comboSel.length>1?` (${cards.map(c=>c.r+c.s).join(' + ')})`:''} — strikes for <b>${dmg} damage</b>${suits.includes('♣')?' (clubs doubled!)':''}, firing powers: <b>${powers}</b>, all at value ${total}.`;
+}
+$('#comboReset').addEventListener('click',()=>{comboSel=[];describeCombo();renderCombo();});
+renderCombo();
+
+/* ---------- 6. decision tree ---------- */
+const qMax=30;
+const branches=[
+  { cls:'good', tag:'Strong tempo',
+    hp:30-18,
+    html:`<b>9♣ → doubled to 18 damage.</b> Clubs aren\'t her suit, so the power lands fully. The Queen drops from 30 to <b>12</b>. You\'ll owe a 15 counter — payable — and she\'s nearly dead. A clean, aggressive choice.` },
+  { cls:'bad', tag:'The trap',
+    hp:30-8,
+    html:`<b>8♥ → only 8 damage.</b> She\'s <b>immune to Hearts</b>, so the heal <em>fizzles</em> — no deck recovery at all. You dealt a feeble 8 (30 → 22) and got nothing back, then still pay 15. This is the immunity lesson: never feed a royal its own suit expecting the power.` },
+  { cls:'good', tag:'Patient defence',
+    hp:30-9,
+    html:`<b>9♠ → 9 damage, and a shield.</b> The Queen falls to <b>21</b>, and her attack is cut by 9 — so this turn\'s counter is just <b>6</b>, not 15. Less burst than the club, but you barely bleed and the shield <em>persists</em>. Excellent against tougher crowns.` }
+];
+$$('#optGrid .opt').forEach(o=>{
+  o.addEventListener('click',()=>{
+    const i=+o.dataset.o; const b=branches[i];
+    $$('#optGrid .opt').forEach(x=>x.classList.toggle('chosen',x===o));
+    const v=$('#verdict');
+    v.className='verdict '+b.cls;
+    v.innerHTML=`<span class="v-tag">${b.tag}</span>${b.html}`;
+    $('#qHpBar').style.width=(Math.max(0,b.hp)/qMax*100)+'%';
+    $('#qHpText').textContent=`${Math.max(0,b.hp)} / ${qMax}`;
+  });
+});
+$('#qReset').addEventListener('click',()=>{
+  $$('#optGrid .opt').forEach(x=>x.classList.remove('chosen'));
+  $('#qHpBar').style.width='100%';
+  $('#qHpText').textContent='30 / 30';
+  const v=$('#verdict'); v.className='verdict';
+  v.innerHTML=`<span class="v-tag">Choose a branch</span>Tap a card above to see where the move leads — and reset the Queen between attempts.`;
+});
+
+/* init bars */
+$('#qHpBar').style.width='100%';
+</script>
+</body>
+</html>
