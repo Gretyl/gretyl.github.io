@@ -164,6 +164,10 @@ html, body {
   position: relative;
   z-index: 2;
   pointer-events: none;
+  /* Overlay the steps on the sticky canvas (which occupies 100vh of flow),
+     and hold the canvas pinned until the last card deactivates. */
+  margin-top: -100vh;
+  padding-bottom: 55vh;
 }
 
 .step {
@@ -190,6 +194,7 @@ html, body {
 }
 
 .step.is-active .step__text { opacity: 1; }
+.step__text:empty { display: none; }
 
 .step--right { justify-content: flex-end; }
 .step--left { justify-content: flex-start; }
@@ -327,6 +332,7 @@ html, body {
 
 @media (max-width: 699px) {
   .scrolly__canvas { height: 50vh; }
+  .scrolly__steps { margin-top: -50vh; padding-bottom: 30vh; }
   .step { min-height: 60vh; justify-content: center !important; }
   .step--morph { min-height: 150vh; }
   .step__text { max-width: 100%; margin: 0 16px; }
@@ -366,7 +372,7 @@ html, body {
   </div>
   <div class="scrolly__steps">
     <div class="step step--right" data-act="1" data-step="1">
-      <div class="step__text"></div>
+      <div class="step__text">Each bar is one year of net equity issuance by U.S. nonfinancial corporations, in 2025 dollars. Green years: the stock market supplied corporations with cash. Red years: corporations retired more stock than they issued.</div>
     </div>
     <div class="step step--right" data-act="1" data-step="2">
       <div class="step__text">Through the late 1970s, American corporations raised more equity than they retired. The public offering was a net source of capital.</div>
@@ -442,7 +448,7 @@ html, body {
   </div>
   <div class="scrolly__steps">
     <div class="step step--left" data-act="3" data-step="1">
-      <div class="step__text"></div>
+      <div class="step__text">Corporate cash, traced from source to use: inflows on the left, outflows on the right. Ribbon width is dollars — real 2025 dollars, as everywhere in this story.</div>
     </div>
     <div class="step step--left" data-act="3" data-step="2">
       <div class="step__text"><strong>1982:</strong> nearly all corporate cash comes from operations. Borrowed money is a sidecar, not a co-pilot.</div>
@@ -1160,6 +1166,9 @@ function initScrolly() {
   renderSankeyAt(0, {saturate: null, highlight: null, showIncidence: false});
 
   var steps = document.querySelectorAll('.step');
+  // Steps activate while they intersect the middle (1 - 2*BAND) of the
+  // viewport. Keep this band thin so adjacent cards don't co-activate.
+  var BAND = 0.45;
   var observer = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
       if (entry.isIntersecting) {
@@ -1174,7 +1183,7 @@ function initScrolly() {
         entry.target.classList.remove('is-active');
       }
     });
-  }, {rootMargin: '-30% 0px -30% 0px', threshold: 0});
+  }, {rootMargin: '-' + (BAND * 100) + '% 0px -' + (BAND * 100) + '% 0px', threshold: 0});
 
   steps.forEach(function(step) { observer.observe(step); });
 
