@@ -322,6 +322,15 @@ html, body {
 .env-szz { fill: none; stroke: var(--c-szz); stroke-width: 1.4; stroke-linecap: round; }
 .env-kss { fill: none; stroke: var(--c-kss); stroke-width: 1.4; stroke-linecap: round; }
 
+.sankey-year {
+  font-family: var(--mono);
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  fill: var(--ink-3);
+  opacity: 0.8;
+}
+
 .inflect-marker { fill: var(--c-accent); opacity: 0; transition: opacity 0.5s ease; }
 .inflect-label { font-family: var(--mono); font-size: 9px; fill: var(--c-accent); opacity: 0; transition: opacity 0.5s ease; }
 
@@ -600,6 +609,14 @@ function buildBarChart() {
   const svg = document.getElementById('chart-bars');
   svg.innerHTML = '';
 
+  // Unit caption
+  const unit = document.createElementNS(NS, 'text');
+  unit.setAttribute('x', BM.left);
+  unit.setAttribute('y', 24);
+  unit.setAttribute('class', 'chart-axis');
+  unit.textContent = 'Net equity issuance · $B (real 2025)';
+  svg.appendChild(unit);
+
   // Gridlines
   [-800,-600,-400,-200,0].forEach(function(v) {
     const line = document.createElementNS(NS, 'line');
@@ -821,7 +838,7 @@ function buildEnvelopeChart() {
 
     var txt = document.createElementNS(NS, 'text');
     txt.setAttribute('x', inf.x);
-    txt.setAttribute('y', 460);
+    txt.setAttribute('y', inf.y - 14);
     txt.setAttribute('text-anchor', 'middle');
     txt.setAttribute('class', 'inflect-label');
     txt.id = 'inflect-label-' + i;
@@ -1044,6 +1061,15 @@ function buildSankeyGeometry(t) {
   // Draw nodes
   data.sources.forEach(function(n) { drawSankeyNode(svg, n, 'left'); });
   data.sinks.forEach(function(n) { drawSankeyNode(svg, n, 'right'); });
+
+  // Year readout (interpolates while the morph scrubs)
+  var yr = document.createElementNS(NS, 'text');
+  yr.setAttribute('x', SANKEY_VW / 2);
+  yr.setAttribute('y', 28);
+  yr.setAttribute('text-anchor', 'middle');
+  yr.setAttribute('class', 'sankey-year');
+  yr.textContent = Math.round(lerp(1982, 2024, t));
+  svg.appendChild(yr);
 
   // Incidence bar (revealed by opacity at the final step)
   drawIncidenceBar(svg);
