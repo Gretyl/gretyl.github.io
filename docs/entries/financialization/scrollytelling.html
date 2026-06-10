@@ -164,13 +164,17 @@ html, body {
   position: relative;
   z-index: 2;
   pointer-events: none;
+  /* Overlay the steps on the sticky canvas (which occupies 100vh of flow),
+     and hold the canvas pinned until the last card deactivates. */
+  margin-top: -100vh;
+  padding-bottom: 55vh;
 }
 
 .step {
   min-height: 90vh;
   display: flex;
   align-items: center;
-  padding: 20px 0;
+  padding: 20px clamp(24px, 4vw, 64px);
   pointer-events: auto;
 }
 .step:first-child { min-height: 70vh; }
@@ -178,6 +182,9 @@ html, body {
 .step__text {
   max-width: 320px;
   background: var(--paper);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
   border: 1px solid var(--rule);
   border-radius: 4px;
   padding: 20px 24px;
@@ -190,6 +197,7 @@ html, body {
 }
 
 .step.is-active .step__text { opacity: 1; }
+.step__text:empty { display: none; }
 
 .step--right { justify-content: flex-end; }
 .step--left { justify-content: flex-start; }
@@ -204,6 +212,14 @@ html, body {
 
 /* Morph step is extra tall for scroll-scrubbing */
 .step--morph { min-height: 200vh; }
+
+/* On wide screens, shift each act's chart away from its card column so
+   the cards never sit on top of axis or node labels. */
+@media (min-width: 1000px) {
+  #act-i .scrolly__canvas { padding-left: 2vw; padding-right: clamp(300px, 30vw, 420px); }
+  #act-ii .scrolly__canvas,
+  #act-iii .scrolly__canvas { padding-left: clamp(300px, 30vw, 420px); padding-right: 2vw; }
+}
 
 /* ═══════════════════════ BRIDGE SECTIONS ═══════════════════════ */
 
@@ -306,6 +322,15 @@ html, body {
 .env-szz { fill: none; stroke: var(--c-szz); stroke-width: 1.4; stroke-linecap: round; }
 .env-kss { fill: none; stroke: var(--c-kss); stroke-width: 1.4; stroke-linecap: round; }
 
+.sankey-year {
+  font-family: var(--mono);
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  fill: var(--ink-3);
+  opacity: 0.8;
+}
+
 .inflect-marker { fill: var(--c-accent); opacity: 0; transition: opacity 0.5s ease; }
 .inflect-label { font-family: var(--mono); font-size: 9px; fill: var(--c-accent); opacity: 0; transition: opacity 0.5s ease; }
 
@@ -327,9 +352,10 @@ html, body {
 
 @media (max-width: 699px) {
   .scrolly__canvas { height: 50vh; }
+  .scrolly__steps { margin-top: -50vh; padding-bottom: 30vh; }
   .step { min-height: 60vh; justify-content: center !important; }
   .step--morph { min-height: 150vh; }
-  .step__text { max-width: 100%; margin: 0 16px; }
+  .step__text { max-width: 100%; }
 }
 </style>
 </head>
@@ -366,7 +392,7 @@ html, body {
   </div>
   <div class="scrolly__steps">
     <div class="step step--right" data-act="1" data-step="1">
-      <div class="step__text"></div>
+      <div class="step__text">Each bar is one year of net equity issuance by U.S. nonfinancial corporations, in 2025 dollars. Green years: the stock market supplied corporations with cash. Red years: corporations retired more stock than they issued.</div>
     </div>
     <div class="step step--right" data-act="1" data-step="2">
       <div class="step__text">Through the late 1970s, American corporations raised more equity than they retired. The public offering was a net source of capital.</div>
@@ -375,13 +401,13 @@ html, body {
       <div class="step__text"><strong>1982:</strong> the SEC adopts Rule 10b-18, creating a safe harbor for open-market repurchases. The structural inflection begins.</div>
     </div>
     <div class="step step--right" data-act="1" data-step="4">
-      <div class="step__text">The 1984–89 LBO wave averaged <span class="num">−$278B/year</span> in real terms — larger than most people realize. But it was episodic.</div>
+      <div class="step__text">The 1984–89 LBO wave averaged <span class="num">−$271B/year</span> in real terms — larger than most people realize. But it was episodic.</div>
     </div>
     <div class="step step--right" data-act="1" data-step="5">
       <div class="step__text"><strong>1994</strong> begins what is now 32 consecutive years of net retirement — uninterrupted through every recession, crisis, and policy regime since.</div>
     </div>
     <div class="step step--right" data-act="1" data-step="6">
-      <div class="step__text">The real-terms trough: <span class="num">−$838B</span> in a single year, driven by the convergence of record buybacks, the second LBO mega-wave, and cash-financed M&A.</div>
+      <div class="step__text"><strong>2007:</strong> the real-terms trough — <span class="num">−$838B</span> in a single year, driven by the convergence of record buybacks, the second LBO mega-wave, and cash-financed M&A.</div>
     </div>
     <div class="step step--right" data-act="1" data-step="7">
       <div class="step__text">Cumulative: <span class="num">−$12.4 trillion</span> in 2025 dollars. The American public corporation became a net consumer of its own equity — permanently.</div>
@@ -406,13 +432,13 @@ html, body {
   </div>
   <div class="scrolly__steps">
     <div class="step step--left" data-act="2" data-step="1">
-      <div class="step__text">The bold line is the median of four independent measures of top-1% wealth share. It rises from <span class="num">24%</span> to <span class="num">33%</span> in three decades.</div>
+      <div class="step__text">The bold line is the median of four independent measures of top-1% wealth share — three of them, before the Fed's series begins in 1989. It rises from <span class="num">24%</span> to <span class="num">33%</span> in three decades.</div>
     </div>
     <div class="step step--left" data-act="2" data-step="2">
       <div class="step__text">Two teams, two methods. The Distributional Financial Accounts (Fed) and Piketty-Saez-Zucman use different data and different imputations. Both agree on the direction.</div>
     </div>
     <div class="step step--left" data-act="2" data-step="3">
-      <div class="step__text">Smith-Zidar-Zwick and Kopczuk-Saez-Song add two more approaches. Four lines, four slopes — none pointing down.</div>
+      <div class="step__text">Smith-Zidar-Zwick and Kuhn-Schularick-Steins add two more approaches. Four lines, four slopes — none pointing down.</div>
     </div>
     <div class="step step--left" data-act="2" data-step="4">
       <div class="step__text">The question is <em>how much</em> — never <em>whether</em>. The envelope is their disagreement: 1 percentage point in 1985, widening to 10 by 2016.</div>
@@ -442,10 +468,10 @@ html, body {
   </div>
   <div class="scrolly__steps">
     <div class="step step--left" data-act="3" data-step="1">
-      <div class="step__text"></div>
+      <div class="step__text">Corporate cash, traced from source to use: inflows on the left, outflows on the right. Ribbon width is dollars — real 2025 dollars, as everywhere in this story.</div>
     </div>
     <div class="step step--left" data-act="3" data-step="2">
-      <div class="step__text"><strong>1982:</strong> nearly all corporate cash comes from operations. Borrowed money is a sidecar, not a co-pilot.</div>
+      <div class="step__text"><strong>1982:</strong> three dollars in four of corporate cash come from operations; the rest is borrowed.</div>
     </div>
     <div class="step step--left" data-act="3" data-step="3">
       <div class="step__text">Capital expenditure takes the lion's share. Dividends are the only meaningful return to shareholders. Buybacks are statistically zero — net equity issuance was actually <em>positive</em> that year.</div>
@@ -457,10 +483,10 @@ html, body {
       <div class="step__text"><span class="num">1982 → 2024</span></div>
     </div>
     <div class="step step--left" data-act="3" data-step="6">
-      <div class="step__text">By 2024, net buybacks alone reach <span class="num">$415B</span>. Dividends have grown fivefold. Together, shareholder returns rival capital expenditure.</div>
+      <div class="step__text">By 2024, net buybacks alone reach <span class="num">$416B</span>. Dividends have grown nearly ninefold. Together, shareholder returns claim two dollars for every three spent on capital expenditure.</div>
     </div>
     <div class="step step--left" data-act="3" data-step="7">
-      <div class="step__text">And a second inflow has appeared: <span class="num">$815B</span> in borrowed money. The diagram splits it proportionally across all uses — but the arithmetic is suggestive: total shareholder payouts roughly equal the debt inflow.</div>
+      <div class="step__text">Net new borrowing adds <span class="num">$459B</span>. The diagram splits it proportionally across all uses — but the arithmetic is suggestive: the year's borrowing alone could have covered every dollar of net buybacks.</div>
     </div>
     <div class="step step--left" data-act="3" data-step="8">
       <div class="step__text">Where the capital gain lands. Of the $5.3T in S&P 500 buybacks during 2010–2019, approximately <span class="num">$2.6T</span> accrued to the top 1% of households.</div>
@@ -472,7 +498,7 @@ html, body {
 
 <section class="closing">
   <div class="thesis">In 1982 the American public corporation was a machine for turning revenue into productive capacity; by 2024 it is a machine for turning revenue — and borrowed money — into share price.</div>
-  <p>Three years kept appearing across every chart: <strong>1982</strong>, when the SEC opened the buyback channel; <strong>2007</strong>, when the plumbing nearly burst; <strong>2017</strong>, when tax reform locked the new regime in place. The same inflection points show up in the equity series, the wealth estimates, and the cash-flow diagrams — because they are the same structural shift, measured three ways.</p>
+  <p>Three moments keep recurring across this exhibit: <strong>1982</strong>, when the SEC opened the buyback channel; <strong>2007–08</strong>, when the plumbing nearly burst; <strong>2017</strong>, when tax reform locked the new regime in place. The equity series registers them as troughs and reversals, the wealth estimates as kinks in the climb, the cash-flow diagrams as a changed morphology — the same structural shift, measured three ways.</p>
   <p>That shift has been in place for forty years. Nothing in the current policy landscape — not the 1% excise tax, not the ARPA compensation cap — has reversed it or bent the curve. As long as the plumbing runs in this direction, wealth concentration follows the flow.</p>
   <div class="thumbnails">
     <svg viewBox="58 51 926 454">
@@ -495,11 +521,11 @@ html, body {
 
 <section class="methodology">
   <h2>Methodology &amp; Sources</h2>
-  <p>All figures in real 2025 dollars, deflated using BLS CPI-U (series CUUR0000SA0). Base: 2025 annual average 321.0.</p>
+  <p>All figures in real 2025 dollars, deflated using BLS CPI-U (series CUUR0000SA0). Base: 321.0, an estimate of the 2025 average — BLS published no October 2025 index (lapse in appropriations), so no official annual average exists; the eleven published months average 321.9, a ≈0.3% difference left unapplied for cross-panel consistency.</p>
   <ul>
     <li><strong>Act I:</strong> Federal Reserve Z.1 Financial Accounts, series NCBCEBA027N (net equity issuance, nonfinancial corporate business). 51 annual observations, 1975–2025.</li>
-    <li><strong>Act II:</strong> DFA (Fed Distributional Financial Accounts, WFRBST01134, 2024 Q4 vintage); PSZ (Piketty-Saez-Zucman, WID series updated 2023); SZZ (Smith-Zidar-Zwick 2023); KSS (Kopczuk-Saez-Song 2010, extended); CMS (Calman-Meyer-Schipporeit 2020, marketable + Social Security).</li>
-    <li><strong>Act III:</strong> Fed Z.1 F.103 (nonfinancial corporate business cash flow identity). Inflows derived to balance within 0.5%. Sankey ribbons split proportionally across all outflows — the marginal-funds interpretation (debt → buybacks specifically) has empirical support but is not depicted.</li>
+    <li><strong>Act II:</strong> DFA (Fed Distributional Financial Accounts, WFRBST01134, 2025 Q3 vintage; the series begins 1989 Q3 — before then the median and envelope span the three available series); PSZ (Saez-Zucman, QJE 2016, usdina updates, 2024 vintage); SZZ (Smith-Zidar-Zwick, QJE 2023); KSS (Kuhn-Schularick-Steins, JPE 2020); CMS (Catherine-Miller-Sarin, Journal of Finance 2025, marketable + Social Security).</li>
+    <li><strong>Act III:</strong> Fed Z.1 F.103 (nonfinancial corporate business cash flow identity). Capex (FA105050005), dividends (FA106121075), net new debt (FA104104005), and net equity (NCBCEBA027N) taken directly; operating cash flow derived as the residual that closes the identity. Sankey ribbons split proportionally across all outflows — the marginal-funds interpretation (debt → buybacks specifically) has empirical support but is not depicted.</li>
     <li><strong>Incidence:</strong> DFA equity-ownership tables, 2024 Q4 vintage. S&P DJI buyback data, 2010–2019 cumulative.</li>
   </ul>
   <p><strong>Key references:</strong> Lazonick, <em>Profits Without Prosperity</em>, HBR (2014); Mason, <em>Disgorge the Cash</em>, Roosevelt Institute (2015); Palladino &amp; Lazonick, <em>Regulating Stock Buybacks</em>, Roosevelt Institute (2021); Gruber &amp; Kamin, <em>Corporate Buybacks and Capital Investment</em>, Fed IFDP Notes (2017).</p>
@@ -536,15 +562,15 @@ const NET_EQUITY = [
 ];
 
 const SANKEY_1982 = {
-  total: 1330,
-  sources: [{id:'ocf',name:'Operating Cash Flow',value:1065},{id:'debt',name:'Net New Debt',value:265}],
-  sinks: [{id:'capex',name:'Capital Expenditure',value:1035},{id:'div',name:'Dividends',value:287},{id:'buyback',name:'Net Buybacks',value:8}]
+  total: 1297,
+  sources: [{id:'ocf',name:'Operating Cash Flow',value:980},{id:'debt',name:'Net New Debt',value:317}],
+  sinks: [{id:'capex',name:'Capital Expenditure',value:1117},{id:'div',name:'Dividends',value:180},{id:'buyback',name:'Net Buybacks',value:0}]
 };
 
 const SANKEY_2024 = {
-  total: 5025,
-  sources: [{id:'ocf',name:'Operating Cash Flow',value:4210},{id:'debt',name:'Net New Debt',value:815}],
-  sinks: [{id:'capex',name:'Capital Expenditure',value:2995},{id:'div',name:'Dividends',value:1615},{id:'buyback',name:'Net Buybacks',value:415}]
+  total: 5016,
+  sources: [{id:'ocf',name:'Operating Cash Flow',value:4557},{id:'debt',name:'Net New Debt',value:459}],
+  sinks: [{id:'capex',name:'Capital Expenditure',value:3025},{id:'div',name:'Dividends',value:1575},{id:'buyback',name:'Net Buybacks',value:416}]
 };
 
 const ENV_PATHS = {
@@ -552,6 +578,9 @@ const ENV_PATHS = {
   envelopeFill: 'M 130 332.25 L 212 312.75 L 273.5 303 L 334.9 264 L 396.4 215.25 L 457.9 176.25 L 519.4 147 L 580.8 117.75 L 642.3 127.5 L 703.8 88.5 L 765.2 59.25 L 765.2 254.25 L 703.8 264 L 642.3 277.65 L 580.8 234.75 L 519.4 254.25 L 457.9 260.1 L 396.4 303 L 334.9 336.15 L 273.5 357.6 L 212 365.4 L 130 351.75 Z',
   edgeUpper: 'M 130 332.25 L 212 312.75 L 273.5 303 L 334.9 264 L 396.4 215.25 L 457.9 176.25 L 519.4 147 L 580.8 117.75 L 642.3 127.5 L 703.8 88.5 L 765.2 59.25',
   edgeLower: 'M 130 351.75 L 212 365.4 L 273.5 357.6 L 334.9 336.15 L 396.4 303 L 457.9 260.1 L 519.4 254.25 L 580.8 234.75 L 642.3 277.65 L 703.8 264 L 765.2 254.25',
+  /* DFA begins 1989 Q3 (x=212); the 1985-89 lower envelope edge belongs
+     to the other series, so the DFA line must not include it. */
+  dfa: 'M 212 365.4 L 273.5 357.6 L 334.9 336.15 L 396.4 303 L 457.9 260.1 L 519.4 254.25 L 580.8 234.75 L 642.3 277.65 L 703.8 264 L 765.2 254.25',
   cms: 'M 212 381 L 273.5 376.65 L 334.9 371.25 L 396.4 365.4 L 457.9 361.5 L 519.4 361.5 L 580.8 351.75 L 642.3 361.5 L 703.8 351.75 L 765.2 345.9 L 826.7 342',
   extDfa: 'M 765.2 254.25 L 826.7 217.2 L 888.2 213.3 L 949.7 191.85',
   extPsz: 'M 765.2 59.25 L 826.7 69 L 888.2 59.25'
@@ -562,6 +591,10 @@ const ENV_PATHS = {
    ────────────────────────────────────────────────────────────────── */
 
 const NS = 'http://www.w3.org/2000/svg';
+
+// Steps activate while they intersect the middle (1 - 2*BAND) of the
+// viewport. Keep this band thin so adjacent cards don't co-activate.
+const BAND = 0.45;
 const BAR_W = 1000, BAR_H = 560;
 const BM = {top: 44, right: 18, bottom: 28, left: 60};
 const BPW = BAR_W - BM.left - BM.right;
@@ -578,6 +611,14 @@ const zeroY = yPx(0);
 function buildBarChart() {
   const svg = document.getElementById('chart-bars');
   svg.innerHTML = '';
+
+  // Unit caption
+  const unit = document.createElementNS(NS, 'text');
+  unit.setAttribute('x', BM.left);
+  unit.setAttribute('y', 24);
+  unit.setAttribute('class', 'chart-axis');
+  unit.textContent = 'Net equity issuance · $B (real 2025)';
+  svg.appendChild(unit);
 
   // Gridlines
   [-800,-600,-400,-200,0].forEach(function(v) {
@@ -718,9 +759,9 @@ function buildEnvelopeChart() {
   edgeL.id = 'env-edge-lower';
   svg.appendChild(edgeL);
 
-  // DFA line (approximation from envelope lower edge = DFA)
+  // DFA line (envelope lower edge from 1989, where the series begins)
   var dfaLine = document.createElementNS(NS, 'path');
-  dfaLine.setAttribute('d', ENV_PATHS.edgeLower);
+  dfaLine.setAttribute('d', ENV_PATHS.dfa);
   dfaLine.setAttribute('class', 'env-path env-dfa');
   dfaLine.id = 'env-dfa';
   dfaLine.style.opacity = '0';
@@ -800,7 +841,7 @@ function buildEnvelopeChart() {
 
     var txt = document.createElementNS(NS, 'text');
     txt.setAttribute('x', inf.x);
-    txt.setAttribute('y', 460);
+    txt.setAttribute('y', inf.y - 14);
     txt.setAttribute('text-anchor', 'middle');
     txt.setAttribute('class', 'inflect-label');
     txt.id = 'inflect-label-' + i;
@@ -940,7 +981,19 @@ function fmtB(v) {
   return '$' + (v / 1000).toFixed(2) + 'T';
 }
 
+/* Geometry is rebuilt only when t changes; opacity-only step changes
+   mutate existing elements so the CSS transitions can cross-fade. */
+var sankeyLastT = null;
+
 function renderSankeyAt(t, opts) {
+  if (t !== sankeyLastT) {
+    buildSankeyGeometry(t);
+    sankeyLastT = t;
+  }
+  applySankeyOpacities(opts);
+}
+
+function buildSankeyGeometry(t) {
   refreshPalette();
   var svg = document.getElementById('chart-sankey');
   svg.innerHTML = '';
@@ -1003,34 +1056,60 @@ function renderSankeyAt(t, opts) {
     path.setAttribute('d', d);
     path.setAttribute('fill', PALETTE[f.sink.id]);
     path.setAttribute('class', 'sankey-flow');
-
-    var flowOpacity = computeFlowOpacity(opts, f.sink.id, f.src.id);
-    path.style.opacity = flowOpacity;
+    path.setAttribute('data-src', f.src.id);
+    path.setAttribute('data-sink', f.sink.id);
     svg.appendChild(path);
   });
 
   // Draw nodes
-  data.sources.forEach(function(n) { drawSankeyNode(svg, n, 'left', opts); });
-  data.sinks.forEach(function(n) { drawSankeyNode(svg, n, 'right', opts); });
+  data.sources.forEach(function(n) { drawSankeyNode(svg, n, 'left'); });
+  data.sinks.forEach(function(n) { drawSankeyNode(svg, n, 'right'); });
 
-  // Incidence bar
-  if (opts.showIncidence) {
-    drawIncidenceBar(svg);
-  }
+  // Year readout (interpolates while the morph scrubs)
+  var yr = document.createElementNS(NS, 'text');
+  yr.setAttribute('x', SANKEY_VW / 2);
+  yr.setAttribute('y', 28);
+  yr.setAttribute('text-anchor', 'middle');
+  yr.setAttribute('class', 'sankey-year');
+  yr.textContent = Math.round(lerp(1982, 2024, t));
+  svg.appendChild(yr);
+
+  // Incidence bar (revealed by opacity at the final step)
+  drawIncidenceBar(svg);
 }
 
-function computeFlowOpacity(opts, sinkId, srcId) {
+function applySankeyOpacities(opts) {
+  var svg = document.getElementById('chart-sankey');
+  svg.querySelectorAll('.sankey-flow').forEach(function(p) {
+    p.style.opacity = flowOpacity(opts, p.getAttribute('data-src'), p.getAttribute('data-sink'));
+  });
+  svg.querySelectorAll('.sankey-node, .sankey-label, .sankey-value').forEach(function(el) {
+    var op = nodeOpacity(opts, el.getAttribute('data-side'), el.getAttribute('data-id'));
+    if (el.classList.contains('sankey-node')) {
+      el.style.opacity = op;
+    } else {
+      el.style.opacity = op > 0.5 ? '1' : '0';
+    }
+  });
+  var inc = svg.querySelector('.incidence-bar');
+  if (inc) inc.style.opacity = opts.showIncidence ? '1' : '0';
+}
+
+function flowOpacity(opts, srcId, sinkId) {
+  if (opts.highlight) return (srcId === opts.highlight || sinkId === opts.highlight) ? 0.95 : 0.3;
   if (!opts.saturate) return 0.2;
-  if (opts.saturate === 'all') return 0.75;
-  if (opts.saturate === 'sources' && srcId) return 0.5;
-  if (opts.saturate === 'sinks') return 0.75;
-  if (opts.highlight === sinkId) return 0.9;
-  if (opts.highlight === srcId) return 0.9;
-  if (opts.saturate === 'highlight-debt' && srcId === 'debt') return 0.9;
+  if (opts.saturate === 'sources') return 0.5;
   return 0.75;
 }
 
-function drawSankeyNode(svg, n, side, opts) {
+function nodeOpacity(opts, side, id) {
+  if (opts.highlight || opts.saturate === 'all') return 1;
+  if (opts.saturate === 'sources') return side === 'left' ? 1 : 0.2;
+  if (opts.saturate === 'sinks') return side === 'right' ? 1 : 0.2;
+  return 0.2;
+}
+
+function drawSankeyNode(svg, n, side) {
   var rect = document.createElementNS(NS, 'rect');
   rect.setAttribute('x', n.x);
   rect.setAttribute('y', n.y);
@@ -1038,40 +1117,36 @@ function drawSankeyNode(svg, n, side, opts) {
   rect.setAttribute('height', Math.max(n.h, 0.5));
   rect.setAttribute('fill', PALETTE[n.id]);
   rect.setAttribute('class', 'sankey-node');
-
-  var nodeOpacity = 0.2;
-  if (opts.saturate === 'all' || opts.saturate === 'sinks' || opts.saturate === 'sources') nodeOpacity = 1;
-  if (opts.saturate && side === 'left' && (opts.saturate === 'sources' || opts.saturate === 'all')) nodeOpacity = 1;
-  if (opts.saturate && side === 'right' && (opts.saturate === 'sinks' || opts.saturate === 'all')) nodeOpacity = 1;
-  if (opts.highlight === n.id || opts.highlight === 'debt') nodeOpacity = 1;
-  rect.style.opacity = nodeOpacity;
+  rect.setAttribute('data-id', n.id);
+  rect.setAttribute('data-side', side);
   svg.appendChild(rect);
 
-  // Labels
+  // Labels (visibility follows node saturation via applySankeyOpacities)
   var tx = side === 'left' ? n.x - 10 : n.x + SK_NODE_W + 10;
   var ty = n.y + n.h / 2;
   var anchor = side === 'left' ? 'end' : 'start';
 
-  var showLabel = nodeOpacity > 0.5;
-  if (showLabel) {
-    var lbl = document.createElementNS(NS, 'text');
-    lbl.setAttribute('x', tx);
-    lbl.setAttribute('y', ty - 2);
-    lbl.setAttribute('text-anchor', anchor);
-    lbl.setAttribute('dominant-baseline', 'middle');
-    lbl.setAttribute('class', 'sankey-label');
-    lbl.textContent = n.name;
-    svg.appendChild(lbl);
+  var lbl = document.createElementNS(NS, 'text');
+  lbl.setAttribute('x', tx);
+  lbl.setAttribute('y', ty - 2);
+  lbl.setAttribute('text-anchor', anchor);
+  lbl.setAttribute('dominant-baseline', 'middle');
+  lbl.setAttribute('class', 'sankey-label');
+  lbl.setAttribute('data-id', n.id);
+  lbl.setAttribute('data-side', side);
+  lbl.textContent = n.name;
+  svg.appendChild(lbl);
 
-    var val = document.createElementNS(NS, 'text');
-    val.setAttribute('x', tx);
-    val.setAttribute('y', ty + 13);
-    val.setAttribute('text-anchor', anchor);
-    val.setAttribute('dominant-baseline', 'middle');
-    val.setAttribute('class', 'sankey-value');
-    val.textContent = fmtB(n.value);
-    svg.appendChild(val);
-  }
+  var val = document.createElementNS(NS, 'text');
+  val.setAttribute('x', tx);
+  val.setAttribute('y', ty + 13);
+  val.setAttribute('text-anchor', anchor);
+  val.setAttribute('dominant-baseline', 'middle');
+  val.setAttribute('class', 'sankey-value');
+  val.setAttribute('data-id', n.id);
+  val.setAttribute('data-side', side);
+  val.textContent = fmtB(n.value);
+  svg.appendChild(val);
 }
 
 function drawIncidenceBar(svg) {
@@ -1087,7 +1162,6 @@ function drawIncidenceBar(svg) {
 
   var g = document.createElementNS(NS, 'g');
   g.setAttribute('class', 'incidence-bar');
-  g.style.opacity = '1';
 
   var cursor = barX;
   segments.forEach(function(seg) {
@@ -1126,28 +1200,36 @@ function drawIncidenceBar(svg) {
 
 var actIIIState = 0;
 var morphT = 0;
-var morphRAF = null;
+var morphStepEl = null;
+
+/* Render the 1982→2024 morph at the progress implied by the morph step's
+   position within its activation window, so t spans exactly 0..1 between
+   the neighboring steps' states. */
+function scrubMorph() {
+  if (!morphStepEl) return;
+  var rect = morphStepEl.getBoundingClientRect();
+  var viewH = window.innerHeight;
+  var t = ((1 - BAND) * viewH - rect.top) / (rect.height + (1 - 2 * BAND) * viewH);
+  updateMorphProgress(t);
+}
 
 function updateActIII(step) {
   if (step === actIIIState) return;
   actIIIState = step;
+  if (step === 5) { scrubMorph(); return; } /* then scrubbed on scroll */
 
   var opts = {saturate: null, highlight: null, showIncidence: false};
-
-  if (step === 1) { opts.saturate = null; renderSankeyAt(0, opts); }
-  else if (step === 2) { opts.saturate = 'sources'; renderSankeyAt(0, opts); }
-  else if (step === 3) { opts.saturate = 'all'; renderSankeyAt(0, opts); }
-  else if (step === 4) { opts.saturate = 'all'; renderSankeyAt(0, opts); }
-  else if (step === 5) { /* morph handled by scroll progress */ }
-  else if (step === 6) { opts.saturate = 'all'; opts.highlight = 'buyback'; renderSankeyAt(1, opts); }
-  else if (step === 7) { opts.saturate = 'all'; opts.highlight = 'debt'; renderSankeyAt(1, opts); }
-  else if (step === 8) { opts.saturate = 'all'; opts.showIncidence = true; renderSankeyAt(1, opts); }
+  if (step === 2) { opts.saturate = 'sources'; }
+  else if (step === 3 || step === 4) { opts.saturate = 'all'; }
+  else if (step === 6) { opts.saturate = 'all'; opts.highlight = 'buyback'; }
+  else if (step === 7) { opts.saturate = 'all'; opts.highlight = 'debt'; }
+  else if (step === 8) { opts.saturate = 'all'; opts.showIncidence = true; }
+  renderSankeyAt(step >= 6 ? 1 : 0, opts);
 }
 
 function updateMorphProgress(t) {
   morphT = Math.max(0, Math.min(1, t));
-  var opts = {saturate: 'all', highlight: null, showIncidence: false};
-  renderSankeyAt(morphT, opts);
+  renderSankeyAt(morphT, {saturate: 'all', highlight: null, showIncidence: false});
 }
 
 /* ──────────────────────────────────────────────────────────────────
@@ -1160,53 +1242,69 @@ function initScrolly() {
   renderSankeyAt(0, {saturate: null, highlight: null, showIncidence: false});
 
   var steps = document.querySelectorAll('.step');
+  function applyStep(act, step) {
+    if (act === 1) updateActI(step);
+    else if (act === 2) updateActII(step);
+    else if (act === 3) updateActIII(step);
+  }
   var observer = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
+      var act = parseInt(entry.target.getAttribute('data-act'));
+      var step = parseInt(entry.target.getAttribute('data-step'));
       if (entry.isIntersecting) {
         entry.target.classList.add('is-active');
-        var act = parseInt(entry.target.getAttribute('data-act'));
-        var step = parseInt(entry.target.getAttribute('data-step'));
-
-        if (act === 1) updateActI(step);
-        else if (act === 2) updateActII(step);
-        else if (act === 3) updateActIII(step);
+        applyStep(act, step);
       } else {
         entry.target.classList.remove('is-active');
+        // A step exiting downward (scrolling up) hands state back to the
+        // previous step, which may have never stopped intersecting and so
+        // won't re-fire an entry of its own.
+        var current = act === 1 ? actIState : act === 2 ? actIIState : actIIIState;
+        if (current === step && step > 1 &&
+            entry.rootBounds && entry.boundingClientRect.top >= entry.rootBounds.bottom) {
+          applyStep(act, step - 1);
+        }
       }
     });
-  }, {rootMargin: '-30% 0px -30% 0px', threshold: 0});
+  }, {rootMargin: '-' + (BAND * 100) + '% 0px -' + (BAND * 100) + '% 0px', threshold: 0});
 
   steps.forEach(function(step) { observer.observe(step); });
 
   // Progress tracking for morph step
-  var morphStep = document.querySelector('.step--morph');
-  if (morphStep) {
+  morphStepEl = document.querySelector('.step--morph');
+  if (morphStepEl) {
     var ticking = false;
     window.addEventListener('scroll', function() {
       if (actIIIState !== 5) return;
       if (!ticking) {
         ticking = true;
         requestAnimationFrame(function() {
-          var rect = morphStep.getBoundingClientRect();
-          var viewH = window.innerHeight;
-          var stepH = rect.height;
-          var scrolled = viewH - rect.top;
-          var t = Math.max(0, Math.min(1, scrolled / (stepH + viewH)));
-          updateMorphProgress(t);
+          scrubMorph();
           ticking = false;
         });
       }
-    });
+    }, {passive: true});
   }
 }
 
-// Dark mode re-render
+// Dark mode re-render: rebuild the SVGs, then re-apply the current step
+// states (the update functions early-return on an unchanged step, so the
+// state vars must be reset first).
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+  var s1 = actIState, s2 = actIIState, s3 = actIIIState;
+  actIState = -1;
   buildBarChart();
-  updateActI(actIState);
+  updateActI(s1);
+  actIIState = -1;
   buildEnvelopeChart();
-  updateActII(actIIState);
-  if (actIIIState > 0) updateActIII(actIIIState);
+  updateActII(s2);
+  sankeyLastT = null; /* palette is baked into the sankey geometry */
+  if (s3 === 5) {
+    updateMorphProgress(morphT);
+  } else {
+    actIIIState = -1;
+    updateActIII(s3);
+  }
 });
 
 if (document.readyState === 'loading') {
