@@ -946,7 +946,19 @@ function fmtB(v) {
   return '$' + (v / 1000).toFixed(2) + 'T';
 }
 
+/* Geometry is rebuilt only when t changes; opacity-only step changes
+   mutate existing elements so the CSS transitions can cross-fade. */
+var sankeyLastT = null;
+
 function renderSankeyAt(t, opts) {
+  if (t !== sankeyLastT) {
+    buildSankeyGeometry(t);
+    sankeyLastT = t;
+  }
+  applySankeyOpacities(opts);
+}
+
+function buildSankeyGeometry(t) {
   refreshPalette();
   var svg = document.getElementById('chart-sankey');
   svg.innerHTML = '';
@@ -1009,34 +1021,51 @@ function renderSankeyAt(t, opts) {
     path.setAttribute('d', d);
     path.setAttribute('fill', PALETTE[f.sink.id]);
     path.setAttribute('class', 'sankey-flow');
-
-    var flowOpacity = computeFlowOpacity(opts, f.sink.id, f.src.id);
-    path.style.opacity = flowOpacity;
+    path.setAttribute('data-src', f.src.id);
+    path.setAttribute('data-sink', f.sink.id);
     svg.appendChild(path);
   });
 
   // Draw nodes
-  data.sources.forEach(function(n) { drawSankeyNode(svg, n, 'left', opts); });
-  data.sinks.forEach(function(n) { drawSankeyNode(svg, n, 'right', opts); });
+  data.sources.forEach(function(n) { drawSankeyNode(svg, n, 'left'); });
+  data.sinks.forEach(function(n) { drawSankeyNode(svg, n, 'right'); });
 
-  // Incidence bar
-  if (opts.showIncidence) {
-    drawIncidenceBar(svg);
-  }
+  // Incidence bar (revealed by opacity at the final step)
+  drawIncidenceBar(svg);
 }
 
-function computeFlowOpacity(opts, sinkId, srcId) {
+function applySankeyOpacities(opts) {
+  var svg = document.getElementById('chart-sankey');
+  svg.querySelectorAll('.sankey-flow').forEach(function(p) {
+    p.style.opacity = flowOpacity(opts, p.getAttribute('data-src'), p.getAttribute('data-sink'));
+  });
+  svg.querySelectorAll('.sankey-node, .sankey-label, .sankey-value').forEach(function(el) {
+    var op = nodeOpacity(opts, el.getAttribute('data-side'), el.getAttribute('data-id'));
+    if (el.classList.contains('sankey-node')) {
+      el.style.opacity = op;
+    } else {
+      el.style.opacity = op > 0.5 ? '1' : '0';
+    }
+  });
+  var inc = svg.querySelector('.incidence-bar');
+  if (inc) inc.style.opacity = opts.showIncidence ? '1' : '0';
+}
+
+function flowOpacity(opts, srcId, sinkId) {
+  if (opts.highlight) return (srcId === opts.highlight || sinkId === opts.highlight) ? 0.95 : 0.3;
   if (!opts.saturate) return 0.2;
-  if (opts.saturate === 'all') return 0.75;
-  if (opts.saturate === 'sources' && srcId) return 0.5;
-  if (opts.saturate === 'sinks') return 0.75;
-  if (opts.highlight === sinkId) return 0.9;
-  if (opts.highlight === srcId) return 0.9;
-  if (opts.saturate === 'highlight-debt' && srcId === 'debt') return 0.9;
+  if (opts.saturate === 'sources') return 0.5;
   return 0.75;
 }
 
-function drawSankeyNode(svg, n, side, opts) {
+function nodeOpacity(opts, side, id) {
+  if (opts.highlight || opts.saturate === 'all') return 1;
+  if (opts.saturate === 'sources') return side === 'left' ? 1 : 0.2;
+  if (opts.saturate === 'sinks') return side === 'right' ? 1 : 0.2;
+  return 0.2;
+}
+
+function drawSankeyNode(svg, n, side) {
   var rect = document.createElementNS(NS, 'rect');
   rect.setAttribute('x', n.x);
   rect.setAttribute('y', n.y);
@@ -1044,40 +1073,36 @@ function drawSankeyNode(svg, n, side, opts) {
   rect.setAttribute('height', Math.max(n.h, 0.5));
   rect.setAttribute('fill', PALETTE[n.id]);
   rect.setAttribute('class', 'sankey-node');
-
-  var nodeOpacity = 0.2;
-  if (opts.saturate === 'all' || opts.saturate === 'sinks' || opts.saturate === 'sources') nodeOpacity = 1;
-  if (opts.saturate && side === 'left' && (opts.saturate === 'sources' || opts.saturate === 'all')) nodeOpacity = 1;
-  if (opts.saturate && side === 'right' && (opts.saturate === 'sinks' || opts.saturate === 'all')) nodeOpacity = 1;
-  if (opts.highlight === n.id || opts.highlight === 'debt') nodeOpacity = 1;
-  rect.style.opacity = nodeOpacity;
+  rect.setAttribute('data-id', n.id);
+  rect.setAttribute('data-side', side);
   svg.appendChild(rect);
 
-  // Labels
+  // Labels (visibility follows node saturation via applySankeyOpacities)
   var tx = side === 'left' ? n.x - 10 : n.x + SK_NODE_W + 10;
   var ty = n.y + n.h / 2;
   var anchor = side === 'left' ? 'end' : 'start';
 
-  var showLabel = nodeOpacity > 0.5;
-  if (showLabel) {
-    var lbl = document.createElementNS(NS, 'text');
-    lbl.setAttribute('x', tx);
-    lbl.setAttribute('y', ty - 2);
-    lbl.setAttribute('text-anchor', anchor);
-    lbl.setAttribute('dominant-baseline', 'middle');
-    lbl.setAttribute('class', 'sankey-label');
-    lbl.textContent = n.name;
-    svg.appendChild(lbl);
+  var lbl = document.createElementNS(NS, 'text');
+  lbl.setAttribute('x', tx);
+  lbl.setAttribute('y', ty - 2);
+  lbl.setAttribute('text-anchor', anchor);
+  lbl.setAttribute('dominant-baseline', 'middle');
+  lbl.setAttribute('class', 'sankey-label');
+  lbl.setAttribute('data-id', n.id);
+  lbl.setAttribute('data-side', side);
+  lbl.textContent = n.name;
+  svg.appendChild(lbl);
 
-    var val = document.createElementNS(NS, 'text');
-    val.setAttribute('x', tx);
-    val.setAttribute('y', ty + 13);
-    val.setAttribute('text-anchor', anchor);
-    val.setAttribute('dominant-baseline', 'middle');
-    val.setAttribute('class', 'sankey-value');
-    val.textContent = fmtB(n.value);
-    svg.appendChild(val);
-  }
+  var val = document.createElementNS(NS, 'text');
+  val.setAttribute('x', tx);
+  val.setAttribute('y', ty + 13);
+  val.setAttribute('text-anchor', anchor);
+  val.setAttribute('dominant-baseline', 'middle');
+  val.setAttribute('class', 'sankey-value');
+  val.setAttribute('data-id', n.id);
+  val.setAttribute('data-side', side);
+  val.textContent = fmtB(n.value);
+  svg.appendChild(val);
 }
 
 function drawIncidenceBar(svg) {
@@ -1093,7 +1118,6 @@ function drawIncidenceBar(svg) {
 
   var g = document.createElementNS(NS, 'g');
   g.setAttribute('class', 'incidence-bar');
-  g.style.opacity = '1';
 
   var cursor = barX;
   segments.forEach(function(seg) {
@@ -1137,23 +1161,20 @@ var morphRAF = null;
 function updateActIII(step) {
   if (step === actIIIState) return;
   actIIIState = step;
+  if (step === 5) return; /* morph: scrubbed by the scroll handler */
 
   var opts = {saturate: null, highlight: null, showIncidence: false};
-
-  if (step === 1) { opts.saturate = null; renderSankeyAt(0, opts); }
-  else if (step === 2) { opts.saturate = 'sources'; renderSankeyAt(0, opts); }
-  else if (step === 3) { opts.saturate = 'all'; renderSankeyAt(0, opts); }
-  else if (step === 4) { opts.saturate = 'all'; renderSankeyAt(0, opts); }
-  else if (step === 5) { /* morph handled by scroll progress */ }
-  else if (step === 6) { opts.saturate = 'all'; opts.highlight = 'buyback'; renderSankeyAt(1, opts); }
-  else if (step === 7) { opts.saturate = 'all'; opts.highlight = 'debt'; renderSankeyAt(1, opts); }
-  else if (step === 8) { opts.saturate = 'all'; opts.showIncidence = true; renderSankeyAt(1, opts); }
+  if (step === 2) { opts.saturate = 'sources'; }
+  else if (step === 3 || step === 4) { opts.saturate = 'all'; }
+  else if (step === 6) { opts.saturate = 'all'; opts.highlight = 'buyback'; }
+  else if (step === 7) { opts.saturate = 'all'; opts.highlight = 'debt'; }
+  else if (step === 8) { opts.saturate = 'all'; opts.showIncidence = true; }
+  renderSankeyAt(step >= 6 ? 1 : 0, opts);
 }
 
 function updateMorphProgress(t) {
   morphT = Math.max(0, Math.min(1, t));
-  var opts = {saturate: 'all', highlight: null, showIncidence: false};
-  renderSankeyAt(morphT, opts);
+  renderSankeyAt(morphT, {saturate: 'all', highlight: null, showIncidence: false});
 }
 
 /* ──────────────────────────────────────────────────────────────────
