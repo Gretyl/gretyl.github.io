@@ -5,6 +5,14 @@
 # bullet text on docs/index.html so the feed reads the same as the
 # homepage.
 
+- id: molly-house
+  title: Molly House — An Interactive Teach
+  url: /tutorials/molly-house.html
+  date: 2026-06-09T19:32:00-05:00
+  summary: A semi-cooperative game about queer joy, danger and betrayal set in 18th-century London. 🕺
+  image: /assets/og/molly-house.svg
+  type: article
+
 - id: regicide
   title: Regicide — Learn the Court
   url: /tutorials/regicide.html
