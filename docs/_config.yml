@@ -48,6 +48,8 @@ navigation:
         link: /tutorials/how-gpt-learns.html
       - name: Hypothesis & HypoFuzz
         link: /tutorials/hypothesis-hypofuzz.html
+      - name: Molly House
+        link: /tutorials/molly-house.html
       - name: Regicide
         link: /tutorials/regicide.html
       - name: The Extremes of Chance
