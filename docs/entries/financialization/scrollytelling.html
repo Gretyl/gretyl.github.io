@@ -579,6 +579,10 @@ const ENV_PATHS = {
    ────────────────────────────────────────────────────────────────── */
 
 const NS = 'http://www.w3.org/2000/svg';
+
+// Steps activate while they intersect the middle (1 - 2*BAND) of the
+// viewport. Keep this band thin so adjacent cards don't co-activate.
+const BAND = 0.45;
 const BAR_W = 1000, BAR_H = 560;
 const BM = {top: 44, right: 18, bottom: 28, left: 60};
 const BPW = BAR_W - BM.left - BM.right;
@@ -1167,12 +1171,23 @@ function drawIncidenceBar(svg) {
 
 var actIIIState = 0;
 var morphT = 0;
-var morphRAF = null;
+var morphStepEl = null;
+
+/* Render the 1982→2024 morph at the progress implied by the morph step's
+   position within its activation window, so t spans exactly 0..1 between
+   the neighboring steps' states. */
+function scrubMorph() {
+  if (!morphStepEl) return;
+  var rect = morphStepEl.getBoundingClientRect();
+  var viewH = window.innerHeight;
+  var t = ((1 - BAND) * viewH - rect.top) / (rect.height + (1 - 2 * BAND) * viewH);
+  updateMorphProgress(t);
+}
 
 function updateActIII(step) {
   if (step === actIIIState) return;
   actIIIState = step;
-  if (step === 5) return; /* morph: scrubbed by the scroll handler */
+  if (step === 5) { scrubMorph(); return; } /* then scrubbed on scroll */
 
   var opts = {saturate: null, highlight: null, showIncidence: false};
   if (step === 2) { opts.saturate = 'sources'; }
@@ -1198,21 +1213,28 @@ function initScrolly() {
   renderSankeyAt(0, {saturate: null, highlight: null, showIncidence: false});
 
   var steps = document.querySelectorAll('.step');
-  // Steps activate while they intersect the middle (1 - 2*BAND) of the
-  // viewport. Keep this band thin so adjacent cards don't co-activate.
-  var BAND = 0.45;
+  function applyStep(act, step) {
+    if (act === 1) updateActI(step);
+    else if (act === 2) updateActII(step);
+    else if (act === 3) updateActIII(step);
+  }
   var observer = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
+      var act = parseInt(entry.target.getAttribute('data-act'));
+      var step = parseInt(entry.target.getAttribute('data-step'));
       if (entry.isIntersecting) {
         entry.target.classList.add('is-active');
-        var act = parseInt(entry.target.getAttribute('data-act'));
-        var step = parseInt(entry.target.getAttribute('data-step'));
-
-        if (act === 1) updateActI(step);
-        else if (act === 2) updateActII(step);
-        else if (act === 3) updateActIII(step);
+        applyStep(act, step);
       } else {
         entry.target.classList.remove('is-active');
+        // A step exiting downward (scrolling up) hands state back to the
+        // previous step, which may have never stopped intersecting and so
+        // won't re-fire an entry of its own.
+        var current = act === 1 ? actIState : act === 2 ? actIIState : actIIIState;
+        if (current === step && step > 1 &&
+            entry.rootBounds && entry.boundingClientRect.top >= entry.rootBounds.bottom) {
+          applyStep(act, step - 1);
+        }
       }
     });
   }, {rootMargin: '-' + (BAND * 100) + '% 0px -' + (BAND * 100) + '% 0px', threshold: 0});
@@ -1220,34 +1242,40 @@ function initScrolly() {
   steps.forEach(function(step) { observer.observe(step); });
 
   // Progress tracking for morph step
-  var morphStep = document.querySelector('.step--morph');
-  if (morphStep) {
+  morphStepEl = document.querySelector('.step--morph');
+  if (morphStepEl) {
     var ticking = false;
     window.addEventListener('scroll', function() {
       if (actIIIState !== 5) return;
       if (!ticking) {
         ticking = true;
         requestAnimationFrame(function() {
-          var rect = morphStep.getBoundingClientRect();
-          var viewH = window.innerHeight;
-          var stepH = rect.height;
-          var scrolled = viewH - rect.top;
-          var t = Math.max(0, Math.min(1, scrolled / (stepH + viewH)));
-          updateMorphProgress(t);
+          scrubMorph();
           ticking = false;
         });
       }
-    });
+    }, {passive: true});
   }
 }
 
-// Dark mode re-render
+// Dark mode re-render: rebuild the SVGs, then re-apply the current step
+// states (the update functions early-return on an unchanged step, so the
+// state vars must be reset first).
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+  var s1 = actIState, s2 = actIIState, s3 = actIIIState;
+  actIState = -1;
   buildBarChart();
-  updateActI(actIState);
+  updateActI(s1);
+  actIIState = -1;
   buildEnvelopeChart();
-  updateActII(actIIState);
-  if (actIIIState > 0) updateActIII(actIIIState);
+  updateActII(s2);
+  sankeyLastT = null; /* palette is baked into the sankey geometry */
+  if (s3 === 5) {
+    updateMorphProgress(morphT);
+  } else {
+    actIIIState = -1;
+    updateActIII(s3);
+  }
 });
 
 if (document.readyState === 'loading') {
