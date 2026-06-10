@@ -174,7 +174,7 @@ html, body {
   min-height: 90vh;
   display: flex;
   align-items: center;
-  padding: 20px 0;
+  padding: 20px clamp(24px, 4vw, 64px);
   pointer-events: auto;
 }
 .step:first-child { min-height: 70vh; }
@@ -182,6 +182,9 @@ html, body {
 .step__text {
   max-width: 320px;
   background: var(--paper);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
   border: 1px solid var(--rule);
   border-radius: 4px;
   padding: 20px 24px;
@@ -209,6 +212,14 @@ html, body {
 
 /* Morph step is extra tall for scroll-scrubbing */
 .step--morph { min-height: 200vh; }
+
+/* On wide screens, shift each act's chart away from its card column so
+   the cards never sit on top of axis or node labels. */
+@media (min-width: 1000px) {
+  #act-i .scrolly__canvas { padding-left: 2vw; padding-right: clamp(300px, 30vw, 420px); }
+  #act-ii .scrolly__canvas,
+  #act-iii .scrolly__canvas { padding-left: clamp(300px, 30vw, 420px); padding-right: 2vw; }
+}
 
 /* ═══════════════════════ BRIDGE SECTIONS ═══════════════════════ */
 
@@ -335,7 +346,7 @@ html, body {
   .scrolly__steps { margin-top: -50vh; padding-bottom: 30vh; }
   .step { min-height: 60vh; justify-content: center !important; }
   .step--morph { min-height: 150vh; }
-  .step__text { max-width: 100%; margin: 0 16px; }
+  .step__text { max-width: 100%; }
 }
 </style>
 </head>
