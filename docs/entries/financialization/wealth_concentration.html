@@ -555,7 +555,7 @@
   <!-- ============ COVERAGE GANTT ============ -->
   <section class="coverage">
     <div class="coverage-title">[01] Native coverage by dataset</div>
-    <svg class="gantt" viewBox="0 0 1000 96" preserveAspectRatio="none" aria-label="Timeline showing the native coverage of each dataset used in the chart. PSZ extends back to 1913, DFA begins in 1989, SZZ covers 1966 to 2016, KSS covers 1949 to 2016, and CMS covers 1989 to 2019. The four-dataset median is computable only for the 1985 to 2016 overlap window.">
+    <svg class="gantt" viewBox="0 0 1000 96" preserveAspectRatio="none" aria-label="Timeline showing the native coverage of each dataset used in the chart. PSZ extends back to 1913, DFA begins in 1989, SZZ covers 1966 to 2016, KSS covers 1949 to 2016, and CMS covers 1989 to 2019. The median and envelope span the three series available from 1985 and all four from 1989; the four-dataset overlap window is 1989 to 2016.">
       <g stroke="#DEDBD2" stroke-width="1">
         <line x1="130"   y1="6" x2="130"   y2="84"/>
         <line x1="232.4" y1="6" x2="232.4" y2="84"/>
@@ -612,7 +612,7 @@
       <div style="font-family: var(--mono); font-size:9.5px; color: var(--ink-3); letter-spacing: 0.12em; text-transform: uppercase;">% of household wealth</div>
     </div>
 
-    <svg class="chart" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet" aria-label="Top-1 percent share of US household wealth from 1985 to 2025. The median across four marketable-wealth datasets rises from roughly 24 percent in 1985 to 32.8 percent in 2016, the last year all four observe. The range between the highest and lowest estimate widens from 1 percentage point to 10 over the same period. After 2016, DFA continues to 31.7 percent in 2025 and PSZ reaches 38.5 percent in 2022. A fifth methodology including Social Security entitlements (CMS) tracks a parallel but lower trajectory, reaching 24 percent in 2019. Three inflection points are annotated: 1995 when the financialization regime begins, 2008-10 for the GFC pause, and 2017 onward for the TCJA and pandemic surge.">
+    <svg class="chart" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet" aria-label="Top-1 percent share of US household wealth from 1985 to 2025. The median across the marketable-wealth datasets — three until DFA begins in 1989, four thereafter — rises from roughly 24 percent in 1985 to 32.8 percent in 2016, the last year all four observe. The range between the highest and lowest estimate widens from 1 percentage point to 10 over the same period. After 2016, DFA continues to 31.7 percent in 2025 and PSZ reaches 38.5 percent in 2022. A fifth methodology including Social Security entitlements (CMS) tracks a parallel but lower trajectory, reaching 24 percent in 2019. Three inflection points are annotated: 1995 when the financialization regime begins, 2008-10 for the GFC pause, and 2017 onward for the TCJA and pandemic surge.">
       <!-- Plot area: x 130→970 (840), y 30→420 (390)
            x(year) = 130 + (year-1985)*20.49
            y(pct)  = 420 - (pct-20)*19.5 -->
@@ -918,7 +918,7 @@
     <span class="tk">KSS</span> · Kuhn, Moritz, Moritz Schularick, and Ulrike Steins, <cite>Income and Wealth Inequality in America, 1949–2016</cite>, JPE 2020.<br>
     <span class="tk">CMS</span> · Catherine, Sylvain, Max Miller, and Natasha Sarin, <cite>Social Security and Trends in Wealth Inequality</cite>, Journal of Finance 80(3), 1497–1531, 2025.
     <div class="vintage">
-      Median = arithmetic median of DFA, PSZ, SZZ, KSS at each year all four observe (1985–2016). Envelope = min–max across the same four. CMS plotted as a separate dashed line because its wealth concept (marketable + Social Security entitlements) is not commensurable. Post-2016 the chart plots DFA and PSZ individually as the envelope is no longer well-defined. Series-internal revisions across publication vintages not reconciled. Top-1% shares are unitless ratios — no real-terms deflation applies. Inflection-point years are annotation conveniences, not algorithmically detected breakpoints.
+      Median = arithmetic median of the series available each year: PSZ, SZZ, KSS from 1985, joined by DFA from 1989 (all four observe 1989–2016). Envelope = min–max across the same. CMS plotted as a separate dashed line because its wealth concept (marketable + Social Security entitlements) is not commensurable. Post-2016 the chart plots DFA and PSZ individually as the envelope is no longer well-defined. Series-internal revisions across publication vintages not reconciled. Top-1% shares are unitless ratios — no real-terms deflation applies. Inflection-point years are annotation conveniences, not algorithmically detected breakpoints.
     </div>
   </div>
 

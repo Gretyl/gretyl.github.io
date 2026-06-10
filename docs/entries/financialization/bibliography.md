@@ -24,6 +24,8 @@ final section.
     year in the series; the *nominal* record is 2018 (−$628B).
   - 1984–89 LBO-wave average: **−$271B/yr (corrected** from −$278B; the
     figure is not reproducible from the series at any base year**)**.
+  - Cumulative 1975–2025, *nominal*: **−$8.5T (corrected** from −$10.4T
+    in Panel I's deflation note**)**.
   - 2010–2019 average: **−$484B/yr** (Panel I, verified).
   - 1994–2025: 32 consecutive negative years (verified).
   - 1982: **+$6.4B** real (net issuance, i.e. an *inflow*).
@@ -52,6 +54,11 @@ final section.
   | Operating cash flow (residual) | **980 (corrected** from 1,065**)** | **4,557 (corrected** from 4,210**)** |
   | Total | **1,297** | **5,016** |
 
+- **Root cause of the debt overstatement:** the original Panel III
+  derived net borrowing by differencing the debt *level* series
+  (`BCNSDODNS`), which mixes valuation and other non-transaction
+  changes into the flow; the Z.1 *transactions* series
+  (`BOGZ1FA104104005A`) is the correct measure and is used now.
 - **Narrative consequences of the corrections:** dividends grew
   ~**8.7×** real ("nearly ninefold", previously "fivefold"); 2024 net
   borrowing (**$459B**) alone exceeds 2024 net buybacks (**$416B**) —
